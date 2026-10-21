@@ -1,0 +1,6 @@
+.next
+node_modules
+.cache
+playwright-report
+test-results
+package-lock.json
