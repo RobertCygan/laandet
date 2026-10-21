@@ -210,7 +210,7 @@ test("standalone privacy export, favorite persistence and deletion work", async 
     .getByRole("button", { name: "Slett lokale data", exact: true })
     .click();
   await page.getByRole("button", { name: "Ja, slett alt lokalt" }).click();
-  await expect(page.getByRole("status")).toContainText("slettet");
+  await expect(page.locator("#root").getByRole("status")).toContainText("slettet");
   expect(
     await page.evaluate(() => localStorage.getItem("laanndet:favorites:v1")),
   ).toBeNull();
