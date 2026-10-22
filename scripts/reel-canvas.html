@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="nb">
+  <meta charset="utf-8" /><title>Lånndet — reel composition</title>
+  <style>
+    body {
+      margin: 0;
+      background: #173f35;
+    }
+    canvas {
+      display: block;
+      width: 1080px;
+      height: 1920px;
+    }
+  </style>
+  <canvas width="1080" height="1920"></canvas>
+  <script>
+    const assets = /* ASSET_DATA */ {};
+    const canvas = document.querySelector("canvas");
+    const output = canvas.getContext("2d");
+    const images = {};
+    const surfaces = [0, 1].map(() => {
+      const c = document.createElement("canvas");
+      c.width = 1080;
+      c.height = 1920;
+      return c;
+    });
+    const C = {
+      green: "#174d3c",
+      deep: "#0c3029",
+      cream: "#f7f4ec",
+      orange: "#f4ac61",
+      mint: "#c9e0c4",
+    };
+    const clamp = (x) => Math.max(0, Math.min(1, x));
+    const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+    function round(ctx, x, y, w, h, r = 30) {
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, h, r);
+    }
+    function fill(ctx, color, x, y, w, h, r = 0) {
+      ctx.fillStyle = color;
+      if (r) {
+        round(ctx, x, y, w, h, r);
+        ctx.fill();
+      } else ctx.fillRect(x, y, w, h);
+    }
+    function text(ctx, str, x, y, size = 48, color = C.green, weight = 700) {
+      ctx.font = `${weight} ${size}px Manrope`;
+      ctx.fillStyle = color;
+      ctx.fillText(str, x, y);
+    }
+    function cover(ctx, img, x, y, w, h, r = 0, pan = 0) {
+      ctx.save();
+      if (r) {
+        round(ctx, x, y, w, h, r);
+        ctx.clip();
+      }
+      const s = Math.max(w / img.width, h / img.height);
+      const dw = img.width * s,
+        dh = img.height * s;
+      ctx.drawImage(img, x + (w - dw) / 2 + pan, y + (h - dh) / 2, dw, dh);
+      ctx.restore();
+    }
+    function line(ctx, points, color, width = 3) {
+      ctx.beginPath();
+      ctx.moveTo(...points[0]);
+      for (const p of points.slice(1)) ctx.lineTo(...p);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.stroke();
+    }
+    function arrow(ctx, x, y, color = C.green) {
+      line(
+        ctx,
+        [
+          [x, y + 25],
+          [x + 40, y - 15],
+          [x + 40, y + 15],
+        ],
+        color,
+        5,
+      );
+      line(
+        ctx,
+        [
+          [x + 40, y - 15],
+          [x + 10, y - 15],
+        ],
+        color,
+        5,
+      );
+    }
+    function brand(ctx, dark = false) {
+      const color = dark ? C.cream : C.green;
+      text(ctx, "Lånndet", 84, 182, 48, color, 800);
+      fill(ctx, dark ? "#ffffff20" : "#174d3c12", 752, 134, 242, 66, 33);
+      text(ctx, "STEIGEN", 799, 178, 28, color, 750);
+    }
+    function footer(ctx, index, dark = false) {
+      const color = dark ? "#f7f4ecb8" : "#174d3cc0";
+      text(ctx, "Konseptdemo · Eksempelannonser", 84, 1665, 28, color, 500);
+      for (let i = 0; i < 4; i++)
+        fill(
+          ctx,
+          i === index ? C.orange : dark ? "#ffffff30" : "#174d3c20",
+          84 + i * 227,
+          1710,
+          207,
+          5,
+          2,
+        );
+    }
+    function headline(ctx, lines, local, dark = false, size = 92) {
+      const p = ease(local / 0.38);
+      ctx.save();
+      ctx.globalAlpha = p;
+      const y = 340 + (1 - p) * 45;
+      lines.forEach((s, i) =>
+        text(
+          ctx,
+          s,
+          84,
+          y + i * (size * 1.15),
+          size,
+          dark ? C.cream : C.green,
+          800,
+        ),
+      );
+      ctx.restore();
+    }
+    function card(ctx, img, label, x, y, w, h, angle = 0) {
+      ctx.save();
+      ctx.translate(x + w / 2, y + h / 2);
+      ctx.rotate(angle);
+      ctx.shadowColor = "#031d2440";
+      ctx.shadowBlur = 44;
+      ctx.shadowOffsetY = 22;
+      fill(ctx, C.cream, -w / 2, -h / 2, w, h, 34);
+      ctx.shadowColor = "transparent";
+      cover(ctx, img, -w / 2 + 14, -h / 2 + 14, w - 28, h - 108, 24);
+      text(
+        ctx,
+        label,
+        -w / 2 + 30,
+        h / 2 - 43,
+        Math.min(32, w / 12),
+        C.green,
+        750,
+      );
+      ctx.restore();
+    }
+    function phone(ctx, img, x, y, w, h, angle = 0) {
+      ctx.save();
+      ctx.translate(x + w / 2, y + h / 2);
+      ctx.rotate(angle);
+      ctx.shadowColor = "#001a2550";
+      ctx.shadowBlur = 55;
+      ctx.shadowOffsetY = 28;
+      fill(ctx, "#152d29", -w / 2 - 11, -h / 2 - 11, w + 22, h + 22, 58);
+      ctx.shadowColor = "transparent";
+      round(ctx, -w / 2, -h / 2, w, h, 48);
+      ctx.clip();
+      ctx.drawImage(img, -w / 2, -h / 2, w, h);
+      fill(ctx, "#10221f", -66, -h / 2 + 11, 132, 26, 13);
+      ctx.restore();
+    }
+    function renderScene(ctx, index, local) {
+      fill(
+        ctx,
+        index === 0 || index === 2 || index === 3 ? C.deep : C.cream,
+        0,
+        0,
+        1080,
+        1920,
+      );
+      if (index === 0) {
+        ctx.save();
+        ctx.globalAlpha = 0.38;
+        cover(ctx, images.hero, -10 - local * 4, 0, 1100 + local * 8, 1920);
+        ctx.restore();
+        const g = ctx.createLinearGradient(0, 0, 0, 1920);
+        g.addColorStop(0, "#092d28f0");
+        g.addColorStop(0.55, "#0c3029a0");
+        g.addColorStop(1, C.deep);
+        fill(ctx, g, 0, 0, 1080, 1920);
+        brand(ctx, true);
+        headline(ctx, ["Trenger du noe", "bare én gang?"], local, true, 94);
+        text(ctx, "Det finnes kanskje hos naboen.", 84, 610, 37, C.mint, 500);
+        const p = ease(local / 0.55);
+        ctx.globalAlpha = p;
+        card(
+          ctx,
+          images.trailer,
+          "Transport",
+          578,
+          1005 + (1 - p) * 90,
+          350,
+          372,
+          0.09 - local * 0.007,
+        );
+        card(
+          ctx,
+          images.drill,
+          "Verktøy til helgens prosjekt",
+          105,
+          755 + (1 - p) * 110,
+          620,
+          642,
+          -0.055 + Math.sin(local) * 0.008,
+        );
+        ctx.globalAlpha = 1;
+        fill(ctx, C.orange, 143, 1450, 686, 80, 40);
+        text(ctx, "Lån. Lei. Del lokalt.", 198, 1503, 37, C.deep, 750);
+        footer(ctx, index, true);
+      }
+      if (index === 1) {
+        brand(ctx);
+        headline(
+          ctx,
+          ["Finn det du trenger.", "Rett i nærheten."],
+          local,
+          false,
+          88,
+        );
+        text(ctx, "En idé for folk i Steigen.", 84, 605, 38, C.green, 500);
+        const p = ease(local / 0.5);
+        phone(
+          ctx,
+          images.browse,
+          315,
+          675 + (1 - p) * 100,
+          457,
+          957,
+          -0.035 + local * 0.008,
+        );
+        ctx.save();
+        ctx.shadowColor = "#174d3c25";
+        ctx.shadowBlur = 30;
+        fill(ctx, C.green, 83, 1090, 335, 110, 30);
+        ctx.shadowColor = "transparent";
+        text(ctx, "Her i Steigen", 119, 1158, 35, C.cream, 750);
+        ctx.restore();
+        fill(ctx, C.orange, 790, 803, 115, 115, 58);
+        arrow(ctx, 825, 861);
+        footer(ctx, index);
+      }
+      if (index === 2) {
+        const g = ctx.createLinearGradient(0, 0, 1080, 1920);
+        g.addColorStop(0, C.deep);
+        g.addColorStop(1, C.green);
+        fill(ctx, g, 0, 0, 1080, 1920);
+        brand(ctx, true);
+        headline(ctx, ["Lei ut det", "du allerede har."], local, true, 92);
+        text(ctx, "La tingene dine komme til nytte.", 84, 605, 37, C.mint, 500);
+        const p = ease(local / 0.5);
+        phone(ctx, images.detail, 101, 730 + (1 - p) * 90, 424, 888, -0.04);
+        card(
+          ctx,
+          images.drill,
+          "Har du denne?",
+          576,
+          860 + (1 - p) * 120,
+          372,
+          478,
+          0.065 - Math.sin(local) * 0.009,
+        );
+        text(ctx, "Mer nytte.", 590, 1450, 39, C.cream, 700);
+        text(ctx, "Mindre som står ubrukt.", 590, 1505, 25, C.mint, 500);
+        footer(ctx, index, true);
+      }
+      if (index === 3) {
+        const g = ctx.createRadialGradient(530, 550, 50, 530, 900, 1200);
+        g.addColorStop(0, "#245e49");
+        g.addColorStop(1, C.deep);
+        fill(ctx, g, 0, 0, 1080, 1920);
+        brand(ctx, true);
+        const p = ease(local / 0.4);
+        ctx.save();
+        ctx.globalAlpha = p;
+        ctx.translate(0, (1 - p) * 35);
+        text(ctx, "Lånndet", 84, 468, 155, C.cream, 800);
+        text(ctx, "En lokal idé for Steigen.", 91, 571, 49, C.mint, 500);
+        fill(ctx, C.orange, 84, 725, 824, 126, 63);
+        text(ctx, "Ville du brukt det?", 142, 809, 57, C.deep, 800);
+        text(
+          ctx,
+          "Si din mening i kommentarfeltet.",
+          91,
+          950,
+          37,
+          C.cream,
+          500,
+        );
+        cover(ctx, images.hero, 84, 1057, 912, 320, 34);
+        ctx.save();
+        round(ctx, 84, 1057, 912, 320, 34);
+        ctx.clip();
+        const shade = ctx.createLinearGradient(0, 1170, 0, 1377);
+        shade.addColorStop(0, "#0c302900");
+        shade.addColorStop(1, "#0c3029bb");
+        fill(ctx, shade, 84, 1057, 912, 320);
+        ctx.restore();
+        text(ctx, "Gode naboer. Gode muligheter.", 120, 1330, 33, C.cream, 650);
+        cover(ctx, images.gpsi, 84, 1430, 120, 120, 22);
+        text(ctx, "Et konsept fra G-PSI", 231, 1500, 31, C.mint, 600);
+        ctx.restore();
+        footer(ctx, index, true);
+      }
+    }
+    window.ready = (async () => {
+      const font = new FontFace("Manrope", `url(${assets.font})`, {
+        weight: "200 800",
+      });
+      await font.load();
+      document.fonts.add(font);
+      await Promise.all(
+        Object.entries(assets)
+          .filter(([k]) => k !== "font")
+          .map(async ([k, v]) => {
+            const img = new Image();
+            img.src = v;
+            await img.decode();
+            images[k] = img;
+          }),
+      );
+      window.renderFrame = (time) => {
+        const cuts = [0, 2.35, 5.15, 7.3, 10];
+        let i = 0;
+        while (i < 3 && time >= cuts[i + 1]) i++;
+        const ctx = surfaces[0].getContext("2d");
+        renderScene(ctx, i, time - cuts[i] + (i > 0 ? 0.18 : 0));
+        output.globalAlpha = 1;
+        output.drawImage(surfaces[0], 0, 0);
+        if (i < 3 && time > cuts[i + 1] - 0.18) {
+          const mix = clamp((time - cuts[i + 1] + 0.18) / 0.18);
+          const other = surfaces[1].getContext("2d");
+          renderScene(other, i + 1, time - cuts[i + 1] + 0.18);
+          output.globalAlpha = mix;
+          output.drawImage(surfaces[1], 0, 0);
+          output.globalAlpha = 1;
+        }
+      };
+      window.renderFrame(0);
+    })();
+  </script>
+</html>

@@ -8,6 +8,8 @@ Możesz też pobrać sam plik [Laanndet.html](https://github.com/RobertCygan/laa
 
 Ankiety i inne dane zapisują się wyłącznie w przeglądarce osoby oglądającej demonstrację. Nie trafiają do wspólnej bazy.
 
+Gotowa [10-sekundowa rolka MP4 na Facebooka](https://github.com/RobertCygan/laandet/raw/refs/heads/main/promo/Laanndet-10s.mp4) jest dostępna w katalogu [`promo/`](promo/), wraz z okładką i instrukcją. Format pionowy 1080 × 1920, napisy po norwesku, oryginalny podkład instrumentalny i oznaczenie demonstracji.
+
 A complete, Norwegian Bokmål, web-only research MVP for a hyperlocal peer-to-peer rental marketplace. It starts in Steigen, Nordland, with a municipality/local-area/postcode/approximate-coordinate model that can expand geographically.
 
 **This is a transparent market-validation application, not an operating rental service.** All 18 offers, 5 wanted listings, 4 profiles and equipment images are fictional and labelled. There are no real bookings, payments, insurance, identity checks, reviews or messages.
