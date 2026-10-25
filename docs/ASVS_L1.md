@@ -19,7 +19,7 @@ Legend: ✅ met · 🟡 partly met or met differently · ❌ not met · ⏳ need
 | 2.1.8 | Password strength meter | ❌ | Not built. The breached-password check and the length rule are the controls. |
 | 2.1.9 / 2.1.10 | No composition rules, no forced rotation | ✅ | |
 | 2.1.11 | Paste and password managers allowed | ✅ | Plain `type="password"` fields. |
-| 2.1.12 | Option to show the password | ❌ | Not built. Small UI task. |
+| 2.1.12 | Option to show the password | ✅ | «Vis passord» on every password field (P04-02, e2e `security.spec.ts`). |
 | 2.2.1 | Anti-automation | ✅ | Sign-in, sign-up and reset limits; honeypot and minimum fill time. |
 | 2.2.2 | No weak authenticators | ✅ | No SMS or email codes for sign-in. |
 | 2.2.3 | Notify after authentication changes | ✅ | Emails on password change and email change. |
@@ -134,7 +134,7 @@ Legend: ✅ met · 🟡 partly met or met differently · ❌ not met · ⏳ need
 ## Open items from this checklist
 
 1. **2.1.1** minimum 6 characters — accepted by the owner as an exception (D-056).
-2. **2.1.8 / 2.1.12** strength meter and «Vis passord» — small UI tasks.
+2. **2.1.8** strength meter — not built (the breached-password check is the control). «Vis passord» (2.1.12) is done.
 3. **3.3.2** rolling 30-day sessions for members — kept as the default (explained to the owner 25.10.2026).
 4. **12.4.2** no antivirus — accepted risk while only re-encoded images are allowed.
 5. **14.2.1** add OSV-Scanner to CI.
