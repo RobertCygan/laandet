@@ -3,12 +3,12 @@
 Each decision records context, the choice, the trade-off and its status.
 
 **Status values:**
-- **Proposed** — recommended in Phase 00, waiting for the project owner.
-- **Accepted** — approved by the owner (write the date and how it was approved).
+- **Proposed** — recommended, waiting for the project owner.
+- **Accepted** — approved by the owner (with date and how it was approved).
 - **Superseded** — replaced by a later decision.
 
-Nothing in this log is *Accepted* yet. The owner approves or changes decisions by commenting
-on the Phase 00 pull request or by editing this file.
+The owner approved Phase 00 on 25.10.2026, which accepted D-001…D-029 as recommended. Decisions added
+during Phase 01 start as *Proposed* (implementation-level) unless the owner says otherwise.
 
 ---
 
@@ -20,7 +20,7 @@ on the Phase 00 pull request or by editing this file.
   - Legal documents are written in Norwegian. English versions are informational translations, and each one says the Norwegian text prevails.
   - User-generated content (listings, messages) is shown as written and is never machine-translated.
 - **Trade-off:** About 15–20% more UI copy work and a second set of legal texts to keep in sync. It is far cheaper to do from day one than to retrofit.
-- **Status:** Proposed. **Owner must confirm** whether English legal translations are wanted at launch or only the English UI.
+- **Status:** Accepted 25.10.2026 (owner approved Phase 00: «Zatwierdzam Phase 00»). English UI and informational English legal translations are both in scope.
 
 ## D-002 — Repository location
 - **Context:** This session can only reach `RobertCygan/G-PSI_WWW`, which hosts the G-PSI website (`www/`) and the prototype.
@@ -29,7 +29,7 @@ on the Phase 00 pull request or by editing this file.
   - The G-PSI website build (`www/`) is not touched.
   - When the owner creates a dedicated repository (recommended: `laandet`), move the folder with `git subtree split` to keep history.
 - **Trade-off:** Shared CI configuration and issue tracker for a while. Workflows must use `paths:` filters so one product's changes don't run the other's checks.
-- **Status:** Proposed.
+- **Status:** Accepted 25.10.2026 (owner approved Phase 00: «Zatwierdzam Phase 00»).
 
 ## D-003 — Product name
 - **Decision:**
@@ -66,7 +66,7 @@ on the Phase 00 pull request or by editing this file.
 - **Trade-off:**
   - Next.js is heavier than a minimal server, but well documented and familiar to any developer or AI assistant who picks up the project.
   - Self-hosted auth means we own patching. Mitigated by pinning versions, Dependabot and CI audits.
-- **Status:** Proposed.
+- **Status:** Accepted 25.10.2026 (owner approved Phase 00: «Zatwierdzam Phase 00»).
 
 ## D-005 — Hosting: one EU virtual server with Docker Compose
 - **Context:** Low cost and EU/EEA data residency are priorities. Managed platforms cost about 40–70 USD per month at minimum and are mostly US companies; Vercel Hobby forbids commercial use. Hetzner raised prices in April and June 2026, and its cheapest plans may not be orderable for new customers (see `OPERATING_COSTS.md`).
@@ -78,7 +78,7 @@ on the Phase 00 pull request or by editing this file.
   - Cheapest and simplest, and all data stays in one EU place.
   - It is a single point of failure and the owner must keep the OS updated. Mitigations: unattended security upgrades, nightly encrypted off-site backups, a tested restore runbook, and an uptime monitor.
   - Moving later to managed Postgres or a second server needs no code change, only configuration.
-- **Status:** Proposed. **No server will be ordered without owner approval.**
+- **Status:** Accepted 25.10.2026 (owner approved Phase 00: «Zatwierdzam Phase 00»). Buying the server is still a separate owner action; nothing is ordered by the developer.
 
 ## D-006 — Media storage behind the application
 - **Decision:**
@@ -87,7 +87,7 @@ on the Phase 00 pull request or by editing this file.
   - Private images (condition photos, dispute evidence) are served by the same route only to authorised users, with `Cache-Control: private, no-store`.
   - An S3-compatible adapter (Hetzner Object Storage, Scaleway, Cloudflare R2 with EU jurisdiction) can be added when disk or bandwidth demands it.
 - **Trade-off:** No CDN and no extra service. Disk is included in the server price. Images are included in the off-site backup. Fine for a pilot of a few thousand users.
-- **Status:** Proposed.
+- **Status:** Accepted 25.10.2026 (owner approved Phase 00: «Zatwierdzam Phase 00»).
 
 ## D-007 — Authentication policy
 - **Decision:**
@@ -104,14 +104,14 @@ on the Phase 00 pull request or by editing this file.
   - Passkeys: optional for users, added in Phase 01 if time allows.
   - TOTP two-factor: **mandatory** for moderators and administrators before they can use `/admin`.
   - Bot protection at launch: rate limits, a hidden honeypot field, a minimum form-fill time and email verification. Cloudflare Turnstile is prepared behind a feature flag and switched on only if abuse appears, because it adds a third-party (US) processor.
-- **Status:** Proposed.
+- **Status:** Accepted 25.10.2026 (owner approved Phase 00: «Zatwierdzam Phase 00»).
 
 ## D-008 — Transactional email
 - **Decision:**
   - Send through SMTP to an EU provider. Recommended: Scaleway Transactional Email (pay per use) or Brevo (free tier, 300 per day).
   - Every email goes through an `email_outbox` table with retries, so a provider outage does not break sign-up or bookings.
   - Mailpit catches all email in development and CI.
-- **Status:** Proposed. **Owner chooses the provider and creates the account.**
+- **Status:** Accepted 25.10.2026 (owner approved Phase 00: «Zatwierdzam Phase 00»). The owner still chooses the provider and creates the account.
 
 ## D-009 — Money representation
 - **Decision:**
@@ -128,7 +128,7 @@ on the Phase 00 pull request or by editing this file.
   - At sign-up the user confirms (1) they are at least 18, (2) they use Laandet as a private person, not in business, and (3) they accept the terms. Each confirmation is stored with a timestamp.
   - No date of birth and no fødselsnummer is collected.
   - The interface never presents age as verified.
-- **Status:** Proposed.
+- **Status:** Accepted 25.10.2026 (owner approved Phase 00: «Zatwierdzam Phase 00»).
 
 ## D-011 — Value threshold and the high-value block
 - **Decision:**
@@ -145,7 +145,7 @@ on the Phase 00 pull request or by editing this file.
   - Some valuable items (e-bikes, large tools) cannot be rented in the pilot.
   - Accepted for safety. Owners can still give such items away or lend them outside the platform.
   - Owners might under-declare value to avoid the block. The terms forbid it, the agreement records the declared value (which weakens the owner's own claim if under-declared), and moderators can review suspicious listings.
-- **Status:** Proposed.
+- **Status:** Accepted 25.10.2026 (owner approved Phase 00: «Zatwierdzam Phase 00»).
 
 ## D-012 — No money flows through Laandet in the MVP
 - **Decision:**
@@ -161,14 +161,14 @@ on the Phase 00 pull request or by editing this file.
   - A rental request is a `bookings` row with status `requested`. Accepting it moves the same row forward.
   - Overlap protection (a PostgreSQL exclusion constraint) applies only from `accepted` onward, so several people can request the same dates.
 - **Trade-off:** One state machine, one history, no copying of data between tables. Requests and bookings are separated by status in queries.
-- **Status:** Proposed.
+- **Status:** Accepted 25.10.2026 (owner approved Phase 00: «Zatwierdzam Phase 00»).
 
 ## D-014 — Reviews only after completed rentals, published double-blind
 - **Decision:**
   - Each party can review the other once per completed rental, within 14 days of completion.
   - A review stays hidden until both have reviewed or the 14 days pass, so neither side can retaliate.
   - Giveaways have no reviews in the MVP. Profiles show the verified count of completed giveaways instead.
-- **Status:** Proposed.
+- **Status:** Accepted 25.10.2026 (owner approved Phase 00: «Zatwierdzam Phase 00»).
 
 ## D-015 — Messaging rules
 - **Decision:**
@@ -179,21 +179,21 @@ on the Phase 00 pull request or by editing this file.
     - the messages a participant attaches to a report, and
     - for an escalated dispute, the booking conversation, after both parties have been told it will be reviewed.
   - Every staff view is written to the audit log with a reason.
-- **Status:** Proposed.
+- **Status:** Accepted 25.10.2026 (owner approved Phase 00: «Zatwierdzam Phase 00»).
 
 ## D-016 — Giveaways use a simple separate flow
 - **Decision:**
   - Interested users send a `giveaway_claim` with a message. The giver picks one claim, which reserves the item.
   - Both parties confirm the transfer: a *Gis bort — overleveringsbekreftelse* snapshot with condition and known defects. The listing then becomes "Gitt bort".
   - No rental agreement, no deposit, no condition report.
-- **Status:** Proposed.
+- **Status:** Accepted 25.10.2026 (owner approved Phase 00: «Zatwierdzam Phase 00»).
 
 ## D-017 — No maps and no distances in the MVP
 - **Decision:**
   - Location is a locality from an admin-managed list (Leinesfjord, Nordfold, Engeløya and so on) plus optional free text such as "nær skolen".
   - Search filters by locality, with no distance, travel time or map tiles.
 - **Trade-off:** Less visual than the prototype's planned map toggle, but honest, cheaper and better for privacy. Maps (for example Kartverket open tiles) can come later.
-- **Status:** Proposed.
+- **Status:** Accepted 25.10.2026 (owner approved Phase 00: «Zatwierdzam Phase 00»).
 
 ## D-018 — Background work without a queue service
 - **Decision:** A `worker` process (same codebase) runs every minute and handles:
@@ -204,20 +204,20 @@ on the Phase 00 pull request or by editing this file.
   - retention clean-up
 
   State lives in PostgreSQL tables, and each job is safe to run twice.
-- **Status:** Proposed.
+- **Status:** Accepted 25.10.2026 (owner approved Phase 00: «Zatwierdzam Phase 00»).
 
 ## D-019 — Search with PostgreSQL only
 - **Decision:**
   - PostgreSQL full-text search (`norwegian` and `simple` configurations combined) plus `pg_trgm` for typo tolerance.
   - Filters run as SQL `WHERE` clauses. Availability uses a range-overlap check against bookings and blocked periods.
 - **Trade-off:** More than enough for tens of thousands of listings. No external search server.
-- **Status:** Proposed.
+- **Status:** Accepted 25.10.2026 (owner approved Phase 00: «Zatwierdzam Phase 00»).
 
 ## D-020 — "Ønskes leid" responses
 - **Decision:**
   - A reply to a wanted listing is a message in a conversation tied to that listing. The replier can attach a link to one of their own "Leies ut" listings.
   - The actual rental always happens as a request on a "Leies ut" listing, so every rental uses the same agreement, condition and dispute machinery.
-- **Status:** Proposed.
+- **Status:** Accepted 25.10.2026 (owner approved Phase 00: «Zatwierdzam Phase 00»).
 
 ## D-021 — Agreements are immutable snapshots
 - **Decision:** When the owner accepts a request:
@@ -238,42 +238,42 @@ on the Phase 00 pull request or by editing this file.
 
   Migrations run with a separate owner role. Corrections are new rows that point to the row they supersede.
   Personal-data deletion is the one exception: a narrowly scoped `SECURITY DEFINER` function, used only by the retention job, can redact or remove expired rows.
-- **Status:** Proposed.
+- **Status:** Accepted 25.10.2026 (owner approved Phase 00: «Zatwierdzam Phase 00»).
 
 ## D-023 — Legal documents as versioned files
 - **Decision:**
   - Legal texts are Markdown files in `laandet/legal/nb/` (authoritative) and `laandet/legal/en/` (translations), each with a version header.
   - At deploy, the app loads them into `legal_document_versions` with a content hash. Users accept a specific version.
   - A new material version asks users to accept again at their next login.
-- **Status:** Proposed.
+- **Status:** Accepted 25.10.2026 (owner approved Phase 00: «Zatwierdzam Phase 00»).
 
 ## D-024 — Demo listings
 - **Decision:**
   - Prototype examples may be seeded with `is_demo = true`. They always carry an "Eksempel" badge and cannot be requested or messaged.
   - They are excluded from profiles and statistics.
   - A feature flag `show_demo_listings` lets the owner hide them all once enough real listings exist.
-- **Status:** Proposed.
+- **Status:** Accepted 25.10.2026 (owner approved Phase 00: «Zatwierdzam Phase 00»).
 
 ## D-025 — No analytics or tracking in the MVP
 - **Decision:**
   - No analytics scripts, no advertising or tracking cookies, no fingerprinting.
   - Only strictly necessary cookies: session, CSRF/state, language choice.
   - Operational metrics come from the database (counts) and server logs (kept 30 days), so no cookie banner is needed.
-- **Status:** Proposed.
+- **Status:** Accepted 25.10.2026 (owner approved Phase 00: «Zatwierdzam Phase 00»).
 
 ## D-026 — Voluntary support ("Støtt Laandet")
 - **Decision:**
   - The page explains voluntary support and running costs.
   - It shows a fundraising link only when the owner sets `SUPPORT_CAMPAIGN_URL` for a real, verified campaign (for example Spleis). Until then it says no fundraiser has started.
   - No payment code exists in Laandet. See `SUPPORT_AND_FUNDING.md`.
-- **Status:** Proposed.
+- **Status:** Accepted 25.10.2026 (owner approved Phase 00: «Zatwierdzam Phase 00»).
 
 ## D-027 — Error monitoring
 - **Decision:**
   - Sentry in its EU (Frankfurt) data region on the free Developer plan, with personal data scrubbing (`sendDefaultPii: false`, no request bodies, user id only).
   - UptimeRobot free tier for uptime.
   - Both are optional. The app runs without them.
-- **Status:** Proposed. **Owner approves accounts.**
+- **Status:** Accepted 25.10.2026 (owner approved Phase 00: «Zatwierdzam Phase 00»). Accounts are created by the owner when needed.
 
 ## D-028 — Paid rental of "means of transport" paused until the reporting question is clarified
 - **Context:** Norway's platform-reporting rules (DPI, skatteforvaltningsloven § 7-11, in force from income year 2026) can oblige a platform to collect and report seller identity data. This includes tax identification numbers, which is close to collecting fødselsnummer. The rules cover rental of **means of transport**.
@@ -288,11 +288,29 @@ on the Phase 00 pull request or by editing this file.
 - **Alternatives:**
   - (a) Accept the risk and launch with paid rental, and register as a reporting platform if required.
   - (b) Implement DPI data collection for those categories only.
-- **Status:** Proposed. **Owner decision required before launch.**
+- **Status:** Accepted 25.10.2026 (owner approved Phase 00: «Zatwierdzam Phase 00»): paid rental of these categories stays off until the DPI question is answered (flag per category, no code change needed).
 
 ## D-029 — Geography
 - **Decision:**
   - Listings must be located in one of the admin-managed localities in Steigen kommune: Leinesfjord, Leines, Nordfold, Engeløya, Nordskot, Bogøy, Helnessund and Bogen. Others can be added by an admin.
   - Users may live anywhere.
   - Adding other municipalities needs no schema change.
-- **Status:** Proposed. **Owner to confirm the locality list.**
+- **Status:** Accepted 25.10.2026 (owner approved Phase 00: «Zatwierdzam Phase 00»). The locality list can be edited later without code changes.
+
+## D-030 — Rendering and locale routing (implementation)
+- **Context:** Next.js 16.4 enables Cache Components by default. A per-request CSP nonce needs dynamic rendering, and every page shows a session-aware header, so the static shell would gain little.
+- **Decision:**
+  - `cacheComponents: false`; all pages render per request.
+  - Locale routing is done in `src/proxy.ts`: `nb` without prefix (internally rewritten to `/nb/...`), English under `/en/...`, and `/nb/...` redirects to the canonical URL.
+  - No locale cookie and no automatic language detection. The language is in the URL, and the user's choice is also stored in `user_profiles.locale` for emails.
+  - next-intl is used for messages and formatting only.
+- **Consequence:** the cookie list shrinks. `NEXT_LOCALE` is not used, and `PRIVACY.md` and the cookie page are updated to match.
+- **Status:** Proposed (implementation-level). Revisit before Next.js 17, when Cache Components become mandatory.
+
+## D-031 — Money in TypeScript
+- **Decision:**
+  - Database columns stay `bigint` øre.
+  - The TypeScript layer uses `number`, validated as a safe integer (`Number.isSafeInteger`), because no realistic amount comes close to 2^53 øre.
+  - `formatKr` also accepts `bigint`.
+  - There is no floating-point arithmetic on money; kroner input is parsed into integer øre at the boundary.
+- **Status:** Proposed (implementation-level).

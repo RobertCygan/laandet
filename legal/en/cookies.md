@@ -30,11 +30,9 @@ cookies that are strictly necessary to provide a service you have asked for your
 | Name | What it does | Duration |
 |---|---|---|
 | `__Host-laandet.session` | Keeps you logged in. Contains a random key, not personal data in plain text. | Up to 30 days (8 hours for staff), or until you log out |
-| `__Host-laandet.session_data` | A short-lived, signed cache of your login, so that pages load faster | 5 minutes |
-| `__Host-laandet.two_factor` | Used while staff log in with a two-factor code | 10 minutes |
-| `NEXT_LOCALE` | Remembers whether you have chosen Norwegian or English | 1 year |
+| `__Secure-laandet.two_factor` | Used while staff log in with a two-factor code | 10 minutes |
 
-We do not store personal data in the browser's local storage (localStorage). Drafts of listings
+Your language choice is part of the web address (/en for English), not a cookie. We do not store personal data in the browser's local storage (localStorage). Drafts of listings
 are stored in your account on the server.
 
 ## If we start using something new

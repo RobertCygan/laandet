@@ -27,11 +27,9 @@ levere en tjeneste du selv har bedt om.
 | Navn | Hva den gjør | Varighet |
 |---|---|---|
 | `__Host-laandet.session` | Holder deg innlogget. Inneholder en tilfeldig nøkkel, ikke personopplysninger i klartekst. | Opptil 30 dager (8 timer for ansatte), eller til du logger ut |
-| `__Host-laandet.session_data` | Et kortvarig, signert mellomlager av innloggingen, slik at sidene lastes raskere | 5 minutter |
-| `__Host-laandet.two_factor` | Brukes mens ansatte logger inn med tofaktorkode | 10 minutter |
-| `NEXT_LOCALE` | Husker om du har valgt norsk eller engelsk | 1 år |
+| `__Secure-laandet.two_factor` | Brukes mens ansatte logger inn med tofaktorkode | 10 minutter |
 
-Vi lagrer ikke personopplysninger i nettleserens lokale lagring (localStorage). Utkast til annonser
+Språkvalget ligger i nettadressen (/en for engelsk), ikke i en informasjonskapsel. Vi lagrer ikke personopplysninger i nettleserens lokale lagring (localStorage). Utkast til annonser
 lagres i kontoen din på serveren.
 
 ## Hvis vi tar i bruk noe nytt

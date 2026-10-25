@@ -116,12 +116,10 @@ legal review (L-12).
 | Name | Purpose | Type | Lifetime | Consent needed? |
 |---|---|---|---|---|
 | `__Host-laandet.session` | keeps you signed in (session token) | first-party, HttpOnly | 30 days (8 h staff) | No: strictly necessary for a service the user requested |
-| `__Host-laandet.session_data` | short-lived signed cache of session (if enabled) | first-party, HttpOnly | 5 min | No: strictly necessary |
-| `__Host-laandet.two_factor` | carries the 2FA step during sign-in (staff) | first-party, HttpOnly | 10 min | No: strictly necessary |
-| `NEXT_LOCALE` | remembers the language the user chose | first-party | 1 year | No: user-interface preference explicitly chosen (verify wording, L-05) |
+| `__Secure-laandet.two_factor` | carries the 2FA step during sign-in (staff) | first-party, HttpOnly | 10 min | No: strictly necessary |
 | Turnstile (only if `captcha_turnstile` on) | bot protection at sign-up | third-party (Cloudflare) | session | Assess before enabling (L-05) |
 
-There is no `localStorage` for personal data. Listing drafts are saved on the server, not in the browser.
+The language is part of the URL (`/en/...` for English), not a cookie (D-030). There is no `localStorage` for personal data. Listing drafts are saved on the server, not in the browser.
 
 No consent banner is needed while only the items above are used. The cookie page lists them.
 **Any new cookie or similar storage requires updating this table, the public cookie page and a legal check.**
