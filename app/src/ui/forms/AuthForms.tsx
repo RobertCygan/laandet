@@ -20,7 +20,15 @@ import { FieldError, FormError, invalid, prev } from "./FormMessages";
 
 type Loc = "nb" | "en";
 
-export function SignUpForm({ locale, localities, startedAt }: { locale: Loc; localities: { slug: string; name: string }[]; startedAt: number }) {
+export function SignUpForm({
+  locale,
+  localities,
+  startedAt,
+}: {
+  locale: Loc;
+  localities: { slug: string; name: string }[];
+  startedAt: number;
+}) {
   const t = useTranslations("auth");
   const tc = useTranslations("common");
   const [state, action] = useActionState(signUpAction, idle);
@@ -38,18 +46,44 @@ export function SignUpForm({ locale, localities, startedAt }: { locale: Loc; loc
       <label className="field">
         {t("name")}
         <span className="field-hint">{t("nameHint")}</span>
-        <input name="name" autoComplete="nickname" required minLength={2} maxLength={40} defaultValue={prev(state, "name")} aria-invalid={invalid(state, "name")} aria-describedby="name-error" />
+        <input
+          name="name"
+          autoComplete="nickname"
+          required
+          minLength={2}
+          maxLength={40}
+          defaultValue={prev(state, "name")}
+          aria-invalid={invalid(state, "name")}
+          aria-describedby="name-error"
+        />
         <FieldError state={state} name="name" />
       </label>
       <label className="field">
         {t("email")}
-        <input name="email" type="email" autoComplete="email" required defaultValue={prev(state, "email")} aria-invalid={invalid(state, "email")} aria-describedby="email-error" />
+        <input
+          name="email"
+          type="email"
+          autoComplete="email"
+          required
+          defaultValue={prev(state, "email")}
+          aria-invalid={invalid(state, "email")}
+          aria-describedby="email-error"
+        />
         <FieldError state={state} name="email" />
       </label>
       <label className="field">
         {t("password")}
         <span className="field-hint">{t("passwordHint")}</span>
-        <input name="password" type="password" autoComplete="new-password" required minLength={10} maxLength={128} aria-invalid={invalid(state, "password")} aria-describedby="password-error" />
+        <input
+          name="password"
+          type="password"
+          autoComplete="new-password"
+          required
+          minLength={10}
+          maxLength={128}
+          aria-invalid={invalid(state, "password")}
+          aria-describedby="password-error"
+        />
         <FieldError state={state} name="password" />
       </label>
       <label className="field">
@@ -139,7 +173,15 @@ export function TotpForm({ locale }: { locale: Loc }) {
       <input type="hidden" name="locale" value={locale} />
       <label className="field">
         {t("totpCode")}
-        <input name="code" inputMode="numeric" autoComplete="one-time-code" pattern="\d{6}" maxLength={6} required aria-invalid={invalid(state, "code")} />
+        <input
+          name="code"
+          inputMode="numeric"
+          autoComplete="one-time-code"
+          pattern="\d{6}"
+          maxLength={6}
+          required
+          aria-invalid={invalid(state, "code")}
+        />
         <FieldError state={state} name="code" />
       </label>
       <SubmitButton>{t("totpButton")}</SubmitButton>
@@ -150,7 +192,12 @@ export function TotpForm({ locale }: { locale: Loc }) {
 export function ForgotPasswordForm({ locale }: { locale: Loc }) {
   const t = useTranslations("auth");
   const [state, action] = useActionState(forgotPasswordAction, idle);
-  if (state.status === "ok") return <Notice tone="success" role="status">{t("forgotDone")}</Notice>;
+  if (state.status === "ok")
+    return (
+      <Notice tone="success" role="status">
+        {t("forgotDone")}
+      </Notice>
+    );
   return (
     <form action={action} className="flex flex-col gap-5">
       <FormError state={state} />
@@ -171,7 +218,9 @@ export function ResetPasswordForm({ token }: { token: string }) {
   if (state.status === "ok")
     return (
       <div className="flex flex-col gap-4">
-        <Notice tone="success" role="status">{t("resetDone")}</Notice>
+        <Notice tone="success" role="status">
+          {t("resetDone")}
+        </Notice>
         <Link href="/logg-inn" className="button button-primary">
           {t("signInNow")}
         </Link>
@@ -184,7 +233,15 @@ export function ResetPasswordForm({ token }: { token: string }) {
       <label className="field">
         {t("newPassword")}
         <span className="field-hint">{t("passwordHint")}</span>
-        <input name="password" type="password" autoComplete="new-password" required minLength={10} maxLength={128} aria-invalid={invalid(state, "password")} />
+        <input
+          name="password"
+          type="password"
+          autoComplete="new-password"
+          required
+          minLength={10}
+          maxLength={128}
+          aria-invalid={invalid(state, "password")}
+        />
         <FieldError state={state} name="password" />
       </label>
       <SubmitButton>{t("resetButton")}</SubmitButton>
@@ -195,7 +252,12 @@ export function ResetPasswordForm({ token }: { token: string }) {
 export function ResendVerificationForm({ locale, email }: { locale: Loc; email?: string }) {
   const t = useTranslations("auth");
   const [state, action] = useActionState(resendVerificationAction, idle);
-  if (state.status === "ok") return <Notice tone="success" role="status">{t("resendDone")}</Notice>;
+  if (state.status === "ok")
+    return (
+      <Notice tone="success" role="status">
+        {t("resendDone")}
+      </Notice>
+    );
   return (
     <form action={action} className="flex flex-col gap-4">
       <FormError state={state} />

@@ -26,7 +26,13 @@ export default async function AccountPage({ params, searchParams }: PageProps<"/
   const ta = await getTranslations("auth");
   const staff = profile.role === "moderator" || profile.role === "admin";
   const statusNotice =
-    profile.status === "restricted" ? t("statusRestricted") : profile.status === "suspended" ? t("statusSuspended") : profile.status === "deletion_pending" ? t("statusDeletion") : null;
+    profile.status === "restricted"
+      ? t("statusRestricted")
+      : profile.status === "suspended"
+        ? t("statusSuspended")
+        : profile.status === "deletion_pending"
+          ? t("statusDeletion")
+          : null;
 
   return (
     <NarrowPage>
@@ -54,7 +60,9 @@ export default async function AccountPage({ params, searchParams }: PageProps<"/
           </h2>
           <p className="break-all">
             {profile.email}{" "}
-            <span className={`badge ${profile.emailVerified ? "" : "badge-warning"}`}>{profile.emailVerified ? t("emailVerified") : t("emailUnverified")}</span>
+            <span className={`badge ${profile.emailVerified ? "" : "badge-warning"}`}>
+              {profile.emailVerified ? t("emailVerified") : t("emailUnverified")}
+            </span>
           </p>
           {!profile.emailVerified && (
             <div className="mt-4 flex flex-col gap-4">
@@ -77,7 +85,13 @@ export default async function AccountPage({ params, searchParams }: PageProps<"/
             {t("detailsHeading")}
           </h2>
           <ProfileForm
-            profile={{ name: profile.name, bio: profile.bio, localitySlug: profile.localitySlug, locale: profile.locale, emailNotifications: profile.emailNotifications }}
+            profile={{
+              name: profile.name,
+              bio: profile.bio,
+              localitySlug: profile.localitySlug,
+              locale: profile.locale,
+              emailNotifications: profile.emailNotifications,
+            }}
             localities={localities.map((l) => ({ slug: l.slug, name: l.name }))}
           />
         </section>

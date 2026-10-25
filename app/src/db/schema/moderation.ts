@@ -30,7 +30,10 @@ export const reports = pgTable(
     targetId: uuid("target_id").notNull(),
     reason: text("reason", { enum: REPORT_REASONS }).notNull(),
     details: text("details"),
-    attachedMessageIds: uuid("attached_message_ids").array().notNull().default(sql`'{}'::uuid[]`),
+    attachedMessageIds: uuid("attached_message_ids")
+      .array()
+      .notNull()
+      .default(sql`'{}'::uuid[]`),
     status: text("status", { enum: ["open", "in_review", "actioned", "dismissed"] })
       .notNull()
       .default("open"),
@@ -91,7 +94,9 @@ export const appeals = pgTable(
       .notNull()
       .references(() => users.id),
     text: text("text").notNull(),
-    status: text("status", { enum: ["open", "upheld", "reversed"] }).notNull().default("open"),
+    status: text("status", { enum: ["open", "upheld", "reversed"] })
+      .notNull()
+      .default("open"),
     decidedBy: uuid("decided_by").references(() => users.id),
     decisionText: text("decision_text"),
     decidedBySameStaff: boolean("decided_by_same_staff"),

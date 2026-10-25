@@ -21,7 +21,9 @@ export default async function TwoFactorPage({ params }: PageProps<"/[locale]/kon
   return (
     <NarrowPage>
       <PageHeader title={t("setup2faTitle")} lead={actor.staff2fa ? undefined : t("setup2faLead")} />
-      <div className="card p-6">{actor.staff2fa ? <Notice tone="success">{t("setup2faDone")}</Notice> : <TwoFactorSetup />}</div>
+      <div className="card p-6">
+        {actor.staff2fa ? <Notice tone="success">{t("setup2faDone")}</Notice> : <TwoFactorSetup />}
+      </div>
     </NarrowPage>
   );
 }

@@ -24,7 +24,8 @@ export default async function ModerationDecisionPage({ params }: PageProps<"/[lo
   const t = await getTranslations("moderation");
   const tr = await getTranslations("report");
   const a = view.action;
-  const reason = a.reasonCode && tr.has(`reasons.${a.reasonCode}`) ? tr(`reasons.${a.reasonCode}` as "reasons.other") : a.reasonCode;
+  const reason =
+    a.reasonCode && tr.has(`reasons.${a.reasonCode}`) ? tr(`reasons.${a.reasonCode}` as "reasons.other") : a.reasonCode;
 
   return (
     <NarrowPage>
@@ -39,7 +40,9 @@ export default async function ModerationDecisionPage({ params }: PageProps<"/[lo
         <h2 className="text-xl">{t("appealHeading")}</h2>
         {view.appeal ? (
           <>
-            <Notice tone={view.appeal.status === "reversed" ? "success" : "info"}>{t(`appealStatus.${view.appeal.status}`)}</Notice>
+            <Notice tone={view.appeal.status === "reversed" ? "success" : "info"}>
+              {t(`appealStatus.${view.appeal.status}`)}
+            </Notice>
             {view.appeal.decisionText && <p className="whitespace-pre-line">{view.appeal.decisionText}</p>}
             {view.appeal.decidedBySameStaff && <p className="fine-print">{t("sameStaffNote")}</p>}
           </>

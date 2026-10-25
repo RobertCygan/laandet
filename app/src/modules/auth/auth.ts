@@ -5,15 +5,7 @@ import { haveIBeenPwned } from "better-auth/plugins/haveibeenpwned";
 import { twoFactor } from "better-auth/plugins/two-factor";
 import { eq } from "drizzle-orm";
 import { db } from "@/db/client";
-import {
-  accounts,
-  rateLimits,
-  sessions,
-  twoFactors,
-  userProfiles,
-  users,
-  verifications,
-} from "@/db/schema";
+import { accounts, rateLimits, sessions, twoFactors, userProfiles, users, verifications } from "@/db/schema";
 import { env, hibpEnabled } from "@/modules/config/env";
 import { queueEmail } from "@/modules/notifications/outbox";
 

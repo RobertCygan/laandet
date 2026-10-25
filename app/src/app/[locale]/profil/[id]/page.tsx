@@ -23,7 +23,8 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
   if (!p) notFound();
   const t = await getTranslations("profile");
   const tl = await getTranslations("listing");
-  const isNew = Date.now() - p.createdAt.getTime() < 30 * 24 * 60 * 60 * 1000;
+  // Statistics only when real data exists (completed rentals arrive with Phase 02); otherwise «Ny på Laandet».
+  const isNew = p.completedRentals === null;
   const self = actor.kind === "user" && actor.id === p.id;
 
   return (
@@ -71,7 +72,13 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
       {!self && (
         <details className="card mt-10 p-6">
           <summary className="cursor-pointer font-bold">{t("report")}</summary>
-          <div className="mt-4">{actor.kind === "user" ? <ReportForm targetType="user" targetId={p.id} /> : <ReportSignedOut returnTo={`${locale === "en" ? "/en" : ""}/profil/${p.id}`} />}</div>
+          <div className="mt-4">
+            {actor.kind === "user" ? (
+              <ReportForm targetType="user" targetId={p.id} />
+            ) : (
+              <ReportSignedOut returnTo={`${locale === "en" ? "/en" : ""}/profil/${p.id}`} />
+            )}
+          </div>
         </details>
       )}
     </div>

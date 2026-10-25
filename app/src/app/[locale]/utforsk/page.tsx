@@ -4,7 +4,13 @@ import { Search } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { parseKrToOre } from "@/i18n/format";
 import { pageLocale, param } from "@/i18n/page";
-import { listCategories, listLocalities, PAGE_SIZE, searchListings, type SearchFilters } from "@/modules/listings/queries";
+import {
+  listCategories,
+  listLocalities,
+  PAGE_SIZE,
+  searchListings,
+  type SearchFilters,
+} from "@/modules/listings/queries";
 import { PageHeader } from "@/ui/layout/PageHeader";
 import { ListingCard } from "@/ui/ListingCard";
 
@@ -66,7 +72,16 @@ export default async function ExplorePage({ params, searchParams }: PageProps<"/
   const tw = await getTranslations("wizard");
   const tc = await getTranslations("common");
   const page = f.page ?? 1;
-  const hasFilters = Boolean(f.category || f.locality || f.minPriceOre !== undefined || f.maxPriceOre !== undefined || f.delivery?.length || f.from || f.to || f.sort === "price");
+  const hasFilters = Boolean(
+    f.category ||
+    f.locality ||
+    f.minPriceOre !== undefined ||
+    f.maxPriceOre !== undefined ||
+    f.delivery?.length ||
+    f.from ||
+    f.to ||
+    f.sort === "price",
+  );
   const prefix = locale === "en" ? "/en" : "";
   const shown = (page - 1) * PAGE_SIZE + items.length;
 
@@ -175,7 +190,10 @@ export default async function ExplorePage({ params, searchParams }: PageProps<"/
             <button type="submit" className="button button-primary">
               {t("applyFilters")}
             </button>
-            <Link href={{ pathname: "/utforsk", query: f.type ? { type: f.type } : {} }} className="button button-subtle">
+            <Link
+              href={{ pathname: "/utforsk", query: f.type ? { type: f.type } : {} }}
+              className="button button-subtle"
+            >
               {t("reset")}
             </Link>
           </div>
@@ -203,14 +221,22 @@ export default async function ExplorePage({ params, searchParams }: PageProps<"/
       {(page > 1 || hasMore) && (
         <nav className="mt-8 flex justify-between gap-3" aria-label={t("results", { count: shown })}>
           {page > 1 ? (
-            <Link href={{ pathname: "/utforsk", query: withParams(sp, { side: page > 2 ? String(page - 1) : undefined }) }} className="button button-subtle" rel="prev">
+            <Link
+              href={{ pathname: "/utforsk", query: withParams(sp, { side: page > 2 ? String(page - 1) : undefined }) }}
+              className="button button-subtle"
+              rel="prev"
+            >
               {tc("previous")}
             </Link>
           ) : (
             <span />
           )}
           {hasMore && (
-            <Link href={{ pathname: "/utforsk", query: withParams(sp, { side: String(page + 1) }) }} className="button button-subtle" rel="next">
+            <Link
+              href={{ pathname: "/utforsk", query: withParams(sp, { side: String(page + 1) }) }}
+              className="button button-subtle"
+              rel="next"
+            >
               {tc("next")}
             </Link>
           )}

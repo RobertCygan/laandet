@@ -74,7 +74,14 @@ export async function signUp(input: SignUpInput, now = Date.now()): Promise<void
       const doc = await currentLegalDoc(tx, key, "nb");
       if (doc) await tx.insert(legalAcceptances).values({ userId: created.id, documentVersionId: doc.id });
     }
-    await recordAudit(tx, { actorId: created.id, actorRole: "user", action: "auth.sign_up", targetType: "user", targetId: created.id, meta });
+    await recordAudit(tx, {
+      actorId: created.id,
+      actorRole: "user",
+      action: "auth.sign_up",
+      targetType: "user",
+      targetId: created.id,
+      meta,
+    });
   });
 
   await auth.api.sendVerificationEmail({
@@ -105,7 +112,11 @@ export async function signIn(email: string, password: string): Promise<SignInRes
   } catch (err) {
     if (isAPIError(err)) {
       const code = (err.body as { code?: string } | undefined)?.code;
-      await recordAudit(db, { action: "auth.sign_in_failed", metadata: { emailKey: key, code: code ?? "unknown" }, meta });
+      await recordAudit(db, {
+        action: "auth.sign_in_failed",
+        metadata: { emailKey: key, code: code ?? "unknown" },
+        meta,
+      });
       // Only revealed after a correct password, so no account enumeration.
       if (code === "EMAIL_NOT_VERIFIED") throw new AppError("email_unverified");
       throw new AppError("validation", "invalid_credentials");
@@ -161,10 +172,7 @@ export async function resendVerification(email: string, locale: "nb" | "en"): Pr
     { bucket: `verify:email:${emailKey(email)}`, rule: LIMITS.emailPerAddress },
     { bucket: `verify:ip:${hashIp(meta.ip) ?? "none"}`, rule: LIMITS.signUpPerIp },
   ]);
-  const [u] = await db
-    .select({ verified: users.emailVerified })
-    .from(users)
-    .where(eq(users.email, email));
+  const [u] = await db.select({ verified: users.emailVerified }).from(users).where(eq(users.email, email));
   if (!u || u.verified) return; // same response either way
   await auth.api.sendVerificationEmail({ body: { email, callbackURL: lp(locale, "/konto?verified=1") } });
 }
@@ -203,7 +211,12 @@ export async function requestAccountDeletion(actor: UserActor, password: string)
   await db.transaction(async (tx) => {
     await tx
       .update(userProfiles)
-      .set({ status: "deletion_pending", deletionRequestedAt: new Date(), statusChangedAt: new Date(), updatedAt: new Date() })
+      .set({
+        status: "deletion_pending",
+        deletionRequestedAt: new Date(),
+        statusChangedAt: new Date(),
+        updatedAt: new Date(),
+      })
       .where(eq(userProfiles.userId, actor.id));
     await tx
       .update(listings)
@@ -222,7 +235,13 @@ export async function requestAccountDeletion(actor: UserActor, password: string)
       locale: actor.locale,
       payload: { name: actor.name },
     });
-    await recordAudit(tx, { actorId: actor.id, action: "account.deletion_requested", targetType: "user", targetId: actor.id, meta });
+    await recordAudit(tx, {
+      actorId: actor.id,
+      action: "account.deletion_requested",
+      targetType: "user",
+      targetId: actor.id,
+      meta,
+    });
     await tx.delete(sessions).where(eq(sessions.userId, actor.id));
   });
 }
@@ -233,7 +252,10 @@ const isStaff = (a: UserActor) => a.role === "moderator" || a.role === "admin";
  * Staff 2FA setup, step 1 (AUTH_MODEL §2): re-authenticate with the password and create a TOTP secret.
  * The secret is shown once to the user and stored encrypted by Better Auth.
  */
-export async function startTwoFactorSetup(actor: UserActor, password: string): Promise<{ totpURI: string; secret: string; backupCodes: string[] }> {
+export async function startTwoFactorSetup(
+  actor: UserActor,
+  password: string,
+): Promise<{ totpURI: string; secret: string; backupCodes: string[] }> {
   if (!isStaff(actor)) throw new AppError("forbidden");
   if (actor.staff2fa) throw new AppError("conflict");
   try {
@@ -257,7 +279,14 @@ export async function confirmTwoFactorSetup(actor: UserActor, code: string): Pro
     if (isAPIError(err)) throw new AppError("validation", "totp_invalid");
     throw err;
   }
-  await recordAudit(db, { actorId: actor.id, actorRole: actor.role, action: "auth.two_factor_enabled", targetType: "user", targetId: actor.id, meta });
+  await recordAudit(db, {
+    actorId: actor.id,
+    actorRole: actor.role,
+    action: "auth.two_factor_enabled",
+    targetType: "user",
+    targetId: actor.id,
+    meta,
+  });
 }
 
 /** «Endre passord»: current password required; other sessions are signed out (P01-07). */
@@ -265,35 +294,75 @@ export async function changePassword(actor: UserActor, currentPassword: string, 
   const meta = await getRequestMeta();
   await enforceRateLimits(db, [{ bucket: `password-change:user:${actor.id}`, rule: LIMITS.signInPerEmail }]);
   try {
-    await auth.api.changePassword({ body: { currentPassword, newPassword, revokeOtherSessions: true }, headers: await headers() });
+    await auth.api.changePassword({
+      body: { currentPassword, newPassword, revokeOtherSessions: true },
+      headers: await headers(),
+    });
   } catch (err) {
     if (isAPIError(err)) {
       const code = (err.body as { code?: string } | undefined)?.code;
-      if (code === "PASSWORD_COMPROMISED") throw new AppError("validation", "password_compromised", { fieldErrors: { newPassword: "password_compromised" } });
-      if (code === "INVALID_PASSWORD") throw new AppError("validation", "wrong_password", { fieldErrors: { currentPassword: "wrong_password" } });
+      if (code === "PASSWORD_COMPROMISED")
+        throw new AppError("validation", "password_compromised", {
+          fieldErrors: { newPassword: "password_compromised" },
+        });
+      if (code === "INVALID_PASSWORD")
+        throw new AppError("validation", "wrong_password", { fieldErrors: { currentPassword: "wrong_password" } });
       throw new AppError("validation");
     }
     throw err;
   }
-  await queueEmail(db, { toEmail: actor.email, toUserId: actor.id, template: "password_changed", locale: actor.locale, payload: { name: actor.name } });
-  await recordAudit(db, { actorId: actor.id, action: "auth.password_changed", targetType: "user", targetId: actor.id, meta });
+  await queueEmail(db, {
+    toEmail: actor.email,
+    toUserId: actor.id,
+    template: "password_changed",
+    locale: actor.locale,
+    payload: { name: actor.name },
+  });
+  await recordAudit(db, {
+    actorId: actor.id,
+    action: "auth.password_changed",
+    targetType: "user",
+    targetId: actor.id,
+    meta,
+  });
 }
 
 /**
  * «Endre e-post»: re-authenticate, then a verification link goes to the new address. The old
  * address is told about the request. The response never reveals whether the address is taken.
  */
-export async function changeEmail(actor: UserActor, password: string, newEmail: string, locale: "nb" | "en"): Promise<void> {
-  if (!(await verifyCurrentPassword(password))) throw new AppError("validation", "wrong_password", { fieldErrors: { password: "wrong_password" } });
+export async function changeEmail(
+  actor: UserActor,
+  password: string,
+  newEmail: string,
+  locale: "nb" | "en",
+): Promise<void> {
+  if (!(await verifyCurrentPassword(password)))
+    throw new AppError("validation", "wrong_password", { fieldErrors: { password: "wrong_password" } });
   const meta = await getRequestMeta();
   await enforceRateLimits(db, [{ bucket: `email-change:user:${actor.id}`, rule: LIMITS.emailPerAddress }]);
   if (newEmail === actor.email) return;
   try {
-    await auth.api.changeEmail({ body: { newEmail, callbackURL: lp(locale, "/konto?epost=1") }, headers: await headers() });
+    await auth.api.changeEmail({
+      body: { newEmail, callbackURL: lp(locale, "/konto?epost=1") },
+      headers: await headers(),
+    });
   } catch (err) {
     if (!isAPIError(err)) throw err;
     throw new AppError("validation");
   }
-  await queueEmail(db, { toEmail: actor.email, toUserId: actor.id, template: "email_change_requested", locale: actor.locale, payload: { name: actor.name } });
-  await recordAudit(db, { actorId: actor.id, action: "auth.email_change_requested", targetType: "user", targetId: actor.id, meta });
+  await queueEmail(db, {
+    toEmail: actor.email,
+    toUserId: actor.id,
+    template: "email_change_requested",
+    locale: actor.locale,
+    payload: { name: actor.name },
+  });
+  await recordAudit(db, {
+    actorId: actor.id,
+    action: "auth.email_change_requested",
+    targetType: "user",
+    targetId: actor.id,
+    meta,
+  });
 }

@@ -5,11 +5,7 @@ import { legalDocumentVersions, type LegalDocKey } from "@/db/schema";
 export type LegalDoc = typeof legalDocumentVersions.$inferSelect;
 
 /** The newest loaded version of a document in a locale (null if never loaded). */
-export async function currentLegalDoc(
-  db: DbOrTx,
-  docKey: LegalDocKey,
-  locale: "nb" | "en",
-): Promise<LegalDoc | null> {
+export async function currentLegalDoc(db: DbOrTx, docKey: LegalDocKey, locale: "nb" | "en"): Promise<LegalDoc | null> {
   const [row] = await db
     .select()
     .from(legalDocumentVersions)

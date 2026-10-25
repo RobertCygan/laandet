@@ -30,7 +30,14 @@ export async function uploadListingImage(actor: Actor, file: File): Promise<Uplo
     processed = await processImage(input);
   } catch (err) {
     if (err instanceof ImageRejected) {
-      throw new AppError("validation", err.reason === "too_large" ? "image_too_large" : err.reason === "too_many_pixels" ? "image_too_many_pixels" : "image_undecodable");
+      throw new AppError(
+        "validation",
+        err.reason === "too_large"
+          ? "image_too_large"
+          : err.reason === "too_many_pixels"
+            ? "image_too_many_pixels"
+            : "image_undecodable",
+      );
     }
     throw err;
   }

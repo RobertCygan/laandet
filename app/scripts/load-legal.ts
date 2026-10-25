@@ -1,7 +1,8 @@
 /**
  * Load legal texts from laandet/legal/{nb,en}/*.md into legal_document_versions (D-023).
- *   npm run legal:load                 (refuses unfinished texts when APP_ENV=production)
- *   npm run legal:load -- --allow-draft  (staging/dev only)
+ *   npm run legal:load                   refuses unfinished texts in staging and production
+ *   npm run legal:load -- --allow-draft  staging only: load drafts (always labelled as drafts)
+ * Production never loads a text that still contains placeholders, whatever the flags.
  * Idempotent: a version is inserted only when its content hash is new.
  */
 import { createHash } from "node:crypto";
@@ -12,7 +13,8 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import { LEGAL_DOC_KEYS, legalDocumentVersions, type LegalDocKey } from "../src/db/schema";
 
-const UNFINISHED = /MÅ FYLLES UT FØR LANSERING|KONTROLLERES FØR LANSERING|MUST BE COMPLETED BEFORE LAUNCH|TO BE VERIFIED BEFORE LAUNCH/;
+const UNFINISHED =
+  /MÅ FYLLES UT FØR LANSERING|KONTROLLERES FØR LANSERING|MUST BE COMPLETED BEFORE LAUNCH|TO BE VERIFIED BEFORE LAUNCH/;
 
 export function parseFrontMatter(raw: string): { meta: Record<string, string>; body: string } {
   const m = /^---\n([\s\S]*?)\n---\n?/.exec(raw);
@@ -30,7 +32,8 @@ async function main() {
   if (!url) throw new Error("DATABASE_MIGRATION_URL is not set");
   const legalDir = path.resolve(process.env.LEGAL_DIR ?? "../legal");
   const allowDraft = process.argv.includes("--allow-draft");
-  const production = process.env.APP_ENV === "production";
+  const appEnv = process.env.APP_ENV ?? "development";
+  const strict = appEnv === "production" || (appEnv === "staging" && !allowDraft);
   const pool = new Pool({ connectionString: url, max: 1 });
   const db = drizzle({ client: pool, casing: "snake_case" });
   let inserted = 0;
@@ -45,8 +48,8 @@ async function main() {
           console.warn(`skip ${locale}/${file}: unknown doc_key`);
           continue;
         }
-        if (production && !allowDraft && UNFINISHED.test(body)) {
-          throw new Error(`${locale}/${file} still contains placeholders; refusing to load in production`);
+        if (strict && UNFINISHED.test(body)) {
+          throw new Error(`${locale}/${file} still contains placeholders; refusing to load in ${appEnv}`);
         }
         const sha = createHash("sha256").update(body).digest("hex");
         const version = meta.version ?? "0.0.0";

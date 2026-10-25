@@ -44,7 +44,8 @@ export async function uploadImageAction(form: FormData): Promise<ActionState<Upl
   return runAction(async () => {
     const actor = await requireUser();
     const file = form.get("file");
-    if (!(file instanceof File)) throw new z.ZodError([{ code: "custom", path: ["file"], message: "image_missing", input: file }]);
+    if (!(file instanceof File))
+      throw new z.ZodError([{ code: "custom", path: ["file"], message: "image_missing", input: file }]);
     return uploadListingImage(actor, file);
   });
 }
@@ -69,7 +70,9 @@ export async function toggleSaveAction(form: FormData): Promise<void> {
   const locale = raw.locale === "en" ? "en" : "nb";
   const actor = await getActor();
   if (actor.kind !== "user") {
-    redirect(`${localePath(locale, "/logg-inn")}?neste=${encodeURIComponent(localePath(locale, `/annonse/${listingId}`))}`);
+    redirect(
+      `${localePath(locale, "/logg-inn")}?neste=${encodeURIComponent(localePath(locale, `/annonse/${listingId}`))}`,
+    );
   }
   await toggleSavedListing(actor, listingId);
   revalidatePath("/[locale]", "layout");

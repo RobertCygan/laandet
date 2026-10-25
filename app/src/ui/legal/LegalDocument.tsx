@@ -51,7 +51,8 @@ export async function LegalDocument({
         <Markdown source={transform ? transform(body) : body} locale={locale} />
       </article>
       <p className="fine-print mt-10">
-        {t("version", { version: doc.version })} · {t("updated", { date: formatDate(doc.effectiveAt ?? doc.createdAt) })}
+        {t("version", { version: doc.version })} ·{" "}
+        {t("updated", { date: formatDate(doc.effectiveAt ?? doc.createdAt) })}
       </p>
     </div>
   );

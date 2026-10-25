@@ -8,7 +8,17 @@ import { Notice } from "@/ui/Notice";
 import { SubmitButton } from "@/ui/SubmitButton";
 import { FieldError, FormError, invalid, prev } from "@/ui/forms/FormMessages";
 
-const REASONS = ["prohibited_item", "fraud_or_scam", "misleading", "harassment", "spam", "illegal_content", "privacy", "unsafe", "other"] as const;
+const REASONS = [
+  "prohibited_item",
+  "fraud_or_scam",
+  "misleading",
+  "harassment",
+  "spam",
+  "illegal_content",
+  "privacy",
+  "unsafe",
+  "other",
+] as const;
 
 /** Report form for a listing or a profile (anonymous to the reported person). */
 export function ReportForm({ targetType, targetId }: { targetType: "listing" | "user"; targetId: string }) {
@@ -30,7 +40,12 @@ export function ReportForm({ targetType, targetId }: { targetType: "listing" | "
       <input type="hidden" name="targetId" value={targetId} />
       <label className="field">
         {t("reason")}
-        <select name="reason" defaultValue={prev(state, "reason") ?? ""} required aria-invalid={invalid(state, "reason")}>
+        <select
+          name="reason"
+          defaultValue={prev(state, "reason") ?? ""}
+          required
+          aria-invalid={invalid(state, "reason")}
+        >
           <option value="">–</option>
           {REASONS.map((r) => (
             <option key={r} value={r}>
@@ -74,7 +89,15 @@ export function AppealForm({ actionId }: { actionId: string }) {
       <input type="hidden" name="actionId" value={actionId} />
       <label className="field">
         {t("appealText")}
-        <textarea name="text" rows={6} minLength={10} maxLength={4000} required defaultValue={prev(state, "text")} aria-invalid={invalid(state, "text")} />
+        <textarea
+          name="text"
+          rows={6}
+          minLength={10}
+          maxLength={4000}
+          required
+          defaultValue={prev(state, "text")}
+          aria-invalid={invalid(state, "text")}
+        />
         <FieldError state={state} name="text" />
       </label>
       <SubmitButton pendingLabel={tc("sending")}>{t("appealButton")}</SubmitButton>
@@ -83,7 +106,15 @@ export function AppealForm({ actionId }: { actionId: string }) {
 }
 
 /** Submit button that asks for confirmation first (e.g. deleting a listing). */
-export function ConfirmButton({ message, className, children }: { message: string; className: string; children: ReactNode }) {
+export function ConfirmButton({
+  message,
+  className,
+  children,
+}: {
+  message: string;
+  className: string;
+  children: ReactNode;
+}) {
   return (
     <button
       type="submit"

@@ -15,7 +15,11 @@ export default async function SupportPage({ params }: PageProps<"/[locale]/stott
   const locale = await pageLocale(params);
   const e = env();
   const campaign: SupportCampaign | null =
-    e.SUPPORT_CAMPAIGN_URL && e.SUPPORT_PROVIDER_NAME && e.SUPPORT_FEE_TEXT && e.SUPPORT_RECIPIENT_NAME && e.SUPPORT_RECIPIENT_ORGNR
+    e.SUPPORT_CAMPAIGN_URL &&
+    e.SUPPORT_PROVIDER_NAME &&
+    e.SUPPORT_FEE_TEXT &&
+    e.SUPPORT_RECIPIENT_NAME &&
+    e.SUPPORT_RECIPIENT_ORGNR
       ? {
           url: e.SUPPORT_CAMPAIGN_URL,
           providerName: e.SUPPORT_PROVIDER_NAME,

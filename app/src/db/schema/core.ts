@@ -18,13 +18,7 @@ import { users } from "./auth";
 
 const ts = (name: string) => timestamp(name, { withTimezone: true });
 
-export const ACCOUNT_STATUSES = [
-  "active",
-  "restricted",
-  "suspended",
-  "deletion_pending",
-  "deleted",
-] as const;
+export const ACCOUNT_STATUSES = ["active", "restricted", "suspended", "deletion_pending", "deleted"] as const;
 export type AccountStatus = (typeof ACCOUNT_STATUSES)[number];
 
 export const ROLES = ["user", "moderator", "admin"] as const;
@@ -98,10 +92,7 @@ export const identityVerifications = pgTable(
   (t) => [
     check("identity_provider_chk", sql`${t.provider} IN ('email','bankid','manual_staff')`),
     check("identity_level_chk", sql`${t.level} IN ('basic','strong')`),
-    check(
-      "identity_status_chk",
-      sql`${t.status} IN ('pending','verified','failed','revoked','expired')`,
-    ),
+    check("identity_status_chk", sql`${t.status} IN ('pending','verified','failed','revoked','expired')`),
     check("identity_email_is_basic", sql`${t.level} = 'basic' OR ${t.provider} <> 'email'`),
     uniqueIndex("identity_unique_subject")
       .on(t.provider, t.providerSubjectHash)

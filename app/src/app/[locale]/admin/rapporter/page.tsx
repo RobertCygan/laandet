@@ -39,10 +39,18 @@ export default async function ReportsPage({ params, searchParams }: PageProps<"/
         </div>
       )}
       <div className="mb-6 flex gap-2">
-        <Link href="/admin/rapporter" className={`button button-sm ${automaticOnly ? "button-subtle" : "button-outline"}`} aria-current={!automaticOnly ? "page" : undefined}>
+        <Link
+          href="/admin/rapporter"
+          className={`button button-sm ${automaticOnly ? "button-subtle" : "button-outline"}`}
+          aria-current={!automaticOnly ? "page" : undefined}
+        >
           {t("filterAll")}
         </Link>
-        <Link href={{ pathname: "/admin/rapporter", query: { automatisk: "1" } }} className={`button button-sm ${automaticOnly ? "button-outline" : "button-subtle"}`} aria-current={automaticOnly ? "page" : undefined}>
+        <Link
+          href={{ pathname: "/admin/rapporter", query: { automatisk: "1" } }}
+          className={`button button-sm ${automaticOnly ? "button-outline" : "button-subtle"}`}
+          aria-current={automaticOnly ? "page" : undefined}
+        >
           {t("filterAutomatic")}
         </Link>
       </div>
@@ -57,7 +65,9 @@ export default async function ReportsPage({ params, searchParams }: PageProps<"/
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="badge badge-warning">{tr(`reasons.${r.reason}`)}</span>
                   {r.isAutomatic && <span className="badge">{t("automatic")}</span>}
-                  <span className="text-sm text-muted">{t("reportedAt", { date: formatDateTime(r.createdAt, locale) })}</span>
+                  <span className="text-sm text-muted">
+                    {t("reportedAt", { date: formatDateTime(r.createdAt, locale) })}
+                  </span>
                 </div>
                 {r.targetType === "listing" ? (
                   <p>
@@ -81,14 +91,17 @@ export default async function ReportsPage({ params, searchParams }: PageProps<"/
                   </div>
                 )}
                 <div className="grid gap-4 md:grid-cols-2">
-                  {r.targetType === "listing" && r.listingStatus && !["removed", "deleted"].includes(r.listingStatus) && !ownListing && (
-                    <details className="rounded-md border border-border p-3">
-                      <summary className="cursor-pointer font-bold">{t("hide")}</summary>
-                      <div className="mt-3">
-                        <HideListingForm listingId={r.targetId} reportId={r.id} back={back} />
-                      </div>
-                    </details>
-                  )}
+                  {r.targetType === "listing" &&
+                    r.listingStatus &&
+                    !["removed", "deleted"].includes(r.listingStatus) &&
+                    !ownListing && (
+                      <details className="rounded-md border border-border p-3">
+                        <summary className="cursor-pointer font-bold">{t("hide")}</summary>
+                        <div className="mt-3">
+                          <HideListingForm listingId={r.targetId} reportId={r.id} back={back} />
+                        </div>
+                      </details>
+                    )}
                   {r.targetType === "user" && <Notice>{t("profileNote")}</Notice>}
                   <details className="rounded-md border border-border p-3">
                     <summary className="cursor-pointer font-bold">{t("dismiss")}</summary>

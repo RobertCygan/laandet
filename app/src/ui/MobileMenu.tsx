@@ -4,7 +4,15 @@ import { Menu, X } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
 /** Mobile navigation: focus moves into the panel, Escape closes, focus returns to the button. */
-export function MobileMenu({ openLabel, closeLabel, children }: { openLabel: string; closeLabel: string; children: ReactNode }) {
+export function MobileMenu({
+  openLabel,
+  closeLabel,
+  children,
+}: {
+  openLabel: string;
+  closeLabel: string;
+  children: ReactNode;
+}) {
   const [open, setOpen] = useState(false);
   const button = useRef<HTMLButtonElement>(null);
   const panel = useRef<HTMLDivElement>(null);
@@ -56,9 +64,7 @@ export function MobileMenu({ openLabel, closeLabel, children }: { openLabel: str
             if ((e.target as HTMLElement).closest("a")) setOpen(false);
           }}
         >
-          <nav className="wrap flex flex-col gap-1 py-4 text-base font-semibold [&_a]:block [&_a]:py-3">
-            {children}
-          </nav>
+          <nav className="wrap flex flex-col gap-1 py-4 text-base font-semibold [&_a]:block [&_a]:py-3">{children}</nav>
         </div>
       )}
     </div>

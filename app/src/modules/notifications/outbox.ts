@@ -99,10 +99,5 @@ export async function releaseStuckEmails(db: DbOrTx): Promise<void> {
   await db
     .update(emailOutbox)
     .set({ status: "pending" })
-    .where(
-      and(
-        eq(emailOutbox.status, "sending"),
-        lte(emailOutbox.nextAttemptAt, sql`now() - interval '10 minutes'`),
-      ),
-    );
+    .where(and(eq(emailOutbox.status, "sending"), lte(emailOutbox.nextAttemptAt, sql`now() - interval '10 minutes'`)));
 }

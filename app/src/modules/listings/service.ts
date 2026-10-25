@@ -19,13 +19,24 @@ import { isFlagEnabled } from "@/modules/flags/flags";
 import { assertNoPendingAcceptance } from "@/modules/legal/acceptance";
 import { enforceRateLimits, LIMITS } from "@/modules/ratelimit/ratelimit";
 import { getRequestMeta } from "@/modules/server/request-meta";
-import { containsContactInfo, matchScreeningKeywords, MAX_IMAGES, publishViolations, storageViolations, type ListingDraft } from "./rules";
+import {
+  containsContactInfo,
+  matchScreeningKeywords,
+  MAX_IMAGES,
+  publishViolations,
+  storageViolations,
+  type ListingDraft,
+} from "./rules";
 
 export type SaveIntent = "draft" | "publish";
 export type ImageInput = { mediaId: string; altText: string | null };
 export type SaveResult = { id: string; status: ListingStatus; warnings: string[] };
 
-async function loadOwned(actor: Actor, listingId: string, action: "listing.update" | "listing.publish" | "listing.delete") {
+async function loadOwned(
+  actor: Actor,
+  listingId: string,
+  action: "listing.update" | "listing.publish" | "listing.delete",
+) {
   const [row] = await db.select().from(listings).where(eq(listings.id, listingId));
   if (!row) throw new AppError("not_found");
   assertCan(actor, action, { type: "listing", ownerId: row.ownerId, status: row.status, isDemo: row.isDemo });
@@ -58,10 +69,15 @@ async function syncImages(tx: Tx, actor: UserActor, listingId: string, images: I
       );
     if (owned.length !== new Set(ids).size) throw new AppError("not_found", "media");
   }
-  const previous = await tx.select({ mediaId: listingImages.mediaId }).from(listingImages).where(eq(listingImages.listingId, listingId));
+  const previous = await tx
+    .select({ mediaId: listingImages.mediaId })
+    .from(listingImages)
+    .where(eq(listingImages.listingId, listingId));
   await tx.delete(listingImages).where(eq(listingImages.listingId, listingId));
   for (const [i, img] of images.entries()) {
-    await tx.insert(listingImages).values({ listingId, mediaId: img.mediaId, sortOrder: i, altText: img.altText?.slice(0, 150) ?? null });
+    await tx
+      .insert(listingImages)
+      .values({ listingId, mediaId: img.mediaId, sortOrder: i, altText: img.altText?.slice(0, 150) ?? null });
   }
   const removed = previous.map((p) => p.mediaId).filter((id) => !ids.includes(id));
   if (removed.length) {
@@ -111,7 +127,13 @@ export async function saveListing(
     ]);
   }
 
-  const status: ListingStatus = existing ? (opts.intent === "publish" && existing.status === "draft" ? "published" : existing.status) : opts.intent === "publish" ? "published" : "draft";
+  const status: ListingStatus = existing
+    ? opts.intent === "publish" && existing.status === "draft"
+      ? "published"
+      : existing.status
+    : opts.intent === "publish"
+      ? "published"
+      : "draft";
   const now = new Date();
   const values = {
     type: draft.type,
@@ -129,7 +151,8 @@ export async function saveListing(
     usageRestrictions: draft.usageRestrictions,
     includedAccessories: draft.includedAccessories,
     operatingInstructions: draft.operatingInstructions,
-    restrictedAckAt: category.policy === "restricted" && draft.restrictedAck ? (existing?.restrictedAckAt ?? now) : null,
+    restrictedAckAt:
+      category.policy === "restricted" && draft.restrictedAck ? (existing?.restrictedAckAt ?? now) : null,
     wantedFrom: draft.wantedFrom,
     wantedTo: draft.wantedTo,
     budgetOre: draft.budgetOre,
@@ -151,14 +174,23 @@ export async function saveListing(
       await tx.update(listings).set(values).where(eq(listings.id, existing.id));
       listingId = existing.id;
     } else {
-      const [row] = await tx.insert(listings).values({ ...values, ownerId: user.id }).returning({ id: listings.id });
+      const [row] = await tx
+        .insert(listings)
+        .values({ ...values, ownerId: user.id })
+        .returning({ id: listings.id });
       listingId = row!.id;
     }
     await syncImages(tx, user, listingId, images);
     await recordAudit(tx, {
       actorId: user.id,
       actorRole: user.role,
-      action: existing ? (firstPublish ? "listing.publish" : "listing.update") : status === "published" ? "listing.publish" : "listing.create",
+      action: existing
+        ? firstPublish
+          ? "listing.publish"
+          : "listing.update"
+        : status === "published"
+          ? "listing.publish"
+          : "listing.create",
       targetType: "listing",
       targetId: listingId,
       meta,
@@ -184,7 +216,14 @@ async function reportScreeningHit(tx: Tx, listingId: string, hits: string[]) {
   const [open] = await tx
     .select({ id: reports.id })
     .from(reports)
-    .where(and(eq(reports.targetType, "listing"), eq(reports.targetId, listingId), eq(reports.isAutomatic, true), eq(reports.status, "open")));
+    .where(
+      and(
+        eq(reports.targetType, "listing"),
+        eq(reports.targetId, listingId),
+        eq(reports.isAutomatic, true),
+        eq(reports.status, "open"),
+      ),
+    );
   if (open) return;
   await tx.insert(reports).values({
     reporterId: null,
@@ -227,7 +266,10 @@ export async function changeListingStatus(actor: Actor, listingId: string, actio
 
 export async function toggleSavedListing(actor: Actor, listingId: string): Promise<boolean> {
   assertCan(actor, "savedListing.toggle");
-  const [l] = await db.select({ id: listings.id }).from(listings).where(and(eq(listings.id, listingId), eq(listings.status, "published")));
+  const [l] = await db
+    .select({ id: listings.id })
+    .from(listings)
+    .where(and(eq(listings.id, listingId), eq(listings.status, "published")));
   if (!l) throw new AppError("not_found");
   const removed = await db
     .delete(savedListings)

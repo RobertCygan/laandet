@@ -47,7 +47,13 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         </div>
         <figure className="relative m-0 overflow-hidden rounded-[12px_70px_12px_12px]">
           {/* eslint-disable-next-line @next/next/no-img-element -- static illustration, fixed size */}
-          <img src="/images/hero.webp" alt={t("heroAlt")} width={1200} height={950} className="h-auto w-full object-cover" />
+          <img
+            src="/images/hero.webp"
+            alt={t("heroAlt")}
+            width={1200}
+            height={950}
+            className="h-auto w-full object-cover"
+          />
           <figcaption className="absolute right-3 bottom-2 rounded bg-black/45 px-2 py-0.5 text-xs text-white">
             {t("heroCaption")}
           </figcaption>
@@ -55,7 +61,11 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
       </section>
 
       <section className="wrap pb-6" aria-label={t("searchLabel")}>
-        <form action={`${prefix}/utforsk`} method="get" className="card flex flex-col gap-3 p-3 md:flex-row md:items-end">
+        <form
+          action={`${prefix}/utforsk`}
+          method="get"
+          className="card flex flex-col gap-3 p-3 md:flex-row md:items-end"
+        >
           <label className="field flex-1">
             {t("searchLabel")}
             <input name="q" type="search" placeholder={t("searchPlaceholder")} maxLength={100} />
@@ -83,7 +93,11 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         )}
       </section>
 
-      <Section title={t("rentHeading")} href={{ pathname: "/utforsk", query: { type: "rent_out" } }} linkLabel={t("seeAll")}>
+      <Section
+        title={t("rentHeading")}
+        href={{ pathname: "/utforsk", query: { type: "rent_out" } }}
+        linkLabel={t("seeAll")}
+      >
         {rent.length ? (
           <div className="listing-grid">
             {rent.map((l) => (
@@ -120,7 +134,11 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
       </section>
 
       {wanted.length > 0 && (
-        <Section title={t("wantedHeading")} href={{ pathname: "/utforsk", query: { type: "wanted" } }} linkLabel={t("seeAll")}>
+        <Section
+          title={t("wantedHeading")}
+          href={{ pathname: "/utforsk", query: { type: "wanted" } }}
+          linkLabel={t("seeAll")}
+        >
           <div className="listing-grid">
             {wanted.map((l) => (
               <ListingCard key={l.id} listing={l} locale={locale} />
@@ -130,7 +148,11 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
       )}
 
       {give.length > 0 && (
-        <Section title={t("giveHeading")} href={{ pathname: "/utforsk", query: { type: "give_away" } }} linkLabel={t("seeAll")}>
+        <Section
+          title={t("giveHeading")}
+          href={{ pathname: "/utforsk", query: { type: "give_away" } }}
+          linkLabel={t("seeAll")}
+        >
           <div className="listing-grid">
             {give.map((l) => (
               <ListingCard key={l.id} listing={l} locale={locale} />

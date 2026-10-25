@@ -1,7 +1,10 @@
 import { z } from "zod";
 
 // Messages are i18n keys under `validation.*`.
-export const emailSchema = z.email({ error: "email" }).max(254, { error: "email" }).transform((v) => v.trim().toLowerCase());
+export const emailSchema = z
+  .email({ error: "email" })
+  .max(254, { error: "email" })
+  .transform((v) => v.trim().toLowerCase());
 export const passwordSchema = z
   .string()
   .min(10, { error: "password_too_short" })
@@ -20,7 +23,11 @@ export const signUpSchema = z.object({
   name: displayNameSchema,
   email: emailSchema,
   password: passwordSchema,
-  locality: z.string().max(60).optional().transform((v) => (v ? v : undefined)),
+  locality: z
+    .string()
+    .max(60)
+    .optional()
+    .transform((v) => (v ? v : undefined)),
   age18: checked,
   privateUse: checked,
   terms: checked,
@@ -45,7 +52,10 @@ export const resetPasswordSchema = z.object({
 });
 
 export const totpSchema = z.object({
-  code: z.string().trim().regex(/^\d{6}$/, { error: "totp_format" }),
+  code: z
+    .string()
+    .trim()
+    .regex(/^\d{6}$/, { error: "totp_format" }),
 });
 
 export const deleteAccountSchema = z.object({

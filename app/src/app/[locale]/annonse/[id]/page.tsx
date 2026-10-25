@@ -21,7 +21,10 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/annonse/
   const { id } = await params;
   const d = await getListingForViewer(await getActor(), id);
   if (!d) return {};
-  return { title: d.listing.title, robots: d.listing.isDemo || d.listing.status !== "published" ? { index: false } : undefined };
+  return {
+    title: d.listing.title,
+    robots: d.listing.isDemo || d.listing.status !== "published" ? { index: false } : undefined,
+  };
 }
 
 export default async function ListingPage({ params, searchParams }: PageProps<"/[locale]/annonse/[id]">) {
@@ -44,7 +47,8 @@ export default async function ListingPage({ params, searchParams }: PageProps<"/
   const tc = await getTranslations("common");
   const lagret = param(sp.lagret);
   const unit = tl(`unit.${l.priceUnit ?? "day"}`);
-  const highValue = l.type === "rent_out" && l.declaredValueOre !== null && classifyValue(Number(l.declaredValueOre)) === "B";
+  const highValue =
+    l.type === "rent_out" && l.declaredValueOre !== null && classifyValue(Number(l.declaredValueOre)) === "B";
   const [main, ...rest] = d.images;
 
   return (
@@ -72,7 +76,9 @@ export default async function ListingPage({ params, searchParams }: PageProps<"/
             )}
           </Notice>
         )}
-        {l.status !== "published" && l.status !== "removed" && <Notice>{t("notPublished", { status: tl(`status.${l.status}`) })}</Notice>}
+        {l.status !== "published" && l.status !== "removed" && (
+          <Notice>{t("notPublished", { status: tl(`status.${l.status}`) })}</Notice>
+        )}
         {isOwner && (
           <Notice>
             <p>
@@ -91,9 +97,20 @@ export default async function ListingPage({ params, searchParams }: PageProps<"/
         <div className="flex flex-col gap-6">
           <section aria-label={t("images")}>
             {main ? (
-              <a href={`/media/${main.mediaId}/display`} target="_blank" rel="noopener" aria-label={t("openImage", { n: 1 })}>
+              <a
+                href={`/media/${main.mediaId}/display`}
+                target="_blank"
+                rel="noopener"
+                aria-label={t("openImage", { n: 1 })}
+              >
                 {/* eslint-disable-next-line @next/next/no-img-element -- authorised media route */}
-                <img src={`/media/${main.mediaId}/display`} alt={main.altText || l.title} width={1600} height={1200} className="aspect-[4/3] w-full rounded-xl object-cover" />
+                <img
+                  src={`/media/${main.mediaId}/display`}
+                  alt={main.altText || l.title}
+                  width={1600}
+                  height={1200}
+                  className="aspect-[4/3] w-full rounded-xl object-cover"
+                />
               </a>
             ) : (
               <div className="flex aspect-[4/3] w-full items-center justify-center rounded-xl bg-secondary text-primary/70">
@@ -105,9 +122,21 @@ export default async function ListingPage({ params, searchParams }: PageProps<"/
               <ul className="mt-3 grid grid-cols-4 gap-2">
                 {rest.map((img, i) => (
                   <li key={img.mediaId}>
-                    <a href={`/media/${img.mediaId}/display`} target="_blank" rel="noopener" aria-label={t("openImage", { n: i + 2 })}>
+                    <a
+                      href={`/media/${img.mediaId}/display`}
+                      target="_blank"
+                      rel="noopener"
+                      aria-label={t("openImage", { n: i + 2 })}
+                    >
                       {/* eslint-disable-next-line @next/next/no-img-element -- authorised media route */}
-                      <img src={`/media/${img.mediaId}/thumb`} alt={img.altText || ""} width={480} height={360} className="aspect-[4/3] w-full rounded-md object-cover" loading="lazy" />
+                      <img
+                        src={`/media/${img.mediaId}/thumb`}
+                        alt={img.altText || ""}
+                        width={480}
+                        height={360}
+                        className="aspect-[4/3] w-full rounded-md object-cover"
+                        loading="lazy"
+                      />
                     </a>
                   </li>
                 ))}
@@ -192,11 +221,19 @@ export default async function ListingPage({ params, searchParams }: PageProps<"/
                 {l.depositOre ? <p className="fine-print">{t("depositNote")}</p> : null}
               </div>
             )}
-            {l.type === "give_away" && <p className="price text-2xl"><strong>{tl("free")}</strong></p>}
+            {l.type === "give_away" && (
+              <p className="price text-2xl">
+                <strong>{tl("free")}</strong>
+              </p>
+            )}
             {l.type === "wanted" && (
               <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
                 <dt className="font-bold">{t("wantedPeriod")}</dt>
-                <dd>{l.wantedFrom || l.wantedTo ? `${l.wantedFrom ? formatIsoDate(l.wantedFrom) : "…"} – ${l.wantedTo ? formatIsoDate(l.wantedTo) : "…"}` : t("flexible")}</dd>
+                <dd>
+                  {l.wantedFrom || l.wantedTo
+                    ? `${l.wantedFrom ? formatIsoDate(l.wantedFrom) : "…"} – ${l.wantedTo ? formatIsoDate(l.wantedTo) : "…"}`
+                    : t("flexible")}
+                </dd>
                 <dt className="font-bold">{t("wantedBudget")}</dt>
                 <dd>{l.budgetOre ? formatKr(l.budgetOre) : tl("budgetOpen")}</dd>
               </dl>
@@ -235,7 +272,12 @@ export default async function ListingPage({ params, searchParams }: PageProps<"/
             {!l.isDemo && !isOwner && l.status === "published" && (
               <div className="flex flex-col gap-2">
                 {l.type === "rent_out" && !rentalsOpen && (
-                  <button type="button" className="button button-primary w-full" disabled aria-describedby="request-soon">
+                  <button
+                    type="button"
+                    className="button button-primary w-full"
+                    disabled
+                    aria-describedby="request-soon"
+                  >
                     {t("sendRequest")}
                   </button>
                 )}
@@ -258,7 +300,11 @@ export default async function ListingPage({ params, searchParams }: PageProps<"/
               <form action={toggleSaveAction}>
                 <input type="hidden" name="listingId" value={l.id} />
                 <input type="hidden" name="locale" value={locale} />
-                <button type="submit" className={`button w-full ${saved ? "button-subtle" : "button-outline"}`} aria-pressed={saved}>
+                <button
+                  type="submit"
+                  className={`button w-full ${saved ? "button-subtle" : "button-outline"}`}
+                  aria-pressed={saved}
+                >
                   {saved ? <BookmarkCheck size={18} aria-hidden="true" /> : <Bookmark size={18} aria-hidden="true" />}
                   {saved ? t("saved") : t("save")}
                 </button>
@@ -271,7 +317,9 @@ export default async function ListingPage({ params, searchParams }: PageProps<"/
             <Link href={`/profil/${d.owner.id}`} className="text-link text-lg">
               {d.owner.name}
             </Link>
-            <p className="text-sm text-muted">{t("memberSince", { date: formatMonthYear(d.owner.createdAt, locale) })}</p>
+            <p className="text-sm text-muted">
+              {t("memberSince", { date: formatMonthYear(d.owner.createdAt, locale) })}
+            </p>
             <p className="fine-print">{t("privateNote")}</p>
           </div>
 
@@ -280,7 +328,13 @@ export default async function ListingPage({ params, searchParams }: PageProps<"/
           {!isOwner && (
             <details className="card p-6">
               <summary className="cursor-pointer font-bold">{t("report")}</summary>
-              <div className="mt-4">{actor.kind === "user" ? <ReportForm targetType="listing" targetId={l.id} /> : <ReportSignedOut returnTo={`${locale === "en" ? "/en" : ""}/annonse/${l.id}`} />}</div>
+              <div className="mt-4">
+                {actor.kind === "user" ? (
+                  <ReportForm targetType="listing" targetId={l.id} />
+                ) : (
+                  <ReportSignedOut returnTo={`${locale === "en" ? "/en" : ""}/annonse/${l.id}`} />
+                )}
+              </div>
             </details>
           )}
         </aside>

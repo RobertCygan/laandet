@@ -53,7 +53,13 @@ export default async function MyListingsPage({ params }: PageProps<"/[locale]/mi
               <div className="h-20 w-28 shrink-0 overflow-hidden rounded-md bg-secondary">
                 {l.thumbId && (
                   // eslint-disable-next-line @next/next/no-img-element -- authorised media route
-                  <img src={`/media/${l.thumbId}/thumb`} alt="" width={480} height={360} className="h-full w-full object-cover" />
+                  <img
+                    src={`/media/${l.thumbId}/thumb`}
+                    alt=""
+                    width={480}
+                    height={360}
+                    className="h-full w-full object-cover"
+                  />
                 )}
               </div>
               <div className="min-w-0 flex-1">
@@ -62,7 +68,11 @@ export default async function MyListingsPage({ params }: PageProps<"/[locale]/mi
                 </Link>
                 <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted">
                   <span className="badge">{tl(`type.${l.type}`)}</span>
-                  <span className={`badge ${l.status === "removed" ? "badge-danger" : l.status === "published" ? "" : "badge-warning"}`}>{tl(`status.${l.status}`)}</span>
+                  <span
+                    className={`badge ${l.status === "removed" ? "badge-danger" : l.status === "published" ? "" : "badge-warning"}`}
+                  >
+                    {tl(`status.${l.status}`)}
+                  </span>
                   <span>{t("updated", { date: formatDate(l.updatedAt) })}</span>
                 </p>
                 {l.status === "removed" && <p className="mt-1 text-sm">{t("removedInfo")}</p>}

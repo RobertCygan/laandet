@@ -43,7 +43,10 @@ export default async function AdminPage({ params }: PageProps<"/[locale]/admin">
             {recent.map((a) => (
               <li key={a.id} className="card p-4 text-sm">
                 <p className="font-bold">
-                  {t("listingHiddenLabel")} · {a.reasonCode && tr.has(`reasons.${a.reasonCode}`) ? tr(`reasons.${a.reasonCode}` as "reasons.other") : a.reasonCode}
+                  {t("listingHiddenLabel")} ·{" "}
+                  {a.reasonCode && tr.has(`reasons.${a.reasonCode}`)
+                    ? tr(`reasons.${a.reasonCode}` as "reasons.other")
+                    : a.reasonCode}
                 </p>
                 <p className="text-muted">{formatDateTime(a.createdAt, locale)}</p>
                 <p className="mt-1 line-clamp-2 whitespace-pre-line">{a.statementOfReasons}</p>

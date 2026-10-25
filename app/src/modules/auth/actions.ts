@@ -107,7 +107,10 @@ export async function deleteAccountAction(_prev: ActionState, form: FormData): P
 
 export type TwoFactorSetup = { totpURI: string; secret: string; backupCodes: string[] };
 
-export async function startTwoFactorAction(_prev: ActionState<TwoFactorSetup>, form: FormData): Promise<ActionState<TwoFactorSetup>> {
+export async function startTwoFactorAction(
+  _prev: ActionState<TwoFactorSetup>,
+  form: FormData,
+): Promise<ActionState<TwoFactorSetup>> {
   return runAction(async () => {
     const actor = await requireUser();
     const { password } = twoFactorStartSchema.parse(formToObject(form));

@@ -2,16 +2,33 @@
 
 import { useActionState } from "react";
 import { useTranslations } from "next-intl";
-import { changeEmailAction, changePasswordAction, confirmTwoFactorAction, startTwoFactorAction } from "@/modules/auth/actions";
+import {
+  changeEmailAction,
+  changePasswordAction,
+  confirmTwoFactorAction,
+  startTwoFactorAction,
+} from "@/modules/auth/actions";
 import { idle } from "@/modules/server/action";
 import { updateProfileAction } from "@/modules/users/actions";
 import { Notice } from "@/ui/Notice";
 import { SubmitButton } from "@/ui/SubmitButton";
 import { FieldError, FormError, invalid, prev } from "./FormMessages";
 
-type Profile = { name: string; bio: string | null; localitySlug: string | null; locale: "nb" | "en"; emailNotifications: boolean };
+type Profile = {
+  name: string;
+  bio: string | null;
+  localitySlug: string | null;
+  locale: "nb" | "en";
+  emailNotifications: boolean;
+};
 
-export function ProfileForm({ profile, localities }: { profile: Profile; localities: { slug: string; name: string }[] }) {
+export function ProfileForm({
+  profile,
+  localities,
+}: {
+  profile: Profile;
+  localities: { slug: string; name: string }[];
+}) {
   const t = useTranslations("account");
   const ta = useTranslations("auth");
   const tc = useTranslations("common");
@@ -28,7 +45,14 @@ export function ProfileForm({ profile, localities }: { profile: Profile; localit
       <label className="field">
         {ta("name")}
         <span className="field-hint">{ta("nameHint")}</span>
-        <input name="name" required minLength={2} maxLength={40} defaultValue={v("name", profile.name)} aria-invalid={invalid(state, "name")} />
+        <input
+          name="name"
+          required
+          minLength={2}
+          maxLength={40}
+          defaultValue={v("name", profile.name)}
+          aria-invalid={invalid(state, "name")}
+        />
         <FieldError state={state} name="name" />
       </label>
       <label className="field">
@@ -45,7 +69,13 @@ export function ProfileForm({ profile, localities }: { profile: Profile; localit
       <label className="field">
         {t("bio")}
         <span className="field-hint">{t("bioHint")}</span>
-        <textarea name="bio" rows={4} maxLength={500} defaultValue={v("bio", profile.bio ?? "")} aria-invalid={invalid(state, "bio")} />
+        <textarea
+          name="bio"
+          rows={4}
+          maxLength={500}
+          defaultValue={v("bio", profile.bio ?? "")}
+          aria-invalid={invalid(state, "bio")}
+        />
         <FieldError state={state} name="bio" />
       </label>
       <label className="field">
@@ -56,7 +86,13 @@ export function ProfileForm({ profile, localities }: { profile: Profile; localit
         </select>
       </label>
       <label className="check">
-        <input type="checkbox" name="emailNotifications" defaultChecked={state.status === "error" ? prev(state, "emailNotifications") === "on" : profile.emailNotifications} />
+        <input
+          type="checkbox"
+          name="emailNotifications"
+          defaultChecked={
+            state.status === "error" ? prev(state, "emailNotifications") === "on" : profile.emailNotifications
+          }
+        />
         <span>{t("emailNotifications")}</span>
       </label>
       <SubmitButton pendingLabel={tc("saving")}>{tc("save")}</SubmitButton>
@@ -96,7 +132,9 @@ export function TwoFactorSetup() {
     <div className="flex flex-col gap-6">
       <div>
         <p className="mb-2">{t("setup2faUri")}</p>
-        <code className="block rounded-md bg-surface p-3 text-lg break-all select-all">{secret.replace(/(.{4})/g, "$1 ").trim()}</code>
+        <code className="block rounded-md bg-surface p-3 text-lg break-all select-all">
+          {secret.replace(/(.{4})/g, "$1 ").trim()}
+        </code>
         <a href={totpURI} className="text-link mt-2 inline-block">
           otpauth://…
         </a>
@@ -113,7 +151,15 @@ export function TwoFactorSetup() {
         <FormError state={confirm} />
         <label className="field">
           {ta("totpCode")}
-          <input name="code" inputMode="numeric" autoComplete="one-time-code" pattern="\d{6}" maxLength={6} required aria-invalid={invalid(confirm, "code")} />
+          <input
+            name="code"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            pattern="\d{6}"
+            maxLength={6}
+            required
+            aria-invalid={invalid(confirm, "code")}
+          />
           <FieldError state={confirm} name="code" />
         </label>
         <SubmitButton>{t("setup2faVerify")}</SubmitButton>
@@ -137,13 +183,27 @@ export function ChangePasswordForm() {
       )}
       <label className="field">
         {t("currentPassword")}
-        <input name="currentPassword" type="password" autoComplete="current-password" required aria-invalid={invalid(state, "currentPassword")} />
+        <input
+          name="currentPassword"
+          type="password"
+          autoComplete="current-password"
+          required
+          aria-invalid={invalid(state, "currentPassword")}
+        />
         <FieldError state={state} name="currentPassword" />
       </label>
       <label className="field">
         {ta("newPassword")}
         <span className="field-hint">{ta("passwordHint")}</span>
-        <input name="newPassword" type="password" autoComplete="new-password" required minLength={10} maxLength={128} aria-invalid={invalid(state, "newPassword")} />
+        <input
+          name="newPassword"
+          type="password"
+          autoComplete="new-password"
+          required
+          minLength={10}
+          maxLength={128}
+          aria-invalid={invalid(state, "newPassword")}
+        />
         <FieldError state={state} name="newPassword" />
       </label>
       <SubmitButton className="button button-outline" pendingLabel={tc("saving")}>
@@ -171,12 +231,25 @@ export function ChangeEmailForm({ locale }: { locale: "nb" | "en" }) {
       <label className="field">
         {t("newEmail")}
         <span className="field-hint">{t("changeEmailHint")}</span>
-        <input name="newEmail" type="email" autoComplete="email" required defaultValue={prev(state, "newEmail")} aria-invalid={invalid(state, "newEmail")} />
+        <input
+          name="newEmail"
+          type="email"
+          autoComplete="email"
+          required
+          defaultValue={prev(state, "newEmail")}
+          aria-invalid={invalid(state, "newEmail")}
+        />
         <FieldError state={state} name="newEmail" />
       </label>
       <label className="field">
         {t("currentPassword")}
-        <input name="password" type="password" autoComplete="current-password" required aria-invalid={invalid(state, "password")} />
+        <input
+          name="password"
+          type="password"
+          autoComplete="current-password"
+          required
+          aria-invalid={invalid(state, "password")}
+        />
         <FieldError state={state} name="password" />
       </label>
       <SubmitButton className="button button-outline" pendingLabel={tc("sending")}>

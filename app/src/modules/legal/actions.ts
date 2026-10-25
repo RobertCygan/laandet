@@ -16,6 +16,9 @@ export async function acceptTermsAction(_prev: ActionState, form: FormData): Pro
   });
   if (result.status !== "ok") return result;
   revalidatePath("/[locale]", "layout");
-  const next = raw.next && raw.next.startsWith("/") && !raw.next.startsWith("//") ? raw.next : localePath(raw.locale ?? "nb", "/konto");
+  const next =
+    raw.next && raw.next.startsWith("/") && !raw.next.startsWith("//")
+      ? raw.next
+      : localePath(raw.locale ?? "nb", "/konto");
   redirect(next);
 }

@@ -7,9 +7,7 @@ import { usePathname } from "next/navigation";
 export function LanguageSwitch({ locale, label }: { locale: "nb" | "en"; label: string }) {
   const pathname = usePathname() || "/";
   const target =
-    locale === "en"
-      ? pathname.replace(/^\/en(?=\/|$)/, "") || "/"
-      : `/en${pathname === "/" ? "" : pathname}`;
+    locale === "en" ? pathname.replace(/^\/en(?=\/|$)/, "") || "/" : `/en${pathname === "/" ? "" : pathname}`;
   return (
     <a
       href={target}

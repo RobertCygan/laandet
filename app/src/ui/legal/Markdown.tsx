@@ -6,7 +6,8 @@ import { headingId, rewriteLegalHref } from "@/modules/legal/content";
 function text(children: ReactNode): string {
   if (typeof children === "string" || typeof children === "number") return String(children);
   if (Array.isArray(children)) return children.map(text).join("");
-  if (children && typeof children === "object" && "props" in children) return text((children as { props: { children?: ReactNode } }).props.children);
+  if (children && typeof children === "object" && "props" in children)
+    return text((children as { props: { children?: ReactNode } }).props.children);
   return "";
 }
 

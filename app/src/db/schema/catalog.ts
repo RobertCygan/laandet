@@ -87,10 +87,7 @@ export const categories = pgTable(
     check("categories_labels_chk", sql`${t.labels} ? 'nb' AND ${t.labels} ? 'en'`),
     check("categories_policy_chk", sql`${t.policy} IN ('allowed','restricted','prohibited')`),
     check("categories_restricted_has_notice", sql`${t.policy} <> 'restricted' OR ${t.safetyNotice} IS NOT NULL`),
-    check(
-      "categories_types_chk",
-      sql`${t.allowedListingTypes} <@ ARRAY['rent_out','wanted','give_away']`,
-    ),
+    check("categories_types_chk", sql`${t.allowedListingTypes} <@ ARRAY['rent_out','wanted','give_away']`),
   ],
 );
 
@@ -100,7 +97,9 @@ export const categorySuggestions = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
     text: text("text").notNull(),
-    status: text("status", { enum: ["new", "accepted", "rejected"] }).notNull().default("new"),
+    status: text("status", { enum: ["new", "accepted", "rejected"] })
+      .notNull()
+      .default("new"),
     handledBy: uuid("handled_by").references(() => users.id),
     handledAt: ts("handled_at"),
     createdAt: ts("created_at").notNull().defaultNow(),
@@ -174,7 +173,10 @@ export const listings = pgTable(
     ),
     depositOre: ore("deposit_ore"),
     usageRestrictions: text("usage_restrictions"),
-    includedAccessories: text("included_accessories").array().notNull().default(sql`'{}'::text[]`),
+    includedAccessories: text("included_accessories")
+      .array()
+      .notNull()
+      .default(sql`'{}'::text[]`),
     operatingInstructions: text("operating_instructions"),
     restrictedAckAt: ts("restricted_ack_at"),
     // Ønskes leid
@@ -216,10 +218,7 @@ export const listings = pgTable(
     check("listings_defects_len", sql`char_length(${t.knownDefects}) <= 1000`),
     check("listings_restrictions_len", sql`char_length(${t.usageRestrictions}) <= 1000`),
     check("listings_instructions_len", sql`char_length(${t.operatingInstructions}) <= 2000`),
-    check(
-      "listings_condition_chk",
-      sql`${t.itemCondition} IN ('new','as_new','good','fair','worn','defective')`,
-    ),
+    check("listings_condition_chk", sql`${t.itemCondition} IN ('new','as_new','good','fair','worn','defective')`),
     check("listings_price_unit_chk", sql`${t.priceUnit} IN ('hour','day','weekend','week')`),
     check(
       "listings_money_nonneg",
@@ -262,10 +261,7 @@ export const listings = pgTable(
       "published_offer_has_handover",
       sql`${t.type} = 'wanted' OR ${t.status} = 'draft' OR ${t.handoverPickup} OR ${t.handoverOwnerDelivery} OR ${t.handoverMeet}`,
     ),
-    check(
-      "reserved_only_for_give_away",
-      sql`${t.status} NOT IN ('reserved','given_away') OR ${t.type} = 'give_away'`,
-    ),
+    check("reserved_only_for_give_away", sql`${t.status} NOT IN ('reserved','given_away') OR ${t.type} = 'give_away'`),
   ],
 );
 

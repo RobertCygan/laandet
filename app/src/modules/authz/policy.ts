@@ -82,10 +82,7 @@ export function can(actor: Actor, action: Action, resource: Resource = NONE): De
   }
   if (actor.kind === "anonymous") return deny("auth_required");
   if (actor.status === "deleted") return deny("auth_required");
-  if (
-    (actor.status === "suspended" || actor.status === "deletion_pending") &&
-    !ALLOWED_WHEN_SUSPENDED.has(action)
-  ) {
+  if ((actor.status === "suspended" || actor.status === "deletion_pending") && !ALLOWED_WHEN_SUSPENDED.has(action)) {
     return deny("account_restricted");
   }
   if (actor.status === "restricted" && DENIED_WHEN_RESTRICTED.has(action)) {
@@ -119,9 +116,7 @@ export function can(actor: Actor, action: Action, resource: Resource = NONE): De
     case "profile.update":
       return resource.type === "profile" && resource.userId === actor.id ? ALLOW : deny("not_found");
     case "appeal.create":
-      return resource.type === "moderationAction" && resource.affectedUserId === actor.id
-        ? ALLOW
-        : deny("not_found");
+      return resource.type === "moderationAction" && resource.affectedUserId === actor.id ? ALLOW : deny("not_found");
     case "admin.access":
       return staffAccess(actor);
     case "report.handle":

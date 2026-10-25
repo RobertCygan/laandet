@@ -86,7 +86,13 @@ describe("publishViolations", () => {
   });
   it("requires at least one handover option for offers, not for wanted", () => {
     expect(codes(rental({ handoverPickup: false }))).toContain("handover_required");
-    const wanted = rental({ type: "wanted", priceOre: null, priceUnit: null, declaredValueOre: null, handoverPickup: false });
+    const wanted = rental({
+      type: "wanted",
+      priceOre: null,
+      priceUnit: null,
+      declaredValueOre: null,
+      handoverPickup: false,
+    });
     expect(codes(wanted)).toEqual([]);
   });
   it("rejects contact info in titles", () => {

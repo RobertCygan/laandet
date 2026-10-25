@@ -4,8 +4,7 @@ import { z } from "zod";
  * Validated environment. Import `env()` on the server only.
  * The app refuses to start with missing or invalid values (P01-01).
  */
-const secret = (name: string) =>
-  z.string().min(32, `${name} must be at least 32 characters`);
+const secret = (name: string) => z.string().min(32, `${name} must be at least 32 characters`);
 
 const optionalText = z
   .string()
@@ -54,7 +53,11 @@ export const envSchema = z
     }
     if (e.SUPPORT_CAMPAIGN_URL) {
       if (!e.SUPPORT_CAMPAIGN_URL.startsWith("https://")) {
-        ctx.addIssue({ code: "custom", path: ["SUPPORT_CAMPAIGN_URL"], message: "SUPPORT_CAMPAIGN_URL must use https" });
+        ctx.addIssue({
+          code: "custom",
+          path: ["SUPPORT_CAMPAIGN_URL"],
+          message: "SUPPORT_CAMPAIGN_URL must use https",
+        });
       }
       for (const key of [
         "SUPPORT_PROVIDER_NAME",
@@ -78,9 +81,7 @@ export type Env = z.infer<typeof envSchema>;
 export function parseEnv(source: Record<string, string | undefined>): Env {
   const result = envSchema.safeParse(source);
   if (!result.success) {
-    const problems = result.error.issues
-      .map((i) => `  - ${i.path.join(".") || "(root)"}: ${i.message}`)
-      .join("\n");
+    const problems = result.error.issues.map((i) => `  - ${i.path.join(".") || "(root)"}: ${i.message}`).join("\n");
     throw new Error(`Invalid environment configuration:\n${problems}`);
   }
   return result.data;
@@ -107,9 +108,7 @@ const BUILD_PHASE_DEFAULTS: Record<string, string> = {
 export function env(): Env {
   if (cached) return cached;
   const source =
-    process.env.NEXT_PHASE === "phase-production-build"
-      ? { ...BUILD_PHASE_DEFAULTS, ...process.env }
-      : process.env;
+    process.env.NEXT_PHASE === "phase-production-build" ? { ...BUILD_PHASE_DEFAULTS, ...process.env } : process.env;
   cached = parseEnv(source);
   return cached;
 }

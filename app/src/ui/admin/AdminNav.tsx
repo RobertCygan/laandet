@@ -11,7 +11,12 @@ export async function AdminNav({ current }: { current: "dashboard" | "reports" |
   return (
     <nav aria-label={t("title")} className="mb-8 flex flex-wrap gap-2">
       {items.map(([key, href, label]) => (
-        <Link key={key} href={href} className={`button button-sm ${current === key ? "button-primary" : "button-subtle"}`} aria-current={current === key ? "page" : undefined}>
+        <Link
+          key={key}
+          href={href}
+          className={`button button-sm ${current === key ? "button-primary" : "button-subtle"}`}
+          aria-current={current === key ? "page" : undefined}
+        >
           {label}
         </Link>
       ))}

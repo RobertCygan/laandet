@@ -26,7 +26,12 @@ export default async function EditListingPage({ params, searchParams }: PageProp
   const te = await getTranslations("errors");
   const sp = await searchParams;
   const step = Number(param(sp.steg));
-  const decision = can(actor, "listing.update", { type: "listing", ownerId: d.listing.ownerId, status: d.listing.status, isDemo: d.listing.isDemo });
+  const decision = can(actor, "listing.update", {
+    type: "listing",
+    ownerId: d.listing.ownerId,
+    status: d.listing.status,
+    isDemo: d.listing.isDemo,
+  });
   return (
     <div className="wrap max-w-3xl py-10">
       <PageHeader title={t("titleEdit")} />

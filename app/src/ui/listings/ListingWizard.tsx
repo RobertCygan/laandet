@@ -119,7 +119,9 @@ export function ListingWizard({
   function go(next: number) {
     if (next === 5 && formRef.current) {
       const fd = new FormData(formRef.current);
-      setPreview(Object.fromEntries([...fd.entries()].filter(([, val]) => typeof val === "string")) as Record<string, string>);
+      setPreview(
+        Object.fromEntries([...fd.entries()].filter(([, val]) => typeof val === "string")) as Record<string, string>,
+      );
     }
     setStep(next);
     requestAnimationFrame(() => headingRef.current?.focus());
@@ -187,7 +189,12 @@ export function ListingWizard({
         </fieldset>
         <label className="field">
           {t("category")}
-          <select name="categoryId" value={categoryId} onChange={(e) => setCategoryId(e.target.value)} aria-invalid={invalid(state, "categoryId")}>
+          <select
+            name="categoryId"
+            value={categoryId}
+            onChange={(e) => setCategoryId(e.target.value)}
+            aria-invalid={invalid(state, "categoryId")}
+          >
             <option value="">{t("chooseCategory")}</option>
             {forType.map((c) => (
               <option key={c.id} value={c.id}>
@@ -217,14 +224,24 @@ export function ListingWizard({
         <label className="field">
           {t("descriptionLabel")}
           <span className="field-hint">{t("descriptionHint")}</span>
-          <textarea name="description" rows={6} maxLength={4000} defaultValue={v("description")} aria-invalid={invalid(state, "description")} />
+          <textarea
+            name="description"
+            rows={6}
+            maxLength={4000}
+            defaultValue={v("description")}
+            aria-invalid={invalid(state, "description")}
+          />
           <FieldError state={state} name="description" />
         </label>
         {offer && (
           <>
             <label className="field">
               {t("conditionLabel")}
-              <select name="itemCondition" defaultValue={v("itemCondition")} aria-invalid={invalid(state, "itemCondition")}>
+              <select
+                name="itemCondition"
+                defaultValue={v("itemCondition")}
+                aria-invalid={invalid(state, "itemCondition")}
+              >
                 <option value="">–</option>
                 {CONDITIONS.map((c) => (
                   <option key={c} value={c}>
@@ -237,7 +254,13 @@ export function ListingWizard({
             <label className="field">
               {t("knownDefectsLabel")}
               <span className="field-hint">{t("knownDefectsHint")}</span>
-              <textarea name="knownDefects" rows={3} maxLength={1000} defaultValue={v("knownDefects")} aria-invalid={invalid(state, "knownDefects")} />
+              <textarea
+                name="knownDefects"
+                rows={3}
+                maxLength={1000}
+                defaultValue={v("knownDefects")}
+                aria-invalid={invalid(state, "knownDefects")}
+              />
               <FieldError state={state} name="knownDefects" />
             </label>
           </>
@@ -272,13 +295,22 @@ export function ListingWizard({
               {!(freeLoan || !paidAllowed) && (
                 <label className="field">
                   {t("priceLabel")}
-                  <input name="price" inputMode="decimal" defaultValue={v("price")} aria-invalid={invalid(state, "price")} />
+                  <input
+                    name="price"
+                    inputMode="decimal"
+                    defaultValue={v("price")}
+                    aria-invalid={invalid(state, "price")}
+                  />
                   <FieldError state={state} name="price" />
                 </label>
               )}
               <label className="field">
                 {t("unitLabel")}
-                <select name="priceUnit" defaultValue={v("priceUnit") || "day"} aria-invalid={invalid(state, "priceUnit")}>
+                <select
+                  name="priceUnit"
+                  defaultValue={v("priceUnit") || "day"}
+                  aria-invalid={invalid(state, "priceUnit")}
+                >
                   {UNITS.map((u) => (
                     <option key={u} value={u}>
                       {tl(`unit.${u}`)}
@@ -291,13 +323,23 @@ export function ListingWizard({
             <label className="field">
               {t("declaredValueLabel")}
               <span className="field-hint">{t("declaredValueHint")}</span>
-              <input name="declaredValue" inputMode="decimal" defaultValue={v("declaredValue")} aria-invalid={invalid(state, "declaredValue")} />
+              <input
+                name="declaredValue"
+                inputMode="decimal"
+                defaultValue={v("declaredValue")}
+                aria-invalid={invalid(state, "declaredValue")}
+              />
               <FieldError state={state} name="declaredValue" />
             </label>
             <label className="field">
               {t("depositLabel")}
               <span className="field-hint">{t("depositHint")}</span>
-              <input name="deposit" inputMode="decimal" defaultValue={v("deposit")} aria-invalid={invalid(state, "deposit")} />
+              <input
+                name="deposit"
+                inputMode="decimal"
+                defaultValue={v("deposit")}
+                aria-invalid={invalid(state, "deposit")}
+              />
               <FieldError state={state} name="deposit" />
             </label>
             <label className="field">
@@ -308,7 +350,12 @@ export function ListingWizard({
             </label>
             <label className="field">
               {t("instructionsLabel")}
-              <textarea name="operatingInstructions" rows={3} maxLength={2000} defaultValue={v("operatingInstructions")} />
+              <textarea
+                name="operatingInstructions"
+                rows={3}
+                maxLength={2000}
+                defaultValue={v("operatingInstructions")}
+              />
               <FieldError state={state} name="operatingInstructions" />
             </label>
           </>
@@ -323,13 +370,23 @@ export function ListingWizard({
               </label>
               <label className="field">
                 {t("wantedToLabel")}
-                <input type="date" name="wantedTo" defaultValue={v("wantedTo")} aria-invalid={invalid(state, "wantedTo")} />
+                <input
+                  type="date"
+                  name="wantedTo"
+                  defaultValue={v("wantedTo")}
+                  aria-invalid={invalid(state, "wantedTo")}
+                />
                 <FieldError state={state} name="wantedTo" />
               </label>
             </div>
             <label className="field">
               {t("budgetLabel")} <span className="field-hint">({tc("optional")})</span>
-              <input name="budget" inputMode="decimal" defaultValue={v("budget")} aria-invalid={invalid(state, "budget")} />
+              <input
+                name="budget"
+                inputMode="decimal"
+                defaultValue={v("budget")}
+                aria-invalid={invalid(state, "budget")}
+              />
               <FieldError state={state} name="budget" />
             </label>
           </>
@@ -359,25 +416,42 @@ export function ListingWizard({
           <FieldError state={state} name="areaNote" />
         </label>
         <fieldset className="flex flex-col gap-3 border-0 p-0">
-          <legend className="mb-2 font-bold">{type === "wanted" ? t("handoverWantedLabel") : t("handoverLabel")}</legend>
+          <legend className="mb-2 font-bold">
+            {type === "wanted" ? t("handoverWantedLabel") : t("handoverLabel")}
+          </legend>
           <label className="check">
             <input type="checkbox" name="handoverPickup" defaultChecked={initial.handoverPickup} />
             <span>{t("pickupOption")}</span>
           </label>
           <label className="check">
-            <input type="checkbox" name="handoverOwnerDelivery" checked={delivery} onChange={(e) => setDelivery(e.target.checked)} />
+            <input
+              type="checkbox"
+              name="handoverOwnerDelivery"
+              checked={delivery}
+              onChange={(e) => setDelivery(e.target.checked)}
+            />
             <span>{t("deliveryOption")}</span>
           </label>
           {delivery && (
             <div className="grid gap-4 pl-8 sm:grid-cols-2">
               <label className="field">
                 {t("deliveryFeeLabel")}
-                <input name="deliveryFee" inputMode="decimal" defaultValue={v("deliveryFee")} aria-invalid={invalid(state, "deliveryFee")} />
+                <input
+                  name="deliveryFee"
+                  inputMode="decimal"
+                  defaultValue={v("deliveryFee")}
+                  aria-invalid={invalid(state, "deliveryFee")}
+                />
                 <FieldError state={state} name="deliveryFee" />
               </label>
               <label className="field">
                 {t("deliveryRadiusLabel")}
-                <input name="deliveryRadiusKm" inputMode="numeric" defaultValue={v("deliveryRadiusKm")} aria-invalid={invalid(state, "deliveryRadiusKm")} />
+                <input
+                  name="deliveryRadiusKm"
+                  inputMode="numeric"
+                  defaultValue={v("deliveryRadiusKm")}
+                  aria-invalid={invalid(state, "deliveryRadiusKm")}
+                />
                 <FieldError state={state} name="deliveryRadiusKm" />
               </label>
             </div>
@@ -403,7 +477,12 @@ export function ListingWizard({
           <div className="flex flex-col gap-2">
             {category.safetyNotice && <Notice tone="warning">{category.safetyNotice[locale]}</Notice>}
             <label className="check">
-              <input type="checkbox" name="restrictedAck" defaultChecked={initial.restrictedAck} aria-invalid={invalid(state, "restrictedAck")} />
+              <input
+                type="checkbox"
+                name="restrictedAck"
+                defaultChecked={initial.restrictedAck}
+                aria-invalid={invalid(state, "restrictedAck")}
+              />
               <span>{t("restrictedAckLabel")}</span>
             </label>
             <FieldError state={state} name="restrictedAck" />
@@ -414,13 +493,19 @@ export function ListingWizard({
             {type ? tl(`type.${type}`) : "–"} · {category?.labels[locale] ?? "–"}
           </p>
           <h3 className="mt-1 text-xl">{preview.title || "–"}</h3>
-          <p className="mt-1 text-sm text-muted">{localities.find((l) => l.id === preview.localityId)?.name ?? "–"}, Steigen</p>
+          <p className="mt-1 text-sm text-muted">
+            {localities.find((l) => l.id === preview.localityId)?.name ?? "–"}, Steigen
+          </p>
           {preview.description && <p className="mt-3 line-clamp-5 whitespace-pre-line">{preview.description}</p>}
           <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
             {type === "rent_out" && (
               <>
                 <dt className="font-bold">{t("priceLabel")}</dt>
-                <dd>{preview.freeLoan === "on" || !paidAllowed ? tl("freeLoan") : `${preview.price || "–"} kr / ${tl(`unit.${(preview.priceUnit as (typeof UNITS)[number]) || "day"}`)}`}</dd>
+                <dd>
+                  {preview.freeLoan === "on" || !paidAllowed
+                    ? tl("freeLoan")
+                    : `${preview.price || "–"} kr / ${tl(`unit.${(preview.priceUnit as (typeof UNITS)[number]) || "day"}`)}`}
+                </dd>
                 <dt className="font-bold">{t("depositLabel")}</dt>
                 <dd>{preview.deposit ? `${preview.deposit} kr` : "–"}</dd>
               </>
@@ -444,7 +529,12 @@ export function ListingWizard({
           </button>
         )}
         {step < 5 && (
-          <button type="button" className="button button-primary" onClick={() => go(step + 1)} disabled={step === 1 && !type}>
+          <button
+            type="button"
+            className="button button-primary"
+            onClick={() => go(step + 1)}
+            disabled={step === 1 && !type}
+          >
             {tc("next")}
           </button>
         )}
@@ -454,7 +544,13 @@ export function ListingWizard({
           </button>
         ) : (
           <>
-            <button type="submit" name="intent" value="draft" className="button button-outline" disabled={pending || !type}>
+            <button
+              type="submit"
+              name="intent"
+              value="draft"
+              className="button button-outline"
+              disabled={pending || !type}
+            >
               {pending ? tc("saving") : tc("saveDraft")}
             </button>
             {step === 5 && (
@@ -505,7 +601,9 @@ function ImageUploader({
         room -= 1;
       } else if (res.status === "error") {
         const key = res.detail ?? res.fieldErrors?.file;
-        problems.push(`${file.name}: ${key && tv.has(key) ? tv(key) : te.has(res.code) ? te(res.code) : te("unexpected")}`);
+        problems.push(
+          `${file.name}: ${key && tv.has(key) ? tv(key) : te.has(res.code) ? te(res.code) : te("unexpected")}`,
+        );
       }
     }
     setErrors(problems);
@@ -521,7 +619,13 @@ function ImageUploader({
           {images.map((img, i) => (
             <li key={img.id} className="card flex flex-col gap-2 p-2">
               {/* eslint-disable-next-line @next/next/no-img-element -- own upload via the authorised media route */}
-              <img src={`/media/${img.id}/thumb`} alt="" className="aspect-[4/3] w-full rounded object-cover" width={480} height={360} />
+              <img
+                src={`/media/${img.id}/thumb`}
+                alt=""
+                className="aspect-[4/3] w-full rounded object-cover"
+                width={480}
+                height={360}
+              />
               <input type="hidden" name="imageId" value={img.id} />
               <label className="field text-xs">
                 {t("altLabel")}
@@ -529,10 +633,16 @@ function ImageUploader({
                   name="imageAlt"
                   maxLength={150}
                   value={img.alt}
-                  onChange={(e) => setImages((prev) => prev.map((p) => (p.id === img.id ? { ...p, alt: e.target.value } : p)))}
+                  onChange={(e) =>
+                    setImages((prev) => prev.map((p) => (p.id === img.id ? { ...p, alt: e.target.value } : p)))
+                  }
                 />
               </label>
-              <button type="button" className="button button-ghost button-sm" onClick={() => setImages((prev) => prev.filter((p) => p.id !== img.id))}>
+              <button
+                type="button"
+                className="button button-ghost button-sm"
+                onClick={() => setImages((prev) => prev.filter((p) => p.id !== img.id))}
+              >
                 <X size={16} aria-hidden="true" />
                 {t("removePhoto")} {i + 1}
               </button>

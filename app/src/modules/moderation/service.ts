@@ -32,7 +32,10 @@ export async function createReport(actor: Actor, input: z.infer<typeof reportSch
   assertCan(actor, "report.create");
   await enforceRateLimits(db, [{ bucket: `report:user:${actor.id}`, rule: LIMITS.reports }]);
   if (input.targetType === "listing") {
-    const [l] = await db.select({ id: listings.id }).from(listings).where(and(eq(listings.id, input.targetId), ne(listings.status, "deleted")));
+    const [l] = await db
+      .select({ id: listings.id })
+      .from(listings)
+      .where(and(eq(listings.id, input.targetId), ne(listings.status, "deleted")));
     if (!l) throw new AppError("not_found");
   } else {
     const [u] = await db.select({ id: users.id }).from(users).where(eq(users.id, input.targetId));
@@ -71,15 +74,31 @@ export async function listOpenReports(actor: Actor, opts: { automaticOnly?: bool
     })
     .from(reports)
     .leftJoin(listings, and(eq(reports.targetType, "listing"), eq(listings.id, reports.targetId)))
-    .where(and(inArray(reports.status, ["open", "in_review"]), ...(opts.automaticOnly ? [eq(reports.isAutomatic, true)] : [])))
+    .where(
+      and(
+        inArray(reports.status, ["open", "in_review"]),
+        ...(opts.automaticOnly ? [eq(reports.isAutomatic, true)] : []),
+      ),
+    )
     .orderBy(desc(reports.createdAt))
     .limit(200);
 }
 
 export const hideSchema = z.object({
   listingId: z.uuid(),
-  reportId: z.uuid().optional().or(z.literal("").transform(() => undefined)),
-  reasonCode: z.enum(["prohibited_item", "misleading", "unsafe", "fraud_or_scam", "illegal_content", "privacy", "other"]),
+  reportId: z
+    .uuid()
+    .optional()
+    .or(z.literal("").transform(() => undefined)),
+  reasonCode: z.enum([
+    "prohibited_item",
+    "misleading",
+    "unsafe",
+    "fraud_or_scam",
+    "illegal_content",
+    "privacy",
+    "other",
+  ]),
   statement: z.string().trim().min(10, { error: "statement_too_short" }).max(4000, { error: "too_long" }),
 });
 
@@ -119,7 +138,13 @@ export async function hideListing(actor: Actor, input: z.infer<typeof hideSchema
     await tx
       .update(reports)
       .set({ status: "actioned", handledBy: actor.id, handledAt: new Date(), decisionNote: "listing_hidden" })
-      .where(and(eq(reports.targetType, "listing"), eq(reports.targetId, l.id), inArray(reports.status, ["open", "in_review"])));
+      .where(
+        and(
+          eq(reports.targetType, "listing"),
+          eq(reports.targetId, l.id),
+          inArray(reports.status, ["open", "in_review"]),
+        ),
+      );
     await tx.insert(notifications).values({
       userId: l.ownerId,
       type: "listing_hidden",
@@ -159,11 +184,22 @@ export async function dismissReport(actor: Actor, reportId: string, note: string
   await db.transaction(async (tx) => {
     const updated = await tx
       .update(reports)
-      .set({ status: "dismissed", handledBy: actor.id, handledAt: new Date(), decisionNote: note.slice(0, 2000) || null })
+      .set({
+        status: "dismissed",
+        handledBy: actor.id,
+        handledAt: new Date(),
+        decisionNote: note.slice(0, 2000) || null,
+      })
       .where(and(eq(reports.id, reportId), inArray(reports.status, ["open", "in_review"])))
       .returning({ id: reports.id });
     if (!updated.length) throw new AppError("not_found");
-    await recordAudit(tx, { actorId: actor.id, action: "moderation.report_dismissed", targetType: "report", targetId: reportId, meta });
+    await recordAudit(tx, {
+      actorId: actor.id,
+      action: "moderation.report_dismissed",
+      targetType: "report",
+      targetId: reportId,
+      meta,
+    });
   });
 }
 
@@ -227,7 +263,13 @@ async function otherStaffAvailable(excludeId: string): Promise<boolean> {
   const staff = await db
     .select({ id: userProfiles.userId })
     .from(userProfiles)
-    .where(and(inArray(userProfiles.role, ["moderator", "admin"]), eq(userProfiles.status, "active"), ne(userProfiles.userId, excludeId)));
+    .where(
+      and(
+        inArray(userProfiles.role, ["moderator", "admin"]),
+        eq(userProfiles.status, "active"),
+        ne(userProfiles.userId, excludeId),
+      ),
+    );
   return staff.length > 0;
 }
 
@@ -262,11 +304,20 @@ export async function decideAppeal(actor: Actor, input: z.infer<typeof decideApp
   await db.transaction(async (tx) => {
     await tx
       .update(appeals)
-      .set({ status: input.outcome, decidedBy: actor.id, decisionText: input.decision, decidedAt: new Date(), decidedBySameStaff: sameStaff })
+      .set({
+        status: input.outcome,
+        decidedBy: actor.id,
+        decisionText: input.decision,
+        decidedAt: new Date(),
+        decidedBySameStaff: sameStaff,
+      })
       .where(eq(appeals.id, input.appealId));
     if (input.outcome === "reversed" && row.action.action === "listing_hidden") {
       // Restored as paused; the owner decides when to show it again.
-      await tx.update(listings).set({ status: "paused", updatedAt: new Date() }).where(eq(listings.id, row.action.targetId));
+      await tx
+        .update(listings)
+        .set({ status: "paused", updatedAt: new Date() })
+        .where(eq(listings.id, row.action.targetId));
       await tx.insert(moderationActions).values({
         actorId: actor.id,
         targetType: "listing",
@@ -285,14 +336,23 @@ export async function decideAppeal(actor: Actor, input: z.infer<typeof decideApp
       const prefix = appellant.locale === "en" ? "/en" : "";
       const outcome =
         appellant.locale === "en"
-          ? input.outcome === "reversed" ? "the decision was reversed" : "the decision stands"
-          : input.outcome === "reversed" ? "avgjørelsen er omgjort" : "avgjørelsen står ved lag";
+          ? input.outcome === "reversed"
+            ? "the decision was reversed"
+            : "the decision stands"
+          : input.outcome === "reversed"
+            ? "avgjørelsen er omgjort"
+            : "avgjørelsen står ved lag";
       await queueEmail(tx, {
         toEmail: appellant.email,
         toUserId: row.appeal.appellantId,
         template: "appeal_decided",
         locale: appellant.locale,
-        payload: { name: appellant.name, outcome, decision: input.decision, url: `${env().APP_URL}${prefix}/moderering/${row.action.id}` },
+        payload: {
+          name: appellant.name,
+          outcome,
+          decision: input.decision,
+          url: `${env().APP_URL}${prefix}/moderering/${row.action.id}`,
+        },
       });
     }
     await recordAudit(tx, {
@@ -309,17 +369,19 @@ export async function decideAppeal(actor: Actor, input: z.infer<typeof decideApp
 
 export async function adminCounts(actor: Actor) {
   assertCan(actor, "admin.access");
-  const [r] = await db.execute<{
-    users: number;
-    listings: number;
-    open_reports: number;
-    open_appeals: number;
-    outbox_pending: number;
-    outbox_failed: number;
-  }>(
-    // Counts only, no personal data (ARCHITECTURE.md §7).
-    sqlCounts,
-  ).then((res) => res.rows);
+  const [r] = await db
+    .execute<{
+      users: number;
+      listings: number;
+      open_reports: number;
+      open_appeals: number;
+      outbox_pending: number;
+      outbox_failed: number;
+    }>(
+      // Counts only, no personal data (ARCHITECTURE.md §7).
+      sqlCounts,
+    )
+    .then((res) => res.rows);
   return r!;
 }
 
@@ -348,7 +410,14 @@ export async function latestDecisionForOwnListing(actor: Actor, listingId: strin
     .select({ id: moderationActions.id })
     .from(moderationActions)
     .innerJoin(listings, eq(listings.id, moderationActions.targetId))
-    .where(and(eq(moderationActions.targetType, "listing"), eq(moderationActions.targetId, listingId), eq(listings.ownerId, actor.id)))
+    .where(
+      and(
+        eq(moderationActions.targetType, "listing"),
+        eq(moderationActions.targetId, listingId),
+        eq(moderationActions.action, "listing_hidden"),
+        eq(listings.ownerId, actor.id),
+      ),
+    )
     .orderBy(desc(moderationActions.createdAt))
     .limit(1);
   return row?.id ?? null;

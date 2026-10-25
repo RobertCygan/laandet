@@ -29,7 +29,12 @@ async function seedReferenceData() {
   }
   for (const [i, c] of CATEGORIES.entries()) {
     const parentId = c.parent
-      ? (await db.select({ id: schema.categories.id }).from(schema.categories).where(eq(schema.categories.slug, c.parent)))[0]?.id ?? null
+      ? ((
+          await db
+            .select({ id: schema.categories.id })
+            .from(schema.categories)
+            .where(eq(schema.categories.slug, c.parent))
+        )[0]?.id ?? null)
       : null;
     const values = {
       slug: c.slug,
@@ -102,9 +107,22 @@ const CATEGORY_MAP: Record<string, string> = {
 };
 // Declared values (kr) chosen so every demo stays in category A (≤ 5 000 kr).
 const DECLARED_KR: Record<string, number> = {
-  hoytrykksspyler: 3500, tepperenser: 3000, motorsag: 4500, vedkloyver: 4000, borhammer: 2500,
-  takboks: 4000, rullestillas: 4800, kajakk: 4500, sup: 3500, slalam: 3000, snofreser: 4900,
-  hekksaks: 2000, gressklipper: 3000, partytelt: 2500, projektor: 4000, gassgrill: 4000,
+  hoytrykksspyler: 3500,
+  tepperenser: 3000,
+  motorsag: 4500,
+  vedkloyver: 4000,
+  borhammer: 2500,
+  takboks: 4000,
+  rullestillas: 4800,
+  kajakk: 4500,
+  sup: 3500,
+  slalam: 3000,
+  snofreser: 4900,
+  hekksaks: 2000,
+  gressklipper: 3000,
+  partytelt: 2500,
+  projektor: 4000,
+  gassgrill: 4000,
 };
 const DEPOSIT_KR: Record<string, number> = { motorsag: 1000, rullestillas: 1000, projektor: 1000, snofreser: 1000 };
 // Not seeded: trailers (paid rental paused, real values > 5 000 kr) and the prohibited mini-excavator.

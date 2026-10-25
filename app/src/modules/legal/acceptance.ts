@@ -21,7 +21,13 @@ export async function pendingAcceptances(actor: Actor): Promise<LegalDoc[]> {
     const [material] = await db
       .select({ createdAt: legalDocumentVersions.createdAt })
       .from(legalDocumentVersions)
-      .where(and(eq(legalDocumentVersions.docKey, docKey), eq(legalDocumentVersions.locale, "nb"), eq(legalDocumentVersions.materialChange, true)))
+      .where(
+        and(
+          eq(legalDocumentVersions.docKey, docKey),
+          eq(legalDocumentVersions.locale, "nb"),
+          eq(legalDocumentVersions.materialChange, true),
+        ),
+      )
       .orderBy(desc(legalDocumentVersions.createdAt))
       .limit(1);
     if (!material) continue;
@@ -60,7 +66,14 @@ export async function acceptPending(actor: Actor): Promise<void> {
   await db.transaction(async (tx) => {
     for (const doc of pending) {
       await tx.insert(legalAcceptances).values({ userId: actor.id, documentVersionId: doc.id }).onConflictDoNothing();
-      await recordAudit(tx, { actorId: actor.id, action: "legal.accept", targetType: "legal_document", targetId: doc.id, metadata: { docKey: doc.docKey, version: doc.version }, meta });
+      await recordAudit(tx, {
+        actorId: actor.id,
+        action: "legal.accept",
+        targetType: "legal_document",
+        targetId: doc.id,
+        metadata: { docKey: doc.docKey, version: doc.version },
+        meta,
+      });
     }
   });
 }

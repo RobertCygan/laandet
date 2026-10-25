@@ -20,7 +20,9 @@ const email = values.email?.trim().toLowerCase();
 const role = ROLES.find((r) => r === values.role);
 const reason = values.reason?.trim();
 if (!email || !role || !reason || reason.length < 10) {
-  console.error('Usage: npm run grant-role -- --email <email> --role user|moderator|admin --reason "<at least 10 characters>"');
+  console.error(
+    'Usage: npm run grant-role -- --email <email> --role user|moderator|admin --reason "<at least 10 characters>"',
+  );
   process.exit(2);
 }
 
@@ -31,19 +33,28 @@ const db = drizzle({ client: pool, schema, casing: "snake_case" });
 
 async function main() {
   const [user] = await db
-    .select({ id: schema.users.id, name: schema.users.name, role: schema.userProfiles.role, status: schema.userProfiles.status })
+    .select({
+      id: schema.users.id,
+      name: schema.users.name,
+      role: schema.userProfiles.role,
+      status: schema.userProfiles.status,
+    })
     .from(schema.users)
     .innerJoin(schema.userProfiles, eq(schema.userProfiles.userId, schema.users.id))
     .where(eq(schema.users.email, email!));
   if (!user) throw new Error("No account with that email");
-  if (user.status !== "active") throw new Error(`Account status is ${user.status}; only active accounts can get a role`);
+  if (user.status !== "active")
+    throw new Error(`Account status is ${user.status}; only active accounts can get a role`);
   if (user.role === role) {
     console.log(`No change: the account already has the role ${role}.`);
     return;
   }
 
   await db.transaction(async (tx) => {
-    await tx.update(schema.userProfiles).set({ role: role!, updatedAt: new Date() }).where(eq(schema.userProfiles.userId, user.id));
+    await tx
+      .update(schema.userProfiles)
+      .set({ role: role!, updatedAt: new Date() })
+      .where(eq(schema.userProfiles.userId, user.id));
     // A role change ends existing sessions, so the new rights start with a fresh sign-in.
     await tx.delete(schema.sessions).where(eq(schema.sessions.userId, user.id));
     await tx.insert(schema.auditEvents).values({
@@ -56,10 +67,21 @@ async function main() {
       metadata: { from: user.role, to: role, via: "cli" },
     });
     const admins = await tx
-      .select({ id: schema.users.id, email: schema.users.email, name: schema.users.name, locale: schema.userProfiles.locale })
+      .select({
+        id: schema.users.id,
+        email: schema.users.email,
+        name: schema.users.name,
+        locale: schema.userProfiles.locale,
+      })
       .from(schema.users)
       .innerJoin(schema.userProfiles, eq(schema.userProfiles.userId, schema.users.id))
-      .where(and(inArray(schema.userProfiles.role, ["admin"]), eq(schema.userProfiles.status, "active"), ne(schema.users.id, user.id)));
+      .where(
+        and(
+          inArray(schema.userProfiles.role, ["admin"]),
+          eq(schema.userProfiles.status, "active"),
+          ne(schema.users.id, user.id),
+        ),
+      );
     for (const a of admins) {
       await queueEmail(tx, {
         toEmail: a.email,
@@ -70,7 +92,9 @@ async function main() {
       });
     }
   });
-  console.log(`Role changed: ${user.role} → ${role}. Sessions ended; the user must sign in again${role === "user" ? "" : " and set up 2FA at /konto/tofaktor"}.`);
+  console.log(
+    `Role changed: ${user.role} → ${role}. Sessions ended; the user must sign in again${role === "user" ? "" : " and set up 2FA at /konto/tofaktor"}.`,
+  );
 }
 
 main()

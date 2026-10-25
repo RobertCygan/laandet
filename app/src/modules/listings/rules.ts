@@ -62,7 +62,10 @@ export function containsContactInfo(text: string): boolean {
 export function matchScreeningKeywords(text: string, keywords: string[]): string[] {
   const lower = ` ${text.toLowerCase()} `;
   return keywords.filter((k) => {
-    const re = new RegExp(`(^|[^\\p{L}\\p{N}])${k.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}([^\\p{L}\\p{N}]|$)`, "u");
+    const re = new RegExp(
+      `(^|[^\\p{L}\\p{N}])${k.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}([^\\p{L}\\p{N}]|$)`,
+      "u",
+    );
     return re.test(lower);
   });
 }
@@ -75,8 +78,10 @@ export type RuleViolation = { field: string; code: string };
  */
 export function storageViolations(d: ListingDraft): RuleViolation[] {
   const v: RuleViolation[] = [];
-  if (d.declaredValueOre !== null && d.declaredValueOre <= 0) v.push({ field: "declaredValue", code: "declared_value_required" });
-  if (d.declaredValueOre !== null && d.declaredValueOre > MAX_DECLARED_VALUE_ORE) v.push({ field: "declaredValue", code: "declared_value_too_high" });
+  if (d.declaredValueOre !== null && d.declaredValueOre <= 0)
+    v.push({ field: "declaredValue", code: "declared_value_required" });
+  if (d.declaredValueOre !== null && d.declaredValueOre > MAX_DECLARED_VALUE_ORE)
+    v.push({ field: "declaredValue", code: "declared_value_too_high" });
   if (d.depositOre !== null && d.declaredValueOre !== null && d.depositOre > d.declaredValueOre) {
     v.push({ field: "deposit", code: "deposit_above_value" });
   }
@@ -113,7 +118,8 @@ export function publishViolations(
     if (d.priceOre === null || d.priceOre < 0) add("price", "price_required");
     if (d.declaredValueOre === null || d.declaredValueOre <= 0) add("declaredValue", "declared_value_required");
     else if (d.declaredValueOre > MAX_DECLARED_VALUE_ORE) add("declaredValue", "declared_value_too_high");
-    else if (classifyValue(d.declaredValueOre) === "B" && !opts.highValuePreview) add("declaredValue", "high_value_blocked");
+    else if (classifyValue(d.declaredValueOre) === "B" && !opts.highValuePreview)
+      add("declaredValue", "high_value_blocked");
     if (d.depositOre !== null && d.declaredValueOre !== null && d.depositOre > d.declaredValueOre) {
       add("deposit", "deposit_above_value");
     }

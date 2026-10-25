@@ -23,10 +23,7 @@ export async function consumeRateLimit(db: DbOrTx, bucket: string, rule: RateRul
 }
 
 /** Throws AppError("rate_limited") when any of the buckets is exhausted. */
-export async function enforceRateLimits(
-  db: DbOrTx,
-  checks: Array<{ bucket: string; rule: RateRule }>,
-): Promise<void> {
+export async function enforceRateLimits(db: DbOrTx, checks: Array<{ bucket: string; rule: RateRule }>): Promise<void> {
   for (const c of checks) {
     if (!(await consumeRateLimit(db, c.bucket, c.rule))) {
       throw new AppError("rate_limited", undefined, { bucket: c.bucket.split(":")[0] });

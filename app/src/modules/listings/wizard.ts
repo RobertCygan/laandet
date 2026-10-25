@@ -3,7 +3,10 @@ import type { WizardCategory, WizardInitial } from "@/ui/listings/ListingWizard"
 import { listCategories, listLocalities, type ListingDetail } from "./queries";
 
 /** Options for the listing wizard (prohibited categories are never offered). */
-export async function wizardOptions(): Promise<{ categories: WizardCategory[]; localities: { id: string; name: string }[] }> {
+export async function wizardOptions(): Promise<{
+  categories: WizardCategory[];
+  localities: { id: string; name: string }[];
+}> {
   const [cats, locs] = await Promise.all([listCategories(), listLocalities()]);
   return {
     categories: cats.map((c) => ({

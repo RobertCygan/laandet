@@ -11,8 +11,17 @@ import { getRequestMeta } from "@/modules/server/request-meta";
 
 export const profileSchema = z.object({
   name: displayNameSchema,
-  locality: z.string().max(60).optional().transform((v) => (v ? v : null)),
-  bio: z.string().trim().max(500, { error: "too_long" }).optional().transform((v) => (v ? v : null)),
+  locality: z
+    .string()
+    .max(60)
+    .optional()
+    .transform((v) => (v ? v : null)),
+  bio: z
+    .string()
+    .trim()
+    .max(500, { error: "too_long" })
+    .optional()
+    .transform((v) => (v ? v : null)),
   locale: z.enum(["nb", "en"]),
   emailNotifications: z
     .string()
@@ -42,7 +51,13 @@ export async function updateProfile(actor: Actor, input: ProfileInput): Promise<
       })
       .where(eq(userProfiles.userId, actor.id));
     // Only the fact of the change is logged, never the values.
-    await recordAudit(tx, { actorId: actor.id, action: "profile.update", targetType: "user", targetId: actor.id, meta });
+    await recordAudit(tx, {
+      actorId: actor.id,
+      action: "profile.update",
+      targetType: "user",
+      targetId: actor.id,
+      meta,
+    });
   });
 }
 
@@ -88,7 +103,13 @@ export async function getPublicProfile(userId: string) {
   if (!p || !["active", "restricted"].includes(p.status)) return null;
   const showDemo = await isFlagEnabled(db, "show_demo_listings");
   const active = await db
-    .select({ id: listings.id, title: listings.title, type: listings.type, labels: categories.labels, isDemo: listings.isDemo })
+    .select({
+      id: listings.id,
+      title: listings.title,
+      type: listings.type,
+      labels: categories.labels,
+      isDemo: listings.isDemo,
+    })
     .from(listings)
     .innerJoin(categories, eq(categories.id, listings.categoryId))
     .where(

@@ -36,7 +36,12 @@ export async function GET(_req: Request, ctx: RouteContext<"/media/[id]/[variant
   } else {
     const actor = await getActor();
     const allowed = m.ownerId
-      ? can(actor, "listing.view", { type: "listing", ownerId: m.ownerId, status: m.listingStatus!, isDemo: m.isDemo ?? false }).allow
+      ? can(actor, "listing.view", {
+          type: "listing",
+          ownerId: m.ownerId,
+          status: m.listingStatus!,
+          isDemo: m.isDemo ?? false,
+        }).allow
       : actor.kind === "user" && actor.id === m.uploadedBy;
     if (!allowed) return notFound();
   }

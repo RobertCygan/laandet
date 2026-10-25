@@ -6,7 +6,10 @@ import { featureFlags } from "@/db/schema";
 export const FLAG_DEFAULTS = {
   show_demo_listings: { enabled: true, description: "Vis eksempelannonser (merket «Eksempel»)" },
   high_value_preview: { enabled: false, description: "Vis gjenstander over 5 000 kr som forhåndsvisning uten utleie" },
-  extended_agreements: { enabled: false, description: "Åpne utleie over 5 000 kr (krever BankID og depositumsordning)" },
+  extended_agreements: {
+    enabled: false,
+    description: "Åpne utleie over 5 000 kr (krever BankID og depositumsordning)",
+  },
   rentals_open: { enabled: false, description: "Åpne forespørsler og leieavtaler for «Leies ut»" },
   registrations_open: { enabled: true, description: "Tillat nye registreringer" },
   listings_open: { enabled: true, description: "Tillat nye annonser" },
@@ -17,7 +20,10 @@ export const FLAG_DEFAULTS = {
 export type FlagKey = keyof typeof FLAG_DEFAULTS;
 
 export async function isFlagEnabled(conn: DbOrTx, key: FlagKey): Promise<boolean> {
-  const [row] = await conn.select({ enabled: featureFlags.enabled }).from(featureFlags).where(eq(featureFlags.key, key));
+  const [row] = await conn
+    .select({ enabled: featureFlags.enabled })
+    .from(featureFlags)
+    .where(eq(featureFlags.key, key));
   return row?.enabled ?? FLAG_DEFAULTS[key].enabled;
 }
 

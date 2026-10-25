@@ -43,7 +43,10 @@ export async function hideListingAction(_prev: ActionState, form: FormData): Pro
   return result;
 }
 
-const dismissSchema = z.object({ reportId: z.uuid(), note: z.string().trim().max(2000, { error: "too_long" }).default("") });
+const dismissSchema = z.object({
+  reportId: z.uuid(),
+  note: z.string().trim().max(2000, { error: "too_long" }).default(""),
+});
 
 export async function dismissReportAction(_prev: ActionState, form: FormData): Promise<ActionState> {
   const raw = formToObject(form);

@@ -60,8 +60,12 @@ function visibleConditions(showDemo: boolean): SQL[] {
   return c;
 }
 
-const firstImage = sql<string | null>`(SELECT li.media_id FROM listing_images li WHERE li.listing_id = ${listings.id} ORDER BY li.sort_order LIMIT 1)`;
-const firstAlt = sql<string | null>`(SELECT li.alt_text FROM listing_images li WHERE li.listing_id = ${listings.id} ORDER BY li.sort_order LIMIT 1)`;
+const firstImage = sql<
+  string | null
+>`(SELECT li.media_id FROM listing_images li WHERE li.listing_id = ${listings.id} ORDER BY li.sort_order LIMIT 1)`;
+const firstAlt = sql<
+  string | null
+>`(SELECT li.alt_text FROM listing_images li WHERE li.listing_id = ${listings.id} ORDER BY li.sort_order LIMIT 1)`;
 
 const summaryColumns = {
   id: listings.id,
@@ -221,11 +225,14 @@ export async function getListingForViewer(actor: Actor, id: string) {
   const d = await loadDetail(id);
   if (!d || d.listing.status === "deleted") return null;
   const ownerHidden = !["active", "restricted"].includes(d.owner.status);
-  const resource = { type: "listing" as const, ownerId: d.listing.ownerId, status: d.listing.status, isDemo: d.listing.isDemo };
+  const resource = {
+    type: "listing" as const,
+    ownerId: d.listing.ownerId,
+    status: d.listing.status,
+    isDemo: d.listing.isDemo,
+  };
   const viewable = can(actor, "listing.view", resource).allow;
-  const ownerOrStaff =
-    actor.kind === "user" &&
-    (actor.id === d.listing.ownerId || can(actor, "admin.access").allow);
+  const ownerOrStaff = actor.kind === "user" && (actor.id === d.listing.ownerId || can(actor, "admin.access").allow);
   if (!viewable || (ownerHidden && !ownerOrStaff)) return null;
   return d;
 }
