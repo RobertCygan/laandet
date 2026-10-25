@@ -132,16 +132,23 @@ jobs:
   security:
     name: Secrets and dependency audit
     runs-on: ubuntu-latest
-    # Building OSV-Scanner from source takes a few minutes.
-    timeout-minutes: 15
+    # Building gitleaks and OSV-Scanner from source takes a few minutes.
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+          cache: false
+      # The whole history, every time. (gitleaks-action scans "from the parent of the PR's first commit",
+      # which does not exist when a PR brings in a history of its own, as the move from G-PSI_WWW did.)
       - name: Scan for committed secrets
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        working-directory: ${{ github.workspace }}
+        run: |
+          go install github.com/zricethezav/gitleaks/v8@v8.24.3
+          "$(go env GOPATH)/bin/gitleaks" detect --source . --redact --verbose --no-banner
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -150,10 +157,6 @@ jobs:
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=high
       # SEC-60: OSV-Scanner on the whole lockfile. High and critical findings fail (scripts/osv-gate.mjs).
-      - uses: actions/setup-go@v5
-        with:
-          go-version: stable
-          cache: false
       - name: Install OSV-Scanner
         run: go install github.com/google/osv-scanner/v2/cmd/osv-scanner@v2.7.0
       - name: OSV-Scanner
