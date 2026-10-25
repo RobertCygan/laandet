@@ -19,6 +19,7 @@ import {
 } from "@/db/schema";
 import type { Actor, UserActor } from "@/modules/authz/actor-types";
 import { AppError } from "@/modules/errors";
+import { notify } from "@/modules/notifications/notify";
 import { announce, loadBookingFor, moveBooking, periodOf } from "@/modules/rentals/service";
 
 const HOUR = 60 * 60 * 1000;
@@ -320,7 +321,6 @@ export async function confirmReport(
 }
 
 async function notifyOther(tx: Tx, b: typeof bookings.$inferSelect, other: Role, title: string) {
-  const { notify } = await import("@/modules/notifications/notify");
   await notify(tx, {
     userId: other === "owner" ? b.ownerId : b.renterId,
     kind: "condition_to_confirm",
