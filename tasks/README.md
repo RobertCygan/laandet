@@ -61,11 +61,13 @@ parallel work (P01-11 and P01-13 can run alongside P01-05…P01-10). If Phase 01
 | [P03-06](phase-03/P03-06-data-export-retention.md) | Data export, retention jobs, account erasure | P02 | 1.5 | approved |
 | [P03-07](phase-03/P03-07-transparency.md) | Transparency figures (owner input) | P03-04 | 0.5 | approved |
 
-## Phase 04 (outline — detailed task files are written at the end of Phase 03)
+## Phase 04 — Beta, release gates and launch (week 50)
 
-| ID | Task |
-|---|---|
-| P04-01 | Closed beta with residents, feedback loop |
-| P04-02 | Release gates: security, legal, restore test, mobile usability |
-| P04-03 | DPIA document (short) |
-| P04-04 | Production launch and pilot support rota |
+| ID | Task | Depends on | Estimate (ideal days) | Status |
+|---|---|---|---|---|
+| [P04-01](phase-04/P04-01-closed-beta.md) | Closed beta: «Gi tilbakemelding», staging banner, beta plan and tester guide | P03 | 1 | planned |
+| [P04-02](phase-04/P04-02-release-gates.md) | Release gates: gate document, `release:check`, missing journeys, OSV-Scanner, «Vis passord», usability script | P03 | 1.5 | planned |
+| [P04-03](phase-04/P04-03-dpia.md) | Short DPIA | P03 | 0.5 | planned |
+| [P04-04](phase-04/P04-04-launch-and-support.md) | Launch runbook, operations alerts, pilot support, moderator guide | P01-13 | 1 | planned |
+
+Steps that need the server, the domain, a lawyer or beta testers are the owner's (marked «Eier» in the documents).
