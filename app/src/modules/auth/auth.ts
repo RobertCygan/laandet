@@ -138,13 +138,17 @@ export const auth = betterAuth({
   },
   advanced: {
     database: { generateId: "uuid" },
-    useSecureCookies: true,
+    // SEC-11: the names below are final. With useSecureCookies Better Auth would put «__Secure-» in front
+    // («__Secure-__Host-…»), and browsers would then apply only the weaker __Secure- rules. Secure, HttpOnly,
+    // SameSite=Lax and Path=/ come from the default attributes; no Domain is ever set.
+    useSecureCookies: false,
     cookiePrefix: "laandet",
     defaultCookieAttributes: { secure: true, sameSite: "lax", path: "/", httpOnly: true },
     cookies: {
       session_token: { name: "__Host-laandet.session" },
       session_data: { name: "__Host-laandet.session_data" },
       dont_remember: { name: "__Host-laandet.dont_remember" },
+      two_factor: { name: "__Secure-laandet.two_factor" },
     },
     ipAddress: { ipAddressHeaders: ["x-forwarded-for", "x-real-ip"] },
   },
