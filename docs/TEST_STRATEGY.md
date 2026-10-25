@@ -93,7 +93,7 @@ once at the lowest layer that can prove it, plus one end-to-end journey that tie
 
 Each journey runs at a mobile viewport. The rental journey also runs at desktop size.
 
-## 6. CI pipeline (GitHub Actions, `paths: laandet/**`)
+## 6. CI pipeline (GitHub Actions, `.github/workflows/laandet-ci.yml`)
 
 | Job | Contents | Blocking |
 |---|---|---|

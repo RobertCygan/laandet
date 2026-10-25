@@ -1,0 +1,186 @@
+# Laandet — build the image and deploy it to the EU server (P01-13, ARCHITECTURE.md §6).
+#
+# Safe to merge before a server exists: nothing deploys until the owner
+#   1. sets the repository variable LAANDET_DEPLOY_ENABLED to "true",
+#   2. creates the GitHub environments "staging" and "production" (production with required
+#      reviewers) and adds the secrets/variables listed in docs/runbooks/DEPLOY.md.
+# Until then a pushed tag only prints a notice, and a manual run fails at the first check.
+#
+# Triggers
+#   - tag laandet-vX.Y.Z-staging  → staging;  tag laandet-vX.Y.Z → production
+#   - manual run (workflow_dispatch) with an existing tag and the environment
+name: Laandet deploy
+
+on:
+  push:
+    tags: ["laandet-v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing git tag to deploy (laandet-vX.Y.Z or laandet-vX.Y.Z-staging)"
+        required: true
+        type: string
+      environment:
+        description: "Target environment"
+        required: true
+        type: choice
+        options: [staging, production]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: laandet-deploy-${{ github.event.inputs.environment || (endsWith(github.ref_name, '-staging') && 'staging' || 'production') }}
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    name: Plan
+    runs-on: ubuntu-24.04
+    outputs:
+      enabled: ${{ steps.plan.outputs.enabled }}
+      environment: ${{ steps.plan.outputs.environment }}
+      tag: ${{ steps.plan.outputs.tag }}
+      image: ${{ steps.plan.outputs.image }}
+    steps:
+      - id: plan
+        env:
+          EVENT: ${{ github.event_name }}
+          INPUT_TAG: ${{ github.event.inputs.tag }}
+          INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
+          REF_NAME: ${{ github.ref_name }}
+          DEPLOY_ENABLED: ${{ vars.LAANDET_DEPLOY_ENABLED }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          set -euo pipefail
+          if [[ $EVENT == workflow_dispatch ]]; then
+            tag=$INPUT_TAG; environment=$INPUT_ENVIRONMENT
+          else
+            tag=$REF_NAME
+            if [[ $tag == *-staging ]]; then environment=staging; else environment=production; fi
+          fi
+          if [[ ! $tag =~ ^laandet-v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z][0-9A-Za-z.-]*)?$ ]]; then
+            echo "::error::'$tag' is not a Laandet release tag (laandet-vX.Y.Z[-suffix])"; exit 1
+          fi
+          if [[ $environment == production && $tag == *-staging* ]]; then
+            echo "::error::A staging tag cannot be deployed to production"; exit 1
+          fi
+          if [[ $DEPLOY_ENABLED == true ]]; then
+            enabled=true
+          else
+            enabled=false
+            echo "::notice::Deploys are off until the repository variable LAANDET_DEPLOY_ENABLED is 'true' (the server and domain are not bought yet). Nothing was built or deployed."
+            if [[ $EVENT == workflow_dispatch ]]; then
+              echo "::error::Manual deploy requested, but LAANDET_DEPLOY_ENABLED is not 'true'"; exit 1
+            fi
+          fi
+          image="ghcr.io/${OWNER,,}/laandet-app:$tag"
+          {
+            echo "enabled=$enabled"
+            echo "environment=$environment"
+            echo "tag=$tag"
+            echo "image=$image"
+          } >>"$GITHUB_OUTPUT"
+          echo "Plan: $tag → $environment ($image), enabled=$enabled"
+
+  image:
+    name: Build and push image
+    needs: plan
+    if: needs.plan.outputs.enabled == 'true'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: refs/tags/${{ needs.plan.outputs.tag }}
+          persist-credentials: false
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: app
+          file: app/Dockerfile
+          build-contexts: |
+            legal=legal
+          push: true
+          tags: ${{ needs.plan.outputs.image }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ needs.plan.outputs.tag }}
+
+  deploy:
+    name: Deploy to ${{ needs.plan.outputs.environment }}
+    needs: [plan, image]
+    if: needs.plan.outputs.enabled == 'true'
+    runs-on: ubuntu-24.04
+    # Required reviewers for production are configured on the GitHub environment (DEPLOY.md).
+    environment:
+      name: ${{ needs.plan.outputs.environment }}
+      url: ${{ vars.LAANDET_PUBLIC_URL }}
+    timeout-minutes: 20
+    steps:
+      - name: Check configuration
+        env:
+          SSH_HOST: ${{ secrets.LAANDET_SSH_HOST }}
+          SSH_USER: ${{ secrets.LAANDET_SSH_USER }}
+          SSH_KEY: ${{ secrets.LAANDET_SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.LAANDET_SSH_KNOWN_HOSTS }}
+          PUBLIC_URL: ${{ vars.LAANDET_PUBLIC_URL }}
+        run: |
+          missing=()
+          [[ -n $SSH_HOST ]] || missing+=(secret:LAANDET_SSH_HOST)
+          [[ -n $SSH_USER ]] || missing+=(secret:LAANDET_SSH_USER)
+          [[ -n $SSH_KEY ]] || missing+=(secret:LAANDET_SSH_PRIVATE_KEY)
+          [[ -n $SSH_KNOWN_HOSTS ]] || missing+=(secret:LAANDET_SSH_KNOWN_HOSTS)
+          [[ $PUBLIC_URL == https://* ]] || missing+=(variable:LAANDET_PUBLIC_URL)
+          if (( ${#missing[@]} )); then
+            echo "::error::Missing for environment '${{ needs.plan.outputs.environment }}': ${missing[*]} (see docs/runbooks/DEPLOY.md)"
+            exit 1
+          fi
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: refs/tags/${{ needs.plan.outputs.tag }}
+          persist-credentials: false
+          sparse-checkout: deploy
+
+      - name: Deploy over SSH (forced command on the server)
+        env:
+          SSH_HOST: ${{ secrets.LAANDET_SSH_HOST }}
+          SSH_USER: ${{ secrets.LAANDET_SSH_USER }}
+          SSH_KEY: ${{ secrets.LAANDET_SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.LAANDET_SSH_KNOWN_HOSTS }}
+          ENVIRONMENT: ${{ needs.plan.outputs.environment }}
+          TAG: ${{ needs.plan.outputs.tag }}
+        run: |
+          set -euo pipefail
+          key="$RUNNER_TEMP/deploy_key"; hosts="$RUNNER_TEMP/known_hosts"
+          install -m 600 /dev/null "$key"; printf '%s\n' "$SSH_KEY" >"$key"
+          printf '%s\n' "$SSH_KNOWN_HOSTS" >"$hosts"
+          tar -czf "$RUNNER_TEMP/deploy-bundle.tar.gz" deploy
+          ssh -i "$key" -o IdentitiesOnly=yes -o UserKnownHostsFile="$hosts" -o StrictHostKeyChecking=yes \
+            -o ServerAliveInterval=30 "$SSH_USER@$SSH_HOST" "$ENVIRONMENT $TAG" <"$RUNNER_TEMP/deploy-bundle.tar.gz"
+          rm -f "$key"
+
+      - name: Check over HTTPS
+        env:
+          PUBLIC_URL: ${{ vars.LAANDET_PUBLIC_URL }}
+        run: |
+          set -euo pipefail
+          curl -fsS --retry 10 --retry-delay 6 --retry-all-errors "$PUBLIC_URL/healthz"
+          echo
+          headers=$(curl -sS -o /dev/null -D - "$PUBLIC_URL/")
+          printf '%s\n' "$headers"
+          for h in strict-transport-security x-content-type-options content-security-policy; do
+            grep -qi "^$h:" <<<"$headers" || { echo "::error::missing header $h"; exit 1; }
+          done
+          if [[ ${{ needs.plan.outputs.environment }} == staging ]]; then
+            grep -qi '^x-robots-tag: noindex' <<<"$headers" || { echo "::error::staging must send X-Robots-Tag: noindex"; exit 1; }
+          fi

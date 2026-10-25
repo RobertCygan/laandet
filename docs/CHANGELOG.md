@@ -2,6 +2,12 @@
 
 All notable changes to Laandet. Dates are DD.MM.YYYY.
 
+## Repository move — 25.10.2026
+- At the owner's request, Laandet moved from the folder `laandet/` in `RobertCygan/G-PSI_WWW` to its own repository `RobertCygan/laandet`, with the full history of the folder (D-002).
+- The CI, deploy, Dependabot and gitleaks configuration moved to this repository's root without the `laandet/` prefix.
+- The repository's earlier content (research MVP, `Laanndet.html`, `Laanndet.zip`, promotional reel) is kept on branch `prototyp-2026-10`.
+- The code is unchanged by the move.
+
 ## [Phase 04] — 25.10.2026 (approved by the owner: «Zatwierdzam Phase 04»; not deployed)
 
 The code and documents for the beta, the go/no-go gates and the launch. The beta and the launch themselves need the

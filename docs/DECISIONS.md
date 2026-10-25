@@ -29,7 +29,7 @@ during Phase 01 start as *Proposed* (implementation-level) unless the owner says
   - The G-PSI website build (`www/`) is not touched.
   - When the owner creates a dedicated repository (recommended: `laandet`), move the folder with `git subtree split` to keep history.
 - **Trade-off:** Shared CI configuration and issue tracker for a while. Workflows must use `paths:` filters so one product's changes don't run the other's checks.
-- **Status:** Accepted 25.10.2026 (owner approved Phase 00: «Zatwierdzam Phase 00»).
+- **Status:** Accepted 25.10.2026 (owner approved Phase 00: «Zatwierdzam Phase 00»). **Carried out 25.10.2026** at the owner's request («przenieś projekt do osobnego repo laandet»): the folder moved to `RobertCygan/laandet` with its full history (`git subtree split`). The CI, deploy, Dependabot and gitleaks files moved to this repository's root without the `laandet/` prefix and without `paths:` filters. That repository's earlier content (the research MVP, `Laanndet.html`, `Laanndet.zip` and the promotional reel) is kept unchanged on branch `prototyp-2026-10`.
 
 ## D-003 — Product name
 - **Decision:**

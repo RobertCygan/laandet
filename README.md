@@ -10,7 +10,7 @@ It is an independent project in the **G-PSI.ai** portfolio.
 
 | Item | Status (25.10.2026) |
 |---|---|
-| Visual prototype (`../Laanndet.html`) | Exists. Static demo with fictional data (see `docs/CURRENT_STATE_ASSESSMENT.md`) |
+| Visual prototype (`Laanndet.html`) | Exists on branch `prototyp-2026-10` of this repository (with the earlier research MVP) and in `RobertCygan/G-PSI_WWW`. Static demo with fictional data (see `docs/CURRENT_STATE_ASSESSMENT.md`) |
 | **Phase 00:** inventory, architecture, data model, threat model, legal drafts, roadmap | **Approved by the owner** on 25.10.2026 (D-001…D-029 accepted) |
 | **Phase 01:** accounts, listings, uploads, explore, legal pages, reporting (`app/`) | **Approved by the owner** on 25.10.2026. Tested locally and in CI. |
 | **Phase 02:** messages, rental requests and bookings, agreements, giveaway claims, condition reports, worker jobs and notices | **Approved by the owner** on 25.10.2026. Tested locally and in CI. Rentals stay closed (`rentals_open` off) until the owner opens them. See `docs/CHANGELOG.md`. |
@@ -66,6 +66,8 @@ laandet/
 ├─ design/prototype/            assets extracted from the prototype (CSS, images, demo content)
 ├─ app/                         the web application (Next.js); see app/README.md
 ├─ deploy/                      Docker Compose, Caddy, backups (for the future server)
+├─ .github/                     CI (laandet-ci), tag-based deploy workflow, Dependabot
+├─ .gitleaks.toml               secret scanning allow-list for test fixtures
 └─ tasks/                       development tasks (GOAL/CONTEXT/INPUT/OUTPUT/CONSTRAINTS/TESTS)
 ```
 

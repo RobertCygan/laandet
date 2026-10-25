@@ -1,6 +1,6 @@
 # Laandet — Design assets
 
-`prototype/` contains assets **extracted unchanged** from the community-tested prototype `../../Laanndet.html`
+`prototype/` contains assets **extracted unchanged** from the community-tested prototype `Laanndet.html` (branch `prototyp-2026-10` of this repository)
 (25.10.2026). The prototype itself is not modified.
 
 | File | Content | Use |
