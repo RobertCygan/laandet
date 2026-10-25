@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import type { DbOrTx } from "@/db/client";
+import { recordAudit } from "@/modules/audit/audit";
 import { AppError } from "@/modules/errors";
 
 export type RateRule = { max: number; windowSeconds: number };
@@ -22,11 +23,20 @@ export async function consumeRateLimit(db: DbOrTx, bucket: string, rule: RateRul
   return count <= rule.max;
 }
 
-/** Throws AppError("rate_limited") when any of the buckets is exhausted. */
+/**
+ * Throws AppError("rate_limited") when any of the buckets is exhausted, after writing an
+ * `abuse.rate_limited` audit row (SECURITY §2) with the kind of limit and the user, never an IP.
+ */
 export async function enforceRateLimits(db: DbOrTx, checks: Array<{ bucket: string; rule: RateRule }>): Promise<void> {
   for (const c of checks) {
     if (!(await consumeRateLimit(db, c.bucket, c.rule))) {
-      throw new AppError("rate_limited", undefined, { bucket: c.bucket.split(":")[0] });
+      const [kind, scope, id] = c.bucket.split(":");
+      await recordAudit(db, {
+        actorId: scope === "user" && id && /^[0-9a-f-]{36}$/i.test(id) ? id : null,
+        action: "abuse.rate_limited",
+        metadata: { limit: kind ?? "unknown" },
+      });
+      throw new AppError("rate_limited", undefined, { bucket: kind });
     }
   }
 }

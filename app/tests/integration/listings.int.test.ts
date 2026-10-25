@@ -107,6 +107,12 @@ describe("listings (P01-08, P01-10)", () => {
     await expect(
       saveListing(u, await rentalDraft({ title: "Drill nummer 4" }), [], { intent: "publish" }),
     ).rejects.toMatchObject({ code: "rate_limited" });
+    // SECURITY §2: every hit is audited, with the kind of limit and no IP.
+    const [hit] = await owner
+      .select()
+      .from(schema.auditEvents)
+      .where(and(eq(schema.auditEvents.action, "abuse.rate_limited"), eq(schema.auditEvents.actorId, u.id)));
+    expect(hit).toMatchObject({ ipHash: null, metadata: { limit: expect.any(String) } });
   });
 
   it("creates an automatic report for prohibited-item keywords and warns the owner", async () => {
