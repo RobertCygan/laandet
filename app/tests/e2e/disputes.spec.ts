@@ -34,9 +34,11 @@ test.describe("Phase 03: cases at 390 px (P03-01)", () => {
     await renter.goto(`${bookingPath}/tilbakelevering`);
     await addEntry(renter, { outcome: "Levert tilbake i orden" });
     await confirmEntry(renter, false);
+    await expect(renter.getByText("Du har bekreftet. Venter på den andre parten.")).toBeVisible();
     await owner.goto(`${bookingPath}/tilbakelevering`);
     await owner.getByLabel(/Kommentar/).fill("Det er en sprekk i bladet som ikke var der før.");
     await owner.getByRole("button", { name: "Bestrid", exact: true }).click();
+    await expect(owner.getByText("Du har bestridt registreringen.")).toBeVisible();
     await owner.goto(bookingPath);
     await owner.getByRole("link", { name: "Se saken" }).click();
     await expect(owner).toHaveURL(/\/saker\/[0-9a-f-]{36}$/);
@@ -123,6 +125,7 @@ test.describe("Phase 03: cases at 390 px (P03-01)", () => {
       await p.goto(casePath);
       await expect(p.getByText("Lever tilbake innen søndag kl. 18.").first()).toBeVisible();
       await p.getByRole("button", { name: "Godta anbefalingen" }).click();
+      await expect(p).toHaveURL(/\?ok=answered/);
     }
     await expect(renter.getByText("Saken er løst ved avtale.").first()).toBeVisible();
   });
