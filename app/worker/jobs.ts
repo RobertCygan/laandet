@@ -12,6 +12,7 @@ import {
   sendReturnReminders,
 } from "@/modules/rentals/jobs";
 import { sendMessageEmails } from "@/modules/messaging/email-batch";
+import { expireRestrictions } from "@/modules/moderation/users";
 
 export type Job = { name: string; everySeconds: number; run: (db: DbOrTx) => Promise<unknown> };
 
@@ -41,6 +42,8 @@ export const JOBS: Job[] = [
   { name: "return_lapse", everySeconds: 900, run: () => lapseReturns() },
   { name: "return_reminder", everySeconds: 900, run: () => sendReturnReminders() },
   { name: "giveaway_claim_expiry", everySeconds: 3600, run: () => expireClaims() },
+  // Phase 03: time-limited account restrictions end by themselves (P03-03).
+  { name: "restriction_expiry", everySeconds: 3600, run: () => expireRestrictions() },
   {
     name: "audit_retention",
     everySeconds: 24 * 3600,

@@ -29,7 +29,10 @@ export default async function ModerationDecisionPage({ params }: PageProps<"/[lo
 
   return (
     <NarrowPage>
-      <PageHeader title={t("title")} lead={t("hidden", { title: view.listingTitle })} />
+      <PageHeader
+        title={t("title")}
+        lead={a.targetType === "listing" ? t("hidden", { title: view.targetLabel }) : t(`lead.${a.action}`)}
+      />
       <section className="card mb-6 flex flex-col gap-2 p-6">
         <h2 className="text-xl">{t("reasons")}</h2>
         {reason && <p className="font-bold">{reason}</p>}
@@ -38,7 +41,9 @@ export default async function ModerationDecisionPage({ params }: PageProps<"/[lo
       </section>
       <section className="card flex flex-col gap-4 p-6">
         <h2 className="text-xl">{t("appealHeading")}</h2>
-        {view.appeal ? (
+        {!view.appealable ? (
+          <p>{t("nothingToAppeal")}</p>
+        ) : view.appeal ? (
           <>
             <Notice tone={view.appeal.status === "reversed" ? "success" : "info"}>
               {t(`appealStatus.${view.appeal.status}`)}

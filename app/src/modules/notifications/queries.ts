@@ -4,9 +4,13 @@ import { notifications } from "@/db/schema";
 import type { Actor } from "@/modules/authz/actor-types";
 import { ACTIVITY_KINDS, type ActivityKind } from "./email-templates";
 
+/** Moderation notices are stored with the decision id; they link to the statement of reasons. */
+const MODERATION_KINDS = ["listing_hidden", "account_measure", "appeal_decided", "restriction_ended"] as const;
+type ModerationKind = (typeof MODERATION_KINDS)[number];
+
 export type NotificationItem = {
   id: string;
-  kind: ActivityKind;
+  kind: ActivityKind | ModerationKind;
   title: string;
   path: string;
   readAt: Date | null;
@@ -22,7 +26,12 @@ export async function listNotifications(actor: Actor, limit = 50): Promise<Notif
     .where(eq(notifications.userId, actor.id))
     .orderBy(desc(notifications.createdAt))
     .limit(limit);
-  return rows.flatMap((r) => {
+  return rows.flatMap((r): NotificationItem[] => {
+    if ((MODERATION_KINDS as readonly string[]).includes(r.type)) {
+      const actionId = String(r.payload.actionId ?? "");
+      const path = /^[0-9a-f-]{36}$/i.test(actionId) ? `/moderering/${actionId}` : "/konto";
+      return [{ id: r.id, kind: r.type as ModerationKind, title: "", path, readAt: r.readAt, createdAt: r.createdAt }];
+    }
     const path = String(r.payload.path ?? "");
     if (!(r.type in ACTIVITY_KINDS) || !/^\/[a-z0-9/_-]*$/i.test(path)) return [];
     return [

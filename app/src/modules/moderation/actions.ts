@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { osloLocalToDate } from "@/i18n/format";
 import { getActor } from "@/modules/auth/actor";
 import { formToObject, runAction, type ActionState } from "@/modules/server/action";
 import {
@@ -16,6 +17,7 @@ import {
   hideSchema,
   reportSchema,
 } from "./service";
+import { applyUserMeasure, userMeasureSchema } from "./users";
 
 export async function reportAction(_prev: ActionState, form: FormData): Promise<ActionState> {
   const raw = formToObject(form);
@@ -53,6 +55,22 @@ export async function dismissReportAction(_prev: ActionState, form: FormData): P
   const result = await runAction(async () => {
     const { reportId, note } = dismissSchema.parse(raw);
     await dismissReport(await getActor(), reportId, note);
+  }, raw);
+  if (result.status === "ok") backToQueue(raw);
+  return result;
+}
+
+/** Warn, restrict (optionally until a date), suspend or reinstate an account (P03-03). */
+export async function userMeasureAction(_prev: ActionState, form: FormData): Promise<ActionState> {
+  const raw = formToObject(form);
+  const result = await runAction(async () => {
+    let until: string | undefined;
+    if (raw.measure === "restrict" && raw.untilDate) {
+      const at = osloLocalToDate(raw.untilDate, "23:59");
+      if (!at) throw new z.ZodError([{ code: "custom", path: ["until"], message: "date_invalid", input: "" }]);
+      until = at.toISOString();
+    }
+    await applyUserMeasure(await getActor(), userMeasureSchema.parse({ ...raw, until }));
   }, raw);
   if (result.status === "ok") backToQueue(raw);
   return result;

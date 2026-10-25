@@ -432,7 +432,19 @@
       "upheld": "Klagen er behandlet: avgjørelsen står ved lag.",
       "reversed": "Klagen er behandlet: avgjørelsen er omgjort. Annonsen er satt på pause, og du kan publisere den igjen."
     },
-    "sameStaffNote": "Klagen ble behandlet av samme person som tok avgjørelsen, fordi det bare finnes én moderator."
+    "sameStaffNote": "Klagen ble behandlet av samme person som tok avgjørelsen, fordi det bare finnes én moderator.",
+    "lead": {
+      "listing_hidden": "Annonsen din er skjult.",
+      "listing_restored": "Annonsen din er gjenopprettet.",
+      "user_warned": "Laandet har gitt deg en advarsel.",
+      "user_restricted": "Kontoen din er begrenset. Du kan fortsatt fullføre pågående leieforhold og saker.",
+      "user_suspended": "Kontoen din er stengt. Du kan lese begrunnelsen, klage og laste ned dataene dine.",
+      "user_reinstated": "Kontoen din er åpnet igjen.",
+      "review_removed": "En vurdering du skrev, er fjernet.",
+      "review_restored": "Vurderingen din er gjenopprettet.",
+      "message_redacted": "En melding du sendte, er skjult."
+    },
+    "nothingToAppeal": "Dette er en oppheving av et tidligere tiltak. Det er ingenting å klage på."
   },
   "admin": {
     "title": "Administrasjon",
@@ -477,7 +489,6 @@
     "originalStatement": "Opprinnelig begrunnelse",
     "filterAll": "Alle åpne",
     "filterAutomatic": "Bare automatiske",
-    "profileNote": "Tiltak mot profiler (begrensning eller suspensjon) gjøres foreløpig manuelt av en administrator. Avvis rapporten med et notat når saken er håndtert.",
     "openProfile": "Åpne profilen",
     "dashboardLead": "Bare tall, ingen personopplysninger.",
     "reportDetails": "Detaljer fra den som rapporterte",
@@ -496,6 +507,54 @@
       "security": "Sikkerhetslogg",
       "metrics": "Driftstall",
       "transparency": "Åpenhet"
+    },
+    "targetTypes": {
+      "listing": "Annonser",
+      "user": "Profiler",
+      "message": "Meldinger",
+      "review": "Vurderinger"
+    },
+    "repeatedReports": "Gjentatt av samme person",
+    "reportedReview": "Rapportert vurdering",
+    "accountStatus": {
+      "active": "aktiv",
+      "restricted": "begrenset",
+      "suspended": "stengt",
+      "deletion_pending": "sletting bestilt",
+      "deleted": "slettet"
+    },
+    "measure": {
+      "title": "Tiltak for kontoen",
+      "label": "Tiltak",
+      "warn": "Advarsel",
+      "restrict": "Begrens kontoen",
+      "suspend": "Steng kontoen",
+      "reinstate": "Åpne kontoen igjen",
+      "until": "Begrenset til og med (valgfritt)",
+      "untilHint": "Uten dato gjelder begrensningen til den oppheves.",
+      "statementHint": "Sendes til brukeren, som kan klage. Tiltak er et sikkerhetsverktøy, ikke en straff for å tape en uenighet.",
+      "submit": "Gjennomfør tiltaket",
+      "reasons": {
+        "fraud_or_scam": "Svindelforsøk",
+        "harassment": "Trakassering eller trusler",
+        "not_returned": "Gjenstand ikke levert tilbake",
+        "unsafe": "Fare for andres sikkerhet",
+        "spam": "Spam",
+        "illegal_content": "Ulovlig innhold",
+        "repeated_violations": "Gjentatte brudd på vilkårene",
+        "other": "Annet"
+      }
+    },
+    "actionLabel": {
+      "listing_hidden": "Skjult annonse",
+      "listing_restored": "Gjenopprettet annonse",
+      "user_warned": "Advarsel",
+      "user_restricted": "Begrenset konto",
+      "user_suspended": "Stengt konto",
+      "user_reinstated": "Åpnet konto",
+      "review_removed": "Fjernet vurdering",
+      "review_restored": "Gjenopprettet vurdering",
+      "message_redacted": "Skjult melding"
     }
   },
   "errors": {
@@ -564,7 +623,9 @@
     "case_not_escalated": "Saken er ikke sendt til support.",
     "reopen_not_available": "Saken kan bare åpnes igjen innen 30 dager etter at den ble avsluttet.",
     "proposal_invalid": "Sjekk feltene som er merket.",
-    "too_many_photos": "For mange bilder (høyst 6)."
+    "too_many_photos": "For mange bilder (høyst 6).",
+    "already_active": "Kontoen er allerede aktiv.",
+    "measure_invalid": "Sjekk feltene som er merket."
   },
   "validation": {
     "required": "Må fylles ut.",
@@ -1086,7 +1147,11 @@
       "dispute_opened": "Det er meldt fra om et problem i leieforholdet «{title}». Se saken og svar innen 7 dager.",
       "dispute_update": "Det er nytt i saken om «{title}».",
       "dispute_escalated": "Laandet er bedt om hjelp i saken om «{title}». Support leser saken.",
-      "dispute_closed": "Saken om «{title}» er avsluttet."
+      "dispute_closed": "Saken om «{title}» er avsluttet.",
+      "listing_hidden": "Laandet har skjult en av annonsene dine. Les begrunnelsen.",
+      "account_measure": "Det er tatt en avgjørelse om kontoen din. Les begrunnelsen.",
+      "appeal_decided": "Klagen din er behandlet.",
+      "restriction_ended": "Begrensningen av kontoen din er over."
     }
   },
   "disputes": {

@@ -1,6 +1,7 @@
 import { and, asc, desc, eq, inArray, ne, sql } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { z } from "zod";
-import { db } from "@/db/client";
+import { db, type Tx } from "@/db/client";
 import {
   appeals,
   conversations,
@@ -9,7 +10,9 @@ import {
   moderationActions,
   notifications,
   REPORT_REASONS,
+  REPORT_TARGETS,
   reports,
+  reviews,
   userProfiles,
   users,
 } from "@/db/schema";
@@ -23,7 +26,7 @@ import { enforceRateLimits, LIMITS } from "@/modules/ratelimit/ratelimit";
 import { getRequestMeta } from "@/modules/server/request-meta";
 
 export const reportSchema = z.object({
-  targetType: z.enum(["listing", "user", "message"]),
+  targetType: z.enum(["listing", "user", "message", "review"]),
   targetId: z.uuid(),
   reason: z.enum(REPORT_REASONS, { error: "required" }),
   details: z.string().trim().max(2000, { error: "too_long" }).optional().default(""),
@@ -53,6 +56,13 @@ export async function createReport(actor: Actor, input: z.infer<typeof reportSch
     if (!m || (m.initiatorId !== actor.id && m.ownerId !== actor.id) || m.senderId === actor.id) {
       throw new AppError("not_found");
     }
+  } else if (input.targetType === "review") {
+    // Only published reviews can be seen, so only those can be reported; never one's own (P03-02).
+    const [r] = await db
+      .select({ authorId: reviews.authorId })
+      .from(reviews)
+      .where(and(eq(reviews.id, input.targetId), eq(reviews.status, "published")));
+    if (!r || r.authorId === actor.id) throw new AppError("not_found");
   } else {
     const [u] = await db.select({ id: users.id }).from(users).where(eq(users.id, input.targetId));
     if (!u || u.id === actor.id) throw new AppError("not_found");
@@ -75,9 +85,16 @@ export async function createReport(actor: Actor, input: z.infer<typeof reportSch
   });
 }
 
-export async function listOpenReports(actor: Actor, opts: { automaticOnly?: boolean } = {}) {
+const reportedUser = alias(users, "reported_user");
+
+/**
+ * The moderation queue (P03-03): every target type. A reported message is the one piece of a
+ * conversation staff may read (AUTH_MODEL §4, N15), so listing it is audited. Repeated reports by the
+ * same person about the same target in 30 days are flagged.
+ */
+export async function listOpenReports(actor: Actor, opts: { automaticOnly?: boolean; type?: string } = {}) {
   assertCan(actor, "report.handle");
-  return db
+  const rows = await db
     .select({
       id: reports.id,
       targetType: reports.targetType,
@@ -90,21 +107,49 @@ export async function listOpenReports(actor: Actor, opts: { automaticOnly?: bool
       listingTitle: listings.title,
       listingStatus: listings.status,
       listingOwnerId: listings.ownerId,
-      // A reported message is the one piece of a conversation staff may read (AUTH_MODEL §4).
       messageBody: messages.body,
       messageSenderId: messages.senderId,
+      reviewComment: reviews.comment,
+      reviewStatus: reviews.status,
+      reviewAuthorId: reviews.authorId,
+      reviewSubjectId: reviews.subjectId,
+      userName: reportedUser.name,
+      userStatus: userProfiles.status,
+      repeated: sql<number>`(SELECT count(*)::int FROM reports r2 WHERE r2.reporter_id = ${reports.reporterId}
+        AND r2.target_id = ${reports.targetId} AND r2.created_at > now() - interval '30 days')`,
     })
     .from(reports)
     .leftJoin(listings, and(eq(reports.targetType, "listing"), eq(listings.id, reports.targetId)))
     .leftJoin(messages, and(eq(reports.targetType, "message"), eq(messages.id, reports.targetId)))
+    .leftJoin(reviews, and(eq(reports.targetType, "review"), eq(reviews.id, reports.targetId)))
+    .leftJoin(reportedUser, and(eq(reports.targetType, "user"), eq(reportedUser.id, reports.targetId)))
+    .leftJoin(userProfiles, and(eq(reports.targetType, "user"), eq(userProfiles.userId, reports.targetId)))
     .where(
       and(
         inArray(reports.status, ["open", "in_review"]),
         ...(opts.automaticOnly ? [eq(reports.isAutomatic, true)] : []),
+        ...(opts.type && (REPORT_TARGETS as readonly string[]).includes(opts.type)
+          ? [eq(reports.targetType, opts.type as (typeof REPORT_TARGETS)[number])]
+          : []),
       ),
     )
     .orderBy(desc(reports.createdAt))
     .limit(200);
+  const shown = rows.filter((r) => r.targetType === "message" && r.messageBody !== null);
+  if (shown.length) {
+    const meta = await getRequestMeta();
+    for (const r of shown) {
+      await recordAudit(db, {
+        actorId: actor.id,
+        actorRole: (actor as UserActor).role,
+        action: "staff.view_report_messages",
+        targetType: "report",
+        targetId: r.id,
+        meta,
+      });
+    }
+  }
+  return rows.map((r) => ({ ...r, repeated: r.repeated > 1 }));
 }
 
 export const hideSchema = z.object({
@@ -218,6 +263,13 @@ async function assertNotOwnCase(actor: UserActor, report: typeof reports.$inferS
     const [l] = await db.select({ ownerId: listings.ownerId }).from(listings).where(eq(listings.id, report.targetId));
     if (l?.ownerId === actor.id) throw new AppError("forbidden");
   }
+  if (report.targetType === "review") {
+    const [r] = await db
+      .select({ authorId: reviews.authorId, subjectId: reviews.subjectId })
+      .from(reviews)
+      .where(eq(reviews.id, report.targetId));
+    if (r && (r.authorId === actor.id || r.subjectId === actor.id)) throw new AppError("forbidden");
+  }
 }
 
 export async function dismissReport(actor: Actor, reportId: string, note: string): Promise<void> {
@@ -248,20 +300,49 @@ export async function dismissReport(actor: Actor, reportId: string, note: string
   });
 }
 
+/** Who a decision is about: the listing owner, the user, or the review's author. */
+async function affectedUser(
+  a: typeof moderationActions.$inferSelect,
+): Promise<{ userId: string; label: string } | null> {
+  if (a.targetType === "listing") {
+    const [l] = await db
+      .select({ ownerId: listings.ownerId, title: listings.title })
+      .from(listings)
+      .where(eq(listings.id, a.targetId));
+    return l ? { userId: l.ownerId, label: l.title } : null;
+  }
+  if (a.targetType === "user") return { userId: a.targetId, label: "" };
+  if (a.targetType === "review") {
+    const [r] = await db
+      .select({ authorId: reviews.authorId, comment: reviews.comment })
+      .from(reviews)
+      .where(eq(reviews.id, a.targetId));
+    return r ? { userId: r.authorId, label: r.comment ?? "" } : null;
+  }
+  return null;
+}
+
 /** The affected user's view of a moderation decision (and any appeal). */
 export async function getModerationForUser(actor: Actor, actionId: string) {
   if (actor.kind !== "user" || !/^[0-9a-f-]{36}$/i.test(actionId)) return null;
-  const [row] = await db
-    .select({ action: moderationActions, listingTitle: listings.title, ownerId: listings.ownerId })
-    .from(moderationActions)
-    .innerJoin(listings, and(eq(moderationActions.targetType, "listing"), eq(listings.id, moderationActions.targetId)))
-    .where(eq(moderationActions.id, actionId));
-  if (!row || row.ownerId !== actor.id) return null;
+  const [action] = await db.select().from(moderationActions).where(eq(moderationActions.id, actionId));
+  if (!action) return null;
+  const affected = await affectedUser(action);
+  if (!affected || affected.userId !== actor.id) return null;
   const [appeal] = await db
     .select()
     .from(appeals)
     .where(and(eq(appeals.moderationActionId, actionId), eq(appeals.appellantId, actor.id)));
-  return { ...row, appeal: appeal ?? null };
+  // Reinstatements and restorations are good news; there is nothing to appeal.
+  const appealable = !["listing_restored", "user_reinstated", "review_restored"].includes(action.action);
+  return {
+    action,
+    ownerId: affected.userId,
+    listingTitle: affected.label,
+    targetLabel: affected.label,
+    appealable,
+    appeal: appeal ?? null,
+  };
 }
 
 export const appealSchema = z.object({
@@ -274,6 +355,7 @@ export async function createAppeal(actor: Actor, input: z.infer<typeof appealSch
   if (!view) throw new AppError("not_found");
   assertCan(actor, "appeal.create", { type: "moderationAction", affectedUserId: view.ownerId });
   if (view.appeal) throw new AppError("conflict", "appeal_exists");
+  if (!view.appealable) throw new AppError("conflict");
   const meta = await getRequestMeta();
   await db.transaction(async (tx) => {
     const [a] = await tx
@@ -286,22 +368,28 @@ export async function createAppeal(actor: Actor, input: z.infer<typeof appealSch
 
 export async function listOpenAppeals(actor: Actor) {
   assertCan(actor, "report.handle");
-  return db
+  const rows = await db
     .select({
       id: appeals.id,
       text: appeals.text,
       createdAt: appeals.createdAt,
+      appellantId: appeals.appellantId,
       actionId: moderationActions.id,
+      action: moderationActions.action,
+      targetType: moderationActions.targetType,
+      targetId: moderationActions.targetId,
       originalActorId: moderationActions.actorId,
       statement: moderationActions.statementOfReasons,
-      listingId: listings.id,
       listingTitle: listings.title,
+      appellantName: users.name,
     })
     .from(appeals)
     .innerJoin(moderationActions, eq(moderationActions.id, appeals.moderationActionId))
-    .leftJoin(listings, eq(listings.id, moderationActions.targetId))
+    .innerJoin(users, eq(users.id, appeals.appellantId))
+    .leftJoin(listings, and(eq(moderationActions.targetType, "listing"), eq(listings.id, moderationActions.targetId)))
     .where(eq(appeals.status, "open"))
     .orderBy(asc(appeals.createdAt));
+  return rows.map((r) => ({ ...r, listingId: r.targetType === "listing" ? r.targetId : null }));
 }
 
 async function otherStaffAvailable(excludeId: string): Promise<boolean> {
@@ -357,21 +445,7 @@ export async function decideAppeal(actor: Actor, input: z.infer<typeof decideApp
         decidedBySameStaff: sameStaff,
       })
       .where(eq(appeals.id, input.appealId));
-    if (input.outcome === "reversed" && row.action.action === "listing_hidden") {
-      // Restored as paused; the owner decides when to show it again.
-      await tx
-        .update(listings)
-        .set({ status: "paused", updatedAt: new Date() })
-        .where(eq(listings.id, row.action.targetId));
-      await tx.insert(moderationActions).values({
-        actorId: actor.id,
-        targetType: "listing",
-        targetId: row.action.targetId,
-        action: "listing_restored",
-        reasonCode: "appeal_reversed",
-        statementOfReasons: input.decision,
-      });
-    }
+    if (input.outcome === "reversed") await undoAction(tx, actor.id, row.action, input.decision);
     await tx.insert(notifications).values({
       userId: row.appeal.appellantId,
       type: "appeal_decided",
@@ -410,6 +484,36 @@ export async function decideAppeal(actor: Actor, input: z.infer<typeof decideApp
       meta,
     });
   });
+}
+
+/** What a reversed appeal undoes (P03-03). A warning has nothing to undo; the record shows the reversal. */
+async function undoAction(tx: Tx, staffId: string, a: typeof moderationActions.$inferSelect, decision: string) {
+  const restore = (action: (typeof moderationActions.$inferInsert)["action"]) =>
+    tx.insert(moderationActions).values({
+      actorId: staffId,
+      targetType: a.targetType,
+      targetId: a.targetId,
+      action,
+      reasonCode: "appeal_reversed",
+      statementOfReasons: decision,
+    });
+  if (a.action === "listing_hidden") {
+    // Restored as paused; the owner decides when to show it again.
+    await tx.update(listings).set({ status: "paused", updatedAt: new Date() }).where(eq(listings.id, a.targetId));
+    await restore("listing_restored");
+  } else if (a.action === "user_restricted" || a.action === "user_suspended") {
+    await tx
+      .update(userProfiles)
+      .set({ status: "active", statusReasonCode: null, statusChangedAt: new Date() })
+      .where(and(eq(userProfiles.userId, a.targetId), inArray(userProfiles.status, ["restricted", "suspended"])));
+    await restore("user_reinstated");
+  } else if (a.action === "review_removed") {
+    await tx
+      .update(reviews)
+      .set({ status: "published" })
+      .where(and(eq(reviews.id, a.targetId), eq(reviews.status, "removed")));
+    await restore("review_restored");
+  }
 }
 
 export async function adminCounts(actor: Actor) {

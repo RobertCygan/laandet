@@ -432,7 +432,19 @@
       "upheld": "The appeal has been decided: the decision stands.",
       "reversed": "The appeal has been decided: the decision was reversed. The listing is paused and you can publish it again."
     },
-    "sameStaffNote": "The appeal was handled by the same person who made the decision, because there is only one moderator."
+    "sameStaffNote": "The appeal was handled by the same person who made the decision, because there is only one moderator.",
+    "lead": {
+      "listing_hidden": "Your listing has been hidden.",
+      "listing_restored": "Your listing has been restored.",
+      "user_warned": "Laandet has given you a warning.",
+      "user_restricted": "Your account is restricted. You can still finish ongoing rentals and cases.",
+      "user_suspended": "Your account is suspended. You can read the reasons, appeal and download your data.",
+      "user_reinstated": "Your account has been reinstated.",
+      "review_removed": "A review you wrote has been removed.",
+      "review_restored": "Your review has been restored.",
+      "message_redacted": "A message you sent has been hidden."
+    },
+    "nothingToAppeal": "This lifts an earlier measure. There is nothing to appeal."
   },
   "admin": {
     "title": "Administration",
@@ -477,7 +489,6 @@
     "originalStatement": "Original statement",
     "filterAll": "All open",
     "filterAutomatic": "Automatic only",
-    "profileNote": "Measures against profiles (restriction or suspension) are for now done manually by an administrator. Dismiss the report with a note once the case is handled.",
     "openProfile": "Open the profile",
     "dashboardLead": "Numbers only, no personal data.",
     "reportDetails": "Details from the reporter",
@@ -496,6 +507,54 @@
       "security": "Security log",
       "metrics": "Operations",
       "transparency": "Transparency"
+    },
+    "targetTypes": {
+      "listing": "Listings",
+      "user": "Profiles",
+      "message": "Messages",
+      "review": "Reviews"
+    },
+    "repeatedReports": "Repeated by the same person",
+    "reportedReview": "Reported review",
+    "accountStatus": {
+      "active": "active",
+      "restricted": "restricted",
+      "suspended": "suspended",
+      "deletion_pending": "deletion requested",
+      "deleted": "deleted"
+    },
+    "measure": {
+      "title": "Account measure",
+      "label": "Measure",
+      "warn": "Warning",
+      "restrict": "Restrict the account",
+      "suspend": "Suspend the account",
+      "reinstate": "Reinstate the account",
+      "until": "Restricted until (optional)",
+      "untilHint": "Without a date the restriction lasts until it is lifted.",
+      "statementHint": "Sent to the user, who can appeal. Measures are a safety tool, not a penalty for losing an argument.",
+      "submit": "Apply the measure",
+      "reasons": {
+        "fraud_or_scam": "Attempted fraud",
+        "harassment": "Harassment or threats",
+        "not_returned": "Item not returned",
+        "unsafe": "Risk to others' safety",
+        "spam": "Spam",
+        "illegal_content": "Illegal content",
+        "repeated_violations": "Repeated breaches of the terms",
+        "other": "Other"
+      }
+    },
+    "actionLabel": {
+      "listing_hidden": "Hidden listing",
+      "listing_restored": "Restored listing",
+      "user_warned": "Warning",
+      "user_restricted": "Restricted account",
+      "user_suspended": "Suspended account",
+      "user_reinstated": "Reinstated account",
+      "review_removed": "Removed review",
+      "review_restored": "Restored review",
+      "message_redacted": "Hidden message"
     }
   },
   "errors": {
@@ -564,7 +623,9 @@
     "case_not_escalated": "The case has not been sent to support.",
     "reopen_not_available": "The case can only be reopened within 30 days of closing.",
     "proposal_invalid": "Please check the marked fields.",
-    "too_many_photos": "Too many photos (at most 6)."
+    "too_many_photos": "Too many photos (at most 6).",
+    "already_active": "The account is already active.",
+    "measure_invalid": "Please check the marked fields."
   },
   "validation": {
     "required": "Required.",
@@ -1086,7 +1147,11 @@
       "dispute_opened": "A problem has been reported for the rental of \"{title}\". See the case and answer within 7 days.",
       "dispute_update": "There is news in the case about \"{title}\".",
       "dispute_escalated": "Laandet has been asked to help with the case about \"{title}\". Support will read the case.",
-      "dispute_closed": "The case about \"{title}\" is closed."
+      "dispute_closed": "The case about \"{title}\" is closed.",
+      "listing_hidden": "Laandet has hidden one of your listings. Read the reasons.",
+      "account_measure": "A decision has been made about your account. Read the reasons.",
+      "appeal_decided": "Your appeal has been decided.",
+      "restriction_ended": "The restriction on your account has ended."
     }
   },
   "disputes": {

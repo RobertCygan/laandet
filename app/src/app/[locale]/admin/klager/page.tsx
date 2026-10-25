@@ -45,7 +45,7 @@ export default async function AppealsPage({ params, searchParams }: PageProps<"/
                     {t("appealAbout", { title: a.listingTitle ?? "" })}
                   </Link>
                 ) : (
-                  t("appealAbout", { title: "–" })
+                  `${t(`actionLabel.${a.action}`)} · ${a.appellantName}`
                 )}
               </p>
               <p className="text-sm text-muted">{formatDateTime(a.createdAt, locale)}</p>

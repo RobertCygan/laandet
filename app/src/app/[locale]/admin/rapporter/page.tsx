@@ -6,7 +6,7 @@ import { localePath, pageLocale, param } from "@/i18n/page";
 import { requireStaffPage } from "@/modules/auth/guards";
 import { listOpenReports } from "@/modules/moderation/service";
 import { AdminNav } from "@/ui/admin/AdminNav";
-import { DismissReportForm, HideListingForm } from "@/ui/admin/AdminForms";
+import { DismissReportForm, HideListingForm, UserMeasureForm } from "@/ui/admin/AdminForms";
 import { PageHeader } from "@/ui/layout/PageHeader";
 import { Notice } from "@/ui/Notice";
 
@@ -21,9 +21,10 @@ export default async function ReportsPage({ params, searchParams }: PageProps<"/
   const actor = await requireStaffPage(locale);
   const sp = await searchParams;
   const automaticOnly = param(sp.automatisk) === "1";
+  const type = param(sp.type);
   const saved = param(sp.lagret) === "1";
   const back = localePath(locale, "/admin/rapporter");
-  const reports = await listOpenReports(actor, { automaticOnly });
+  const reports = await listOpenReports(actor, { automaticOnly, type });
   const t = await getTranslations("admin");
   const tr = await getTranslations("report");
   const tl = await getTranslations("listing");
@@ -39,7 +40,7 @@ export default async function ReportsPage({ params, searchParams }: PageProps<"/
           </Notice>
         </div>
       )}
-      <div className="mb-6 flex gap-2">
+      <div className="mb-6 flex flex-wrap gap-2">
         <Link
           href="/admin/rapporter"
           className={`button button-sm ${automaticOnly ? "button-subtle" : "button-outline"}`}
@@ -54,6 +55,16 @@ export default async function ReportsPage({ params, searchParams }: PageProps<"/
         >
           {t("filterAutomatic")}
         </Link>
+        {(["listing", "user", "message", "review"] as const).map((k) => (
+          <Link
+            key={k}
+            href={{ pathname: "/admin/rapporter", query: { type: k } }}
+            className={`button button-sm ${type === k ? "button-outline" : "button-subtle"}`}
+            aria-current={type === k ? "page" : undefined}
+          >
+            {t(`targetTypes.${k}`)}
+          </Link>
+        ))}
       </div>
       {reports.length === 0 ? (
         <p>{t("noReports")}</p>
@@ -65,12 +76,14 @@ export default async function ReportsPage({ params, searchParams }: PageProps<"/
               r.listingOwnerId === actor.id ||
               r.reporterId === actor.id ||
               (r.targetType === "user" && r.targetId === actor.id) ||
-              (r.targetType === "message" && r.messageSenderId === actor.id);
+              (r.targetType === "message" && r.messageSenderId === actor.id) ||
+              (r.targetType === "review" && (r.reviewAuthorId === actor.id || r.reviewSubjectId === actor.id));
             return (
               <li key={r.id} className="card flex flex-col gap-3 p-5">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="badge badge-warning">{tr(`reasons.${r.reason}`)}</span>
                   {r.isAutomatic && <span className="badge">{t("automatic")}</span>}
+                  {r.repeated && <span className="badge badge-danger">{t("repeatedReports")}</span>}
                   <span className="text-sm text-muted">
                     {t("reportedAt", { date: formatDateTime(r.createdAt, locale) })}
                   </span>
@@ -92,9 +105,20 @@ export default async function ReportsPage({ params, searchParams }: PageProps<"/
                       </Link>
                     )}
                   </div>
+                ) : r.targetType === "review" ? (
+                  <div>
+                    <p className="text-sm font-bold">{t("reportedReview")}</p>
+                    <p className="whitespace-pre-line break-words">{r.reviewComment || "–"}</p>
+                    {r.reviewSubjectId && (
+                      <Link href={`/profil/${r.reviewSubjectId}`} className="text-link text-sm" target="_blank">
+                        {t("openProfile")}
+                      </Link>
+                    )}
+                  </div>
                 ) : (
                   <p>
-                    {t("reportedProfile")}:{" "}
+                    {t("reportedProfile")}: <strong>{r.userName ?? "–"}</strong>
+                    {r.userStatus && r.userStatus !== "active" ? ` (${t(`accountStatus.${r.userStatus}`)})` : ""}{" "}
                     <Link href={`/profil/${r.targetId}`} className="text-link" target="_blank">
                       {t("openProfile")}
                     </Link>
@@ -120,7 +144,18 @@ export default async function ReportsPage({ params, searchParams }: PageProps<"/
                           </div>
                         </details>
                       )}
-                    {r.targetType === "user" && <Notice>{t("profileNote")}</Notice>}
+                    {(r.targetType === "user" || (r.targetType === "message" && r.messageSenderId)) && (
+                      <details className="rounded-md border border-border p-3">
+                        <summary className="cursor-pointer font-bold">{t("measure.title")}</summary>
+                        <div className="mt-3">
+                          <UserMeasureForm
+                            userId={r.targetType === "user" ? r.targetId : r.messageSenderId!}
+                            reportId={r.id}
+                            back={back}
+                          />
+                        </div>
+                      </details>
+                    )}
                     <details className="rounded-md border border-border p-3">
                       <summary className="cursor-pointer font-bold">{t("dismiss")}</summary>
                       <div className="mt-3">

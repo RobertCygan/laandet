@@ -11,10 +11,29 @@ export type EmailTemplate =
   | "deletion_requested"
   | "listing_hidden"
   | "appeal_decided"
+  | "account_measure"
   | "role_granted"
   | "activity";
 
 type Rendered = { subject: string; text: string };
+
+/** One neutral sentence per account measure (P03-03). */
+const MEASURE = {
+  nb: {
+    warn: "Laandet har gitt deg en advarsel.",
+    restrict:
+      "Kontoen din er begrenset. Du kan logge inn, lese og fullføre pågående leieforhold og saker, men ikke publisere, sende forespørsler eller starte nye samtaler.",
+    suspend: "Kontoen din er stengt. Du kan logge inn bare for å lese begrunnelsen, klage og laste ned dataene dine.",
+    reinstate: "Kontoen din er åpnet igjen.",
+  },
+  en: {
+    warn: "Laandet has given you a warning.",
+    restrict:
+      "Your account is restricted. You can sign in, read and finish ongoing rentals and cases, but not publish, send requests or start new conversations.",
+    suspend: "Your account is suspended. You can sign in only to read the reasons, appeal and download your data.",
+    reinstate: "Your account has been reinstated.",
+  },
+};
 type Payload = Record<string, string>;
 
 const signature = {
@@ -171,6 +190,16 @@ const templates: Record<EmailTemplate, Record<"nb" | "en", (p: Payload) => Rende
     en: (p) => ({
       subject: "Your listing has been hidden",
       text: `Hi ${p.name}!\n\nThe listing "${p.title}" has been hidden by Laandet.\n\nStatement of reasons:\n${p.statement}\n\nYou can read the decision and appeal here:\n${p.url}`,
+    }),
+  },
+  account_measure: {
+    nb: (p) => ({
+      subject: "Avgjørelse om kontoen din hos Laandet",
+      text: `Hei ${p.name}!\n\n${MEASURE.nb[p.measure as keyof typeof MEASURE.nb] ?? ""}\n\nBegrunnelse:\n${p.statement}\n\nDu kan lese avgjørelsen og klage her:\n${p.url}`,
+    }),
+    en: (p) => ({
+      subject: "A decision about your Laandet account",
+      text: `Hi ${p.name}!\n\n${MEASURE.en[p.measure as keyof typeof MEASURE.en] ?? ""}\n\nStatement of reasons:\n${p.statement}\n\nYou can read the decision and appeal here:\n${p.url}`,
     }),
   },
   appeal_decided: {
