@@ -15,6 +15,7 @@ import { CategoryIcon } from "@/ui/Icon";
 import { ReportForm } from "@/ui/listings/ListingActions";
 import { ReportSignedOut } from "@/ui/listings/ReportSignedOut";
 import { SaveWarnings } from "@/ui/listings/SaveWarnings";
+import { ContactOwnerButton } from "@/ui/messaging/ContactOwnerButton";
 import { Notice } from "@/ui/Notice";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/annonse/[id]">): Promise<Metadata> {
@@ -310,6 +311,13 @@ export default async function ListingPage({ params, searchParams }: PageProps<"/
                 </button>
               </form>
             )}
+            <ContactOwnerButton
+              listingId={l.id}
+              ownerId={l.ownerId}
+              listingType={l.type}
+              available={l.status === "published" && !l.isDemo}
+              locale={locale}
+            />
           </div>
 
           <div className="card flex flex-col gap-2 p-6">

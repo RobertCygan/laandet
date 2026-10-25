@@ -20,8 +20,8 @@ const REASONS = [
   "other",
 ] as const;
 
-/** Report form for a listing or a profile (anonymous to the reported person). */
-export function ReportForm({ targetType, targetId }: { targetType: "listing" | "user"; targetId: string }) {
+/** Report form for a listing, a profile or a message (anonymous to the reported person). */
+export function ReportForm({ targetType, targetId }: { targetType: "listing" | "user" | "message"; targetId: string }) {
   const t = useTranslations("report");
   const tc = useTranslations("common");
   const [state, action] = useActionState(reportAction, idle);

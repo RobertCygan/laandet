@@ -27,6 +27,7 @@ export default async function ReportsPage({ params, searchParams }: PageProps<"/
   const t = await getTranslations("admin");
   const tr = await getTranslations("report");
   const tl = await getTranslations("listing");
+  const ti = await getTranslations("inbox");
   return (
     <div className="wrap py-10">
       <PageHeader title={t("reports")} />
@@ -63,7 +64,8 @@ export default async function ReportsPage({ params, searchParams }: PageProps<"/
             const ownCase =
               r.listingOwnerId === actor.id ||
               r.reporterId === actor.id ||
-              (r.targetType === "user" && r.targetId === actor.id);
+              (r.targetType === "user" && r.targetId === actor.id) ||
+              (r.targetType === "message" && r.messageSenderId === actor.id);
             return (
               <li key={r.id} className="card flex flex-col gap-3 p-5">
                 <div className="flex flex-wrap items-center gap-2">
@@ -80,6 +82,16 @@ export default async function ReportsPage({ params, searchParams }: PageProps<"/
                     </Link>{" "}
                     {r.listingStatus && <span className="text-sm text-muted">({tl(`status.${r.listingStatus}`)})</span>}
                   </p>
+                ) : r.targetType === "message" ? (
+                  <div>
+                    <p className="text-sm font-bold">{ti("reportedMessage")}</p>
+                    <p className="whitespace-pre-line break-words">{r.messageBody}</p>
+                    {r.messageSenderId && (
+                      <Link href={`/profil/${r.messageSenderId}`} className="text-link text-sm" target="_blank">
+                        {ti("reportedMessageSender")}
+                      </Link>
+                    )}
+                  </div>
                 ) : (
                   <p>
                     {t("reportedProfile")}:{" "}

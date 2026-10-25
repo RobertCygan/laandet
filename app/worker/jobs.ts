@@ -11,6 +11,7 @@ import {
   lapseReturns,
   sendReturnReminders,
 } from "@/modules/rentals/jobs";
+import { sendMessageEmails } from "@/modules/messaging/email-batch";
 
 export type Job = { name: string; everySeconds: number; run: (db: DbOrTx) => Promise<unknown> };
 
@@ -32,6 +33,7 @@ export const JOBS: Job[] = [
     },
   },
   { name: "orphan_media", everySeconds: 3600, run: (db) => deleteOrphanMedia(db) },
+  { name: "message_email_batch", everySeconds: 60, run: (db) => sendMessageEmails(db) },
   // Phase 02 time-based steps (P02-06). They use the shared connection and lock row by row.
   { name: "booking_request_expiry", everySeconds: 300, run: () => expireBookingRequests() },
   { name: "agreement_expiry", everySeconds: 300, run: () => expireAgreements() },

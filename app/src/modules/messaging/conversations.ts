@@ -40,7 +40,7 @@ export async function getOrCreateConversation(
 
 /**
  * System messages store a stable key (e.g. `booking.requested`) and are rendered in each reader's
- * language (`messages.system.<key>` in nb.json / en.json).
+ * language (`inbox.system.<key>` in nb.json / en.json).
  */
 export async function postSystemMessage(db: DbOrTx, conversationId: string, key: string): Promise<void> {
   await db.insert(messages).values({ conversationId, senderId: null, kind: "system", body: key });
