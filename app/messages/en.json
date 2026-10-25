@@ -393,7 +393,10 @@
     "notVerified": "Identity has not been checked with BankID. The email address is confirmed.",
     "activeListings": "Active listings",
     "noListings": "No active listings.",
-    "report": "Report profile"
+    "report": "Report profile",
+    "completedRentals": "{count, plural, one {# completed rental} other {# completed rentals}}",
+    "reviews": "Reviews",
+    "noReviews": "No reviews yet."
   },
   "report": {
     "title": "Report",
@@ -556,7 +559,8 @@
       "review_restored": "Restored review",
       "message_redacted": "Hidden message"
     },
-    "profileNote": "Measures against profiles (restriction or suspension) are for now done manually by an administrator. Dismiss the report with a note once the case is handled."
+    "profileNote": "Measures against profiles (restriction or suspension) are for now done manually by an administrator. Dismiss the report with a note once the case is handled.",
+    "removeReview": "Remove the review"
   },
   "errors": {
     "auth_required": "Please sign in first.",
@@ -626,7 +630,12 @@
     "proposal_invalid": "Please check the marked fields.",
     "too_many_photos": "Too many photos (at most 6).",
     "already_active": "The account is already active.",
-    "measure_invalid": "Please check the marked fields."
+    "measure_invalid": "Please check the marked fields.",
+    "review_not_open": "You can only review a completed rental.",
+    "review_window_closed": "The deadline for writing a review has passed.",
+    "already_reviewed": "You have already reviewed this rental.",
+    "review_changed": "The review has changed in the meantime. Please reload the page.",
+    "review_invalid": "Please check the marked fields."
   },
   "validation": {
     "required": "Required.",
@@ -1162,7 +1171,11 @@
       "listing_hidden": "Laandet has hidden one of your listings. Read the reasons.",
       "account_measure": "A decision has been made about your account. Read the reasons.",
       "appeal_decided": "Your appeal has been decided.",
-      "restriction_ended": "The restriction on your account has ended."
+      "restriction_ended": "The restriction on your account has ended.",
+      "review_open": "The rental of \"{title}\" is completed. You can now write a review for 14 days.",
+      "review_published": "The reviews after the rental of \"{title}\" have been published.",
+      "review_removed": "A review you wrote about \"{title}\" was removed by Laandet. See the reasons.",
+      "review_restored": "A review you wrote about \"{title}\" has been restored."
     }
   },
   "disputes": {
@@ -1550,5 +1563,56 @@
     "estimateRange": "With about {users} users: about {low}–{high}",
     "estimatesVariantB": "If only the larger server can be ordered, it is about {low}–{high} a month for up to 2 000 users.",
     "estimatesNote": "The prices are not yet confirmed with the providers. Legal review and the owner's time come on top and are not estimated."
+  },
+  "reviews": {
+    "title": "Review",
+    "lead": "The rental of \"{title}\" with {name}.",
+    "open": "Write or see the review",
+    "writeTitle": "How was the rental with {name}?",
+    "deadline": "You can write the review until {date}.",
+    "scaleHint": "1 is the worst and 5 the best.",
+    "scale": {
+      "1": "very poor",
+      "2": "poor",
+      "3": "fair",
+      "4": "good",
+      "5": "very good"
+    },
+    "criteria": {
+      "communication": "Communication",
+      "punctuality": "Punctuality",
+      "accuracy": "Was the listing accurate?",
+      "itemCondition": "Condition of the item",
+      "agreement": "Kept to the agreement"
+    },
+    "comment": "Comment",
+    "commentHint": "At most 1 000 characters. Be fair and honest. Do not write other people's names, addresses or phone numbers.",
+    "blindNote": "The review cannot be changed afterwards. Neither of you sees the other's review until both have written, or until the deadline has passed.",
+    "submit": "Send review",
+    "ok": {
+      "sealed": "Thank you! Your review has been submitted. It is published when both have written, or when the deadline has passed.",
+      "published": "Thank you! Both of you have written, and the reviews are published."
+    },
+    "sealedNote": "Your review has been submitted but is not published yet.",
+    "sealedUntil": "It is published by {date} at the latest, or when the other party has written theirs. If a case about the rental is open, publication waits until the case is closed.",
+    "removedNote": "Your review was removed by Laandet. You have been given the reasons and can appeal.",
+    "windowClosed": "The deadline for writing a review has passed.",
+    "notYet": "You can write a review when the rental is completed.",
+    "publishedTitle": "Published reviews",
+    "you": "you",
+    "byOwner": "From the owner {name}",
+    "byRenter": "From the renter {name}",
+    "formerMember": "Former member",
+    "outOf5": "{n} of 5",
+    "average": "{value} of 5",
+    "reviewCount": "{count, plural, one {# review} other {# reviews}}",
+    "report": "Report this review"
+  },
+  "privacyExport": {
+    "heading": "My data",
+    "lead": "Download everything Laandet holds about you: profile, listings, your own messages, rentals, agreements, condition reports, reviews, reports and cases.",
+    "download": "Download my data (JSON)",
+    "note": "The file contains personal data. Keep it safe. You can download it five times a day.",
+    "limit": "You have downloaded your data five times in the last day. Please try again later."
   }
 }

@@ -6,6 +6,7 @@ import {
   decideAppealAction,
   dismissReportAction,
   hideListingAction,
+  removeReviewAction,
   userMeasureAction,
 } from "@/modules/moderation/actions";
 import { idle } from "@/modules/server/action";
@@ -186,6 +187,50 @@ export function UserMeasureForm({ userId, reportId, back }: { userId: string; re
         <FieldError state={state} name="statement" />
       </label>
       <SubmitButton className="button button-danger button-sm">{t("measure.submit")}</SubmitButton>
+    </form>
+  );
+}
+
+const REVIEW_REASONS = ["fake_review", "harassment", "privacy", "illegal_content", "misleading", "other"] as const;
+
+/** Remove a review with a statement of reasons (sent to the author, who can appeal). */
+export function RemoveReviewForm({ reviewId, reportId, back }: { reviewId: string; reportId?: string; back: string }) {
+  const t = useTranslations("admin");
+  const tr = useTranslations("report");
+  const [state, action] = useActionState(removeReviewAction, idle);
+  return (
+    <form action={action} className="flex flex-col gap-3">
+      <FormError state={state} />
+      <input type="hidden" name="reviewId" value={reviewId} />
+      <input type="hidden" name="back" value={back} />
+      {reportId && <input type="hidden" name="reportId" value={reportId} />}
+      <label className="field">
+        {t("reasonCode")}
+        <select name="reasonCode" required defaultValue={prev(state, "reasonCode") ?? ""}>
+          <option value="">–</option>
+          {REVIEW_REASONS.map((r) => (
+            <option key={r} value={r}>
+              {tr(`reasons.${r}`)}
+            </option>
+          ))}
+        </select>
+        <FieldError state={state} name="reasonCode" />
+      </label>
+      <label className="field">
+        {t("statement")}
+        <span className="field-hint">{t("statementHint")}</span>
+        <textarea
+          name="statement"
+          rows={4}
+          minLength={10}
+          maxLength={4000}
+          required
+          defaultValue={prev(state, "statement")}
+          aria-invalid={invalid(state, "statement")}
+        />
+        <FieldError state={state} name="statement" />
+      </label>
+      <SubmitButton className="button button-danger button-sm">{t("removeReview")}</SubmitButton>
     </form>
   );
 }

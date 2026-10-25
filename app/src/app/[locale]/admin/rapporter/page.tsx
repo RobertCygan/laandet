@@ -6,7 +6,7 @@ import { localePath, pageLocale, param } from "@/i18n/page";
 import { requireStaffPage } from "@/modules/auth/guards";
 import { listOpenReports } from "@/modules/moderation/service";
 import { AdminNav } from "@/ui/admin/AdminNav";
-import { DismissReportForm, HideListingForm, UserMeasureForm } from "@/ui/admin/AdminForms";
+import { DismissReportForm, HideListingForm, RemoveReviewForm, UserMeasureForm } from "@/ui/admin/AdminForms";
 import { PageHeader } from "@/ui/layout/PageHeader";
 import { Notice } from "@/ui/Notice";
 
@@ -144,6 +144,14 @@ export default async function ReportsPage({ params, searchParams }: PageProps<"/
                           </div>
                         </details>
                       )}
+                    {r.targetType === "review" && r.reviewStatus !== "removed" && (
+                      <details className="rounded-md border border-border p-3">
+                        <summary className="cursor-pointer font-bold">{t("removeReview")}</summary>
+                        <div className="mt-3">
+                          <RemoveReviewForm reviewId={r.targetId} reportId={r.id} back={back} />
+                        </div>
+                      </details>
+                    )}
                     {(r.targetType === "user" || (r.targetType === "message" && r.messageSenderId)) && (
                       <details className="rounded-md border border-border p-3">
                         <summary className="cursor-pointer font-bold">{t("measure.title")}</summary>

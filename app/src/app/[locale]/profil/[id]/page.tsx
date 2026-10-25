@@ -9,6 +9,7 @@ import { getActor } from "@/modules/auth/actor";
 import { getPublicProfile } from "@/modules/users/service";
 import { ReportForm } from "@/ui/listings/ListingActions";
 import { ReportSignedOut } from "@/ui/listings/ReportSignedOut";
+import { ReviewCard } from "@/ui/reviews/ReviewCard";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/profil/[id]">): Promise<Metadata> {
   const { id } = await params;
@@ -23,9 +24,11 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
   if (!p) notFound();
   const t = await getTranslations("profile");
   const tl = await getTranslations("listing");
-  // Statistics only when real data exists (completed rentals arrive with Phase 02); otherwise «Ny på Laandet».
-  const isNew = p.completedRentals === null;
+  const tr = await getTranslations("reviews");
+  // Statistics only when real data exists; otherwise «Ny på Laandet».
+  const isNew = p.completedRentals === 0 && p.ratings.count === 0;
   const self = actor.kind === "user" && actor.id === p.id;
+  const returnTo = `${locale === "en" ? "/en" : ""}/profil/${p.id}`;
 
   return (
     <div className="wrap max-w-3xl py-10">
@@ -41,6 +44,7 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
             </span>
           )}
         </p>
+        {p.completedRentals > 0 && <p>{t("completedRentals", { count: p.completedRentals })}</p>}
         {p.bio && <p className="whitespace-pre-line">{p.bio}</p>}
         <p className="fine-print">{t("notVerified")}</p>
       </header>
@@ -69,6 +73,45 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
         )}
       </section>
 
+      <section className="mt-10" aria-labelledby="reviews-h">
+        <h2 id="reviews-h" className="mb-4 text-2xl">
+          {t("reviews")}
+        </h2>
+        {p.ratings.count === 0 ? (
+          <p>{t("noReviews")}</p>
+        ) : (
+          <div className="flex flex-col gap-4">
+            <dl className="card grid grid-cols-[1fr_auto] gap-x-4 gap-y-1 p-4">
+              {p.ratings.ratings.map((r) => (
+                <div key={r.key} className="contents">
+                  <dt>{tr(`criteria.${r.key}`)}</dt>
+                  <dd className="font-bold">
+                    {tr("average", { value: r.average.toLocaleString(locale === "nb" ? "nb-NO" : "en-GB") })}{" "}
+                    <span className="text-sm font-normal text-muted">({tr("reviewCount", { count: r.count })})</span>
+                  </dd>
+                </div>
+              ))}
+            </dl>
+            {p.reviews.map((r) => (
+              <ReviewCard key={r.id} review={r}>
+                {!self && (
+                  <details>
+                    <summary className="cursor-pointer text-sm">{tr("report")}</summary>
+                    <div className="mt-3">
+                      {actor.kind === "user" ? (
+                        <ReportForm targetType="review" targetId={r.id} />
+                      ) : (
+                        <ReportSignedOut returnTo={returnTo} />
+                      )}
+                    </div>
+                  </details>
+                )}
+              </ReviewCard>
+            ))}
+          </div>
+        )}
+      </section>
+
       {!self && (
         <details className="card mt-10 p-6">
           <summary className="cursor-pointer font-bold">{t("report")}</summary>
@@ -76,7 +119,7 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
             {actor.kind === "user" ? (
               <ReportForm targetType="user" targetId={p.id} />
             ) : (
-              <ReportSignedOut returnTo={`${locale === "en" ? "/en" : ""}/profil/${p.id}`} />
+              <ReportSignedOut returnTo={returnTo} />
             )}
           </div>
         </details>

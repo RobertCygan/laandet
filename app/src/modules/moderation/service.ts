@@ -508,9 +508,10 @@ async function undoAction(tx: Tx, staffId: string, a: typeof moderationActions.$
       .where(and(eq(userProfiles.userId, a.targetId), inArray(userProfiles.status, ["restricted", "suspended"])));
     await restore("user_reinstated");
   } else if (a.action === "review_removed") {
+    // Back to where it was: published, or still sealed if it was removed before publication (P03-02).
     await tx
       .update(reviews)
-      .set({ status: "published" })
+      .set({ status: sql`CASE WHEN ${reviews.publishedAt} IS NULL THEN 'sealed' ELSE 'published' END` })
       .where(and(eq(reviews.id, a.targetId), eq(reviews.status, "removed")));
     await restore("review_restored");
   }

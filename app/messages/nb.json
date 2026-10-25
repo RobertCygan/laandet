@@ -393,7 +393,10 @@
     "notVerified": "Identiteten er ikke kontrollert med BankID. E-postadressen er bekreftet.",
     "activeListings": "Aktive annonser",
     "noListings": "Ingen aktive annonser.",
-    "report": "Rapporter profil"
+    "report": "Rapporter profil",
+    "completedRentals": "{count, plural, one {# fullført leieforhold} other {# fullførte leieforhold}}",
+    "reviews": "Vurderinger",
+    "noReviews": "Ingen vurderinger ennå."
   },
   "report": {
     "title": "Rapporter",
@@ -556,7 +559,8 @@
       "review_restored": "Gjenopprettet vurdering",
       "message_redacted": "Skjult melding"
     },
-    "profileNote": "Tiltak mot profiler (begrensning eller suspensjon) gjøres foreløpig manuelt av en administrator. Avvis rapporten med et notat når saken er håndtert."
+    "profileNote": "Tiltak mot profiler (begrensning eller suspensjon) gjøres foreløpig manuelt av en administrator. Avvis rapporten med et notat når saken er håndtert.",
+    "removeReview": "Fjern vurderingen"
   },
   "errors": {
     "auth_required": "Du må logge inn først.",
@@ -626,7 +630,12 @@
     "proposal_invalid": "Sjekk feltene som er merket.",
     "too_many_photos": "For mange bilder (høyst 6).",
     "already_active": "Kontoen er allerede aktiv.",
-    "measure_invalid": "Sjekk feltene som er merket."
+    "measure_invalid": "Sjekk feltene som er merket.",
+    "review_not_open": "Du kan bare vurdere et fullført leieforhold.",
+    "review_window_closed": "Fristen for å skrive vurdering er ute.",
+    "already_reviewed": "Du har allerede vurdert dette leieforholdet.",
+    "review_changed": "Vurderingen er endret i mellomtiden. Last inn siden på nytt.",
+    "review_invalid": "Sjekk feltene som er merket."
   },
   "validation": {
     "required": "Må fylles ut.",
@@ -1162,7 +1171,11 @@
       "listing_hidden": "Laandet har skjult en av annonsene dine. Les begrunnelsen.",
       "account_measure": "Det er tatt en avgjørelse om kontoen din. Les begrunnelsen.",
       "appeal_decided": "Klagen din er behandlet.",
-      "restriction_ended": "Begrensningen av kontoen din er over."
+      "restriction_ended": "Begrensningen av kontoen din er over.",
+      "review_open": "Leieforholdet for «{title}» er fullført. Du kan nå skrive en vurdering i 14 dager.",
+      "review_published": "Vurderingene etter leieforholdet for «{title}» er publisert.",
+      "review_removed": "En vurdering du skrev om «{title}», er fjernet av Laandet. Se begrunnelsen.",
+      "review_restored": "En vurdering du skrev om «{title}», er gjenopprettet."
     }
   },
   "disputes": {
@@ -1550,5 +1563,56 @@
     "estimateRange": "Med om lag {users} brukere: ca. {low}–{high}",
     "estimatesVariantB": "Hvis bare den større serveren kan bestilles, blir det ca. {low}–{high} i måneden for opptil 2 000 brukere.",
     "estimatesNote": "Prisene er ikke bekreftet hos leverandørene ennå. Juridisk gjennomgang og eierens tid kommer i tillegg og er ikke anslått."
+  },
+  "reviews": {
+    "title": "Vurdering",
+    "lead": "Leieforholdet for «{title}» med {name}.",
+    "open": "Skriv eller se vurdering",
+    "writeTitle": "Hvordan var det å ha et leieforhold med {name}?",
+    "deadline": "Du kan skrive vurderingen fram til {date}.",
+    "scaleHint": "1 er dårligst og 5 er best.",
+    "scale": {
+      "1": "svært dårlig",
+      "2": "dårlig",
+      "3": "greit",
+      "4": "bra",
+      "5": "svært bra"
+    },
+    "criteria": {
+      "communication": "Kommunikasjon",
+      "punctuality": "Punktlighet",
+      "accuracy": "Stemte annonsen?",
+      "itemCondition": "Tilstanden til gjenstanden",
+      "agreement": "Holdt avtalen"
+    },
+    "comment": "Kommentar",
+    "commentHint": "Høyst 1 000 tegn. Vær saklig og ærlig. Ikke skriv navn på andre, adresser eller telefonnummer.",
+    "blindNote": "Vurderingen kan ikke endres etterpå. Ingen av dere ser den andres vurdering før begge har skrevet, eller til fristen er ute.",
+    "submit": "Send vurdering",
+    "ok": {
+      "sealed": "Takk! Vurderingen din er levert. Den publiseres når begge har skrevet, eller når fristen er ute.",
+      "published": "Takk! Begge har skrevet, og vurderingene er publisert."
+    },
+    "sealedNote": "Vurderingen din er levert, men ikke publisert ennå.",
+    "sealedUntil": "Den publiseres senest {date}, eller når den andre har skrevet sin. Pågår det en sak om leieforholdet, venter publiseringen til saken er avsluttet.",
+    "removedNote": "Vurderingen din er fjernet av Laandet. Du har fått en begrunnelse og kan klage.",
+    "windowClosed": "Fristen for å skrive vurdering er ute.",
+    "notYet": "Du kan skrive en vurdering når leieforholdet er fullført.",
+    "publishedTitle": "Publiserte vurderinger",
+    "you": "deg",
+    "byOwner": "Fra utleier {name}",
+    "byRenter": "Fra leietaker {name}",
+    "formerMember": "Tidligere medlem",
+    "outOf5": "{n} av 5",
+    "average": "{value} av 5",
+    "reviewCount": "{count, plural, one {# vurdering} other {# vurderinger}}",
+    "report": "Rapporter vurderingen"
+  },
+  "privacyExport": {
+    "heading": "Mine data",
+    "lead": "Last ned alt Laandet har lagret om deg: profil, annonser, egne meldinger, leieforhold, avtaler, tilstandsrapporter, vurderinger, rapporter og saker.",
+    "download": "Last ned mine data (JSON)",
+    "note": "Filen inneholder personopplysninger. Lagre den trygt. Du kan laste ned fem ganger per døgn.",
+    "limit": "Du har lastet ned dataene dine fem ganger det siste døgnet. Prøv igjen senere."
   }
 }

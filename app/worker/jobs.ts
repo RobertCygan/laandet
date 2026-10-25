@@ -13,6 +13,9 @@ import {
 } from "@/modules/rentals/jobs";
 import { sendMessageEmails } from "@/modules/messaging/email-batch";
 import { expireRestrictions } from "@/modules/moderation/users";
+import { eraseDueAccounts, handleInactiveAccounts } from "@/modules/privacy/erasure";
+import { deleteOrphanPrivateMedia, runRetention } from "@/modules/privacy/retention";
+import { publishDueReviews } from "@/modules/reviews/service";
 
 export type Job = { name: string; everySeconds: number; run: (db: DbOrTx) => Promise<unknown> };
 
@@ -44,6 +47,12 @@ export const JOBS: Job[] = [
   { name: "giveaway_claim_expiry", everySeconds: 3600, run: () => expireClaims() },
   // Phase 03: time-limited account restrictions end by themselves (P03-03).
   { name: "restriction_expiry", everySeconds: 3600, run: () => expireRestrictions() },
+  // Phase 03: reviews, retention and erasure (P03-02, P03-06).
+  { name: "review_publish", everySeconds: 900, run: () => publishDueReviews() },
+  { name: "orphan_private_media", everySeconds: 3600, run: () => deleteOrphanPrivateMedia() },
+  { name: "account_erasure", everySeconds: 3600, run: () => eraseDueAccounts() },
+  { name: "retention", everySeconds: 24 * 3600, run: () => runRetention() },
+  { name: "inactive_accounts", everySeconds: 24 * 3600, run: () => handleInactiveAccounts() },
   {
     name: "audit_retention",
     everySeconds: 24 * 3600,

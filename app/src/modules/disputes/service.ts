@@ -21,6 +21,7 @@ import type { ActivityKind } from "@/modules/notifications/email-templates";
 import { notify } from "@/modules/notifications/notify";
 import { enforceRateLimits, LIMITS } from "@/modules/ratelimit/ratelimit";
 import { loadBookingFor, moveBooking } from "@/modules/rentals/service";
+import { inviteReviews } from "@/modules/reviews/service";
 import { getRequestMeta } from "@/modules/server/request-meta";
 import {
   canEscalate,
@@ -97,7 +98,11 @@ export async function closeCase(
 ) {
   await setStatus(tx, d, to, actorId, { closedAt: now, closureNote: note });
   const [b] = await tx.select().from(bookings).where(eq(bookings.id, d.bookingId)).for("update");
-  if (b?.status === "disputed") await moveBooking(tx, b, "dispute_closed", "system", null, {}, { disputeId: d.id });
+  if (b?.status === "disputed") {
+    await moveBooking(tx, b, "dispute_closed", "system", null, {}, { disputeId: d.id });
+    // The review window restarts when the case closes (P03-02).
+    await inviteReviews(tx, b, await caseTitle(tx, b.id));
+  }
 }
 
 /** Own, not yet attached photos uploaded for a case (scope `dispute`). */

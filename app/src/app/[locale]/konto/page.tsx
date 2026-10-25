@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { pageLocale, param } from "@/i18n/page";
+import { localePath, pageLocale, param } from "@/i18n/page";
 import { signOutAction } from "@/modules/auth/actions";
 import { requirePageUser } from "@/modules/auth/guards";
 import { listLocalities } from "@/modules/listings/queries";
@@ -24,6 +24,7 @@ export default async function AccountPage({ params, searchParams }: PageProps<"/
   if (!profile) return null;
   const t = await getTranslations("account");
   const ta = await getTranslations("auth");
+  const tp = await getTranslations("privacyExport");
   const staff = profile.role === "moderator" || profile.role === "admin";
   const statusNotice =
     profile.status === "restricted"
@@ -133,6 +134,25 @@ export default async function AccountPage({ params, searchParams }: PageProps<"/
             </form>
             <SignOutEverywhereForm locale={locale} />
           </div>
+        </section>
+
+        <section className="card p-6" aria-labelledby="data-h">
+          <h2 id="data-h" className="mb-3 text-xl">
+            {tp("heading")}
+          </h2>
+          {param(sp.eksport) === "grense" && (
+            <div className="mb-4">
+              <Notice tone="warning" role="alert">
+                {tp("limit")}
+              </Notice>
+            </div>
+          )}
+          <p className="mb-4">{tp("lead")}</p>
+          {/* A plain link: the file is a download, not a page to prefetch. */}
+          <a href={localePath(locale, "/konto/mine-data")} className="button button-outline" download>
+            {tp("download")}
+          </a>
+          <p className="fine-print mt-3">{tp("note")}</p>
         </section>
 
         <section className="card p-6" aria-labelledby="delete-h">

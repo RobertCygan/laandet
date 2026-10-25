@@ -22,6 +22,7 @@ import { staffMediaGrant } from "@/modules/disputes/access";
 import { AppError } from "@/modules/errors";
 import { notify } from "@/modules/notifications/notify";
 import { announce, loadBookingFor, moveBooking, periodOf } from "@/modules/rentals/service";
+import { inviteReviews } from "@/modules/reviews/service";
 
 const HOUR = 60 * 60 * 1000;
 /** CONDITION_REPORTS §7 (configurable deadlines). */
@@ -317,6 +318,7 @@ export async function confirmReport(
       .where(eq(conditionReports.id, report.id));
     await moveBooking(tx, b, "return_agreed", role, me, { completedAt: now }, { outcome });
     await announce(tx, b, "booking.completed", "booking_completed", ["owner", "renter"], title);
+    await inviteReviews(tx, b, title);
     return "agreed";
   });
 }

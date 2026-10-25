@@ -18,6 +18,7 @@ import {
   reportSchema,
 } from "./service";
 import { applyUserMeasure, userMeasureSchema } from "./users";
+import { removeReview, reviewModerationSchema } from "@/modules/reviews/service";
 
 export async function reportAction(_prev: ActionState, form: FormData): Promise<ActionState> {
   const raw = formToObject(form);
@@ -71,6 +72,16 @@ export async function userMeasureAction(_prev: ActionState, form: FormData): Pro
       until = at.toISOString();
     }
     await applyUserMeasure(await getActor(), userMeasureSchema.parse({ ...raw, until }));
+  }, raw);
+  if (result.status === "ok") backToQueue(raw);
+  return result;
+}
+
+/** Remove a review with a statement of reasons (P03-02 service; the author is told and can appeal). */
+export async function removeReviewAction(_prev: ActionState, form: FormData): Promise<ActionState> {
+  const raw = formToObject(form);
+  const result = await runAction(async () => {
+    await removeReview(await getActor(), reviewModerationSchema.parse(raw));
   }, raw);
   if (result.status === "ok") backToQueue(raw);
   return result;
