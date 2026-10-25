@@ -28,6 +28,7 @@ export default async function BookingPage({ params, searchParams }: PageProps<"/
   if (!v) notFound();
   const b = v.booking;
   const t = await getTranslations("rentals");
+  const tv = await getTranslations("reviews");
   const ok = param((await searchParams).ok);
   const isOwner = v.role === "owner";
   const other = isOwner ? v.renterName : v.ownerName;
@@ -135,7 +136,14 @@ export default async function BookingPage({ params, searchParams }: PageProps<"/
             </Link>
           </>
         )}
-        {b.status === "completed" && <p>{t("next.completed")}</p>}
+        {b.status === "completed" && (
+          <>
+            <p>{t("next.completed")}</p>
+            <Link href={`/leieforhold/${b.id}/vurdering`} className="button button-primary">
+              {tv("open")}
+            </Link>
+          </>
+        )}
         {b.status === "disputed" && <Notice tone="warning">{t("next.disputed")}</Notice>}
         {["declined", "withdrawn", "expired", "cancelled"].includes(b.status) && <p>{t("next.closed")}</p>}
         <Link href={`/meldinger/${b.conversationId}`} className="text-link">

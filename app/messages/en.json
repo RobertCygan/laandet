@@ -393,7 +393,10 @@
     "notVerified": "Identity has not been checked with BankID. The email address is confirmed.",
     "activeListings": "Active listings",
     "noListings": "No active listings.",
-    "report": "Report profile"
+    "report": "Report profile",
+    "completedRentals": "{count, plural, one {# completed rental} other {# completed rentals}}",
+    "reviews": "Reviews",
+    "noReviews": "No reviews yet."
   },
   "report": {
     "title": "Report",
@@ -551,7 +554,12 @@
     "report_empty": "Nobody has recorded the condition yet.",
     "entry_invalid": "Please check the marked fields.",
     "not_returned_too_early": "This can be marked from 24 hours after the rental period has ended.",
-    "listing_in_use": "The listing has a rental or handover in progress."
+    "listing_in_use": "The listing has a rental or handover in progress.",
+    "review_not_open": "You can only review a completed rental.",
+    "review_window_closed": "The deadline for writing a review has passed.",
+    "already_reviewed": "You have already reviewed this rental.",
+    "review_changed": "The review has changed in the meantime. Please reload the page.",
+    "review_invalid": "Please check the marked fields."
   },
   "validation": {
     "required": "Required.",
@@ -1065,7 +1073,62 @@
       "claim_expired": "Your request for \"{title}\" got no answer within 14 days and has expired.",
       "transfer_to_confirm": "Please confirm the handover of \"{title}\".",
       "transfer_confirmed": "Both of you have confirmed the handover of \"{title}\".",
-      "new_message": "You have a new message about \"{title}\"."
+      "new_message": "You have a new message about \"{title}\".",
+      "review_open": "The rental of \"{title}\" is completed. You can now write a review for 14 days.",
+      "review_published": "The reviews after the rental of \"{title}\" have been published.",
+      "review_removed": "A review you wrote about \"{title}\" was removed by Laandet. See the reasons.",
+      "review_restored": "A review you wrote about \"{title}\" has been restored."
     }
+  },
+  "reviews": {
+    "title": "Review",
+    "lead": "The rental of \"{title}\" with {name}.",
+    "open": "Write or see the review",
+    "writeTitle": "How was the rental with {name}?",
+    "deadline": "You can write the review until {date}.",
+    "scaleHint": "1 is the worst and 5 the best.",
+    "scale": {
+      "1": "very poor",
+      "2": "poor",
+      "3": "fair",
+      "4": "good",
+      "5": "very good"
+    },
+    "criteria": {
+      "communication": "Communication",
+      "punctuality": "Punctuality",
+      "accuracy": "Was the listing accurate?",
+      "itemCondition": "Condition of the item",
+      "agreement": "Kept to the agreement"
+    },
+    "comment": "Comment",
+    "commentHint": "At most 1 000 characters. Be fair and honest. Do not write other people's names, addresses or phone numbers.",
+    "blindNote": "The review cannot be changed afterwards. Neither of you sees the other's review until both have written, or until the deadline has passed.",
+    "submit": "Send review",
+    "ok": {
+      "sealed": "Thank you! Your review has been submitted. It is published when both have written, or when the deadline has passed.",
+      "published": "Thank you! Both of you have written, and the reviews are published."
+    },
+    "sealedNote": "Your review has been submitted but is not published yet.",
+    "sealedUntil": "It is published by {date} at the latest, or when the other party has written theirs. If a case about the rental is open, publication waits until the case is closed.",
+    "removedNote": "Your review was removed by Laandet. You have been given the reasons and can appeal.",
+    "windowClosed": "The deadline for writing a review has passed.",
+    "notYet": "You can write a review when the rental is completed.",
+    "publishedTitle": "Published reviews",
+    "you": "you",
+    "byOwner": "From the owner {name}",
+    "byRenter": "From the renter {name}",
+    "formerMember": "Former member",
+    "outOf5": "{n} of 5",
+    "average": "{value} of 5",
+    "reviewCount": "{count, plural, one {# review} other {# reviews}}",
+    "report": "Report this review"
+  },
+  "privacyExport": {
+    "heading": "My data",
+    "lead": "Download everything Laandet holds about you: profile, listings, your own messages, rentals, agreements, condition reports, reviews, reports and cases.",
+    "download": "Download my data (JSON)",
+    "note": "The file contains personal data. Keep it safe. You can download it five times a day.",
+    "limit": "You have downloaded your data five times in the last day. Please try again later."
   }
 }

@@ -12,6 +12,8 @@ export type EmailTemplate =
   | "listing_hidden"
   | "appeal_decided"
   | "role_granted"
+  | "account_erased"
+  | "inactivity_warning"
   | "activity";
 
 type Rendered = { subject: string; text: string };
@@ -76,6 +78,22 @@ export const ACTIVITY_KINDS = {
     en: 'Both of you have confirmed the handover of "%s".',
   },
   new_message: { nb: "Du har en ny melding om «%s».", en: 'You have a new message about "%s".' },
+  review_open: {
+    nb: "Leieforholdet for «%s» er fullført. Du kan nå skrive en vurdering i 14 dager.",
+    en: 'The rental of "%s" is completed. You can now write a review for 14 days.',
+  },
+  review_published: {
+    nb: "Vurderingene etter leieforholdet for «%s» er publisert.",
+    en: 'The reviews after the rental of "%s" have been published.',
+  },
+  review_removed: {
+    nb: "En vurdering du skrev om «%s», er fjernet av Laandet. Se begrunnelsen.",
+    en: 'A review you wrote about "%s" was removed by Laandet. See the reasons.',
+  },
+  review_restored: {
+    nb: "En vurdering du skrev om «%s», er gjenopprettet.",
+    en: 'A review you wrote about "%s" has been restored.',
+  },
 } as const;
 export type ActivityKind = keyof typeof ACTIVITY_KINDS;
 
@@ -181,6 +199,26 @@ const templates: Record<EmailTemplate, Record<"nb" | "en", (p: Payload) => Rende
     en: (p) => ({
       subject: "Role change in Laandet",
       text: `Hi ${p.name}!\n\nThe user ${p.subject} was given the role "${p.role}". Reason: ${p.reason}\n\nIf this was not agreed, contact the other administrators immediately.`,
+    }),
+  },
+  account_erased: {
+    nb: (p) => ({
+      subject: "Kontoen din hos Laandet er slettet",
+      text: `Hei ${p.name}!\n\nKontoen din hos Laandet er nå slettet. E-postadressen, passordet, profilen og annonsene uten leieforhold er fjernet. Leieavtaler, tilstandsrapporter og saker beholdes uten e-postadressen din så lenge personvernerklæringen sier, fordi den andre parten kan trenge dem.\n\nDette er den siste e-posten du får fra oss.`,
+    }),
+    en: (p) => ({
+      subject: "Your Laandet account has been deleted",
+      text: `Hi ${p.name}!\n\nYour Laandet account has now been deleted. Your email address, password, profile and listings without rentals have been removed. Rental agreements, condition reports and cases are kept without your email address for as long as the privacy notice says, because the other party may need them.\n\nThis is the last email you will get from us.`,
+    }),
+  },
+  inactivity_warning: {
+    nb: (p) => ({
+      subject: "Vil du beholde kontoen din hos Laandet?",
+      text: `Hei ${p.name}!\n\nDu har ikke logget inn hos Laandet på to år. Hvis du vil beholde kontoen, logger du inn før ${p.date}. Ellers sletter vi den, slik personvernerklæringen beskriver.\n\n${p.url}`,
+    }),
+    en: (p) => ({
+      subject: "Do you want to keep your Laandet account?",
+      text: `Hi ${p.name}!\n\nYou have not signed in to Laandet for two years. If you want to keep the account, sign in before ${p.date}. Otherwise we will delete it, as the privacy notice describes.\n\n${p.url}`,
     }),
   },
 };

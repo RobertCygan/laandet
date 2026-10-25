@@ -44,6 +44,14 @@ async function addEntry(page: Page, opts: { photo?: boolean; outcome?: string } 
   await expect(page.getByText("Registreringen er lagret.")).toBeVisible();
 }
 
+/** Rates every criterion on the open review page and sends the review. */
+async function writeReview(page: Page, comment: string, renter: boolean) {
+  for (const name of ["communication", "punctuality", "itemCondition", "agreement", ...(renter ? ["accuracy"] : [])])
+    await page.locator(`input[name="${name}"][value="5"]`).check();
+  await page.getByRole("textbox", { name: /Kommentar/ }).fill(comment);
+  await page.getByRole("button", { name: "Send vurdering" }).click();
+}
+
 async function confirmEntry(page: Page, checklist: boolean) {
   if (checklist) for (const box of await page.locator('input[name="check"]').all()) await box.check();
   await page.getByRole("button", { name: "Bekreft", exact: true }).click();
@@ -128,6 +136,24 @@ test.describe("Phase 02 journeys at 390 px", () => {
     await owner.goto(bookingPath);
     await expect(owner.getByText("Fullført").first()).toBeVisible();
     await expect(owner.getByText("Tilbakelevering bekreftet av begge")).toBeVisible();
+    await noHorizontalScroll(owner);
+
+    // Both review each other (double-blind): nothing is shown until both have written.
+    await renter.goto(`${bookingPath}/vurdering`);
+    await accessible(renter);
+    await writeReview(renter, "Ryddig utleier, alt som avtalt.", true);
+    await expect(renter.getByText("Vurderingen din er levert, men ikke publisert ennå.")).toBeVisible();
+    await owner.goto(`${bookingPath}/vurdering`);
+    await expect(owner.getByText("Ryddig utleier, alt som avtalt.")).toHaveCount(0);
+    await writeReview(owner, "Leverte tilbake i fin stand.", false);
+    await expect(owner.getByText("Takk! Begge har skrevet, og vurderingene er publisert.")).toBeVisible();
+    await expect(owner.getByText("Ryddig utleier, alt som avtalt.")).toBeVisible();
+    await expect(owner.getByText("Leverte tilbake i fin stand.")).toBeVisible();
+    // The review is on the owner's public profile, with a real count of completed rentals.
+    await owner.goto("/konto");
+    await owner.getByRole("link", { name: "Se din offentlige profil" }).click();
+    await expect(owner.getByText("Ryddig utleier, alt som avtalt.")).toBeVisible();
+    await expect(owner.getByText("1 fullført leieforhold")).toBeVisible();
     await noHorizontalScroll(owner);
     expect(problems).toEqual([]);
   });

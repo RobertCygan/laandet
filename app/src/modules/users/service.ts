@@ -7,6 +7,7 @@ import { displayNameSchema } from "@/modules/auth/schemas";
 import type { Actor } from "@/modules/authz/actor-types";
 import { assertCan } from "@/modules/authz/policy";
 import { isFlagEnabled } from "@/modules/flags/flags";
+import { completedRentalCount, listPublishedReviews, ratingSummary } from "@/modules/reviews/service";
 import { getRequestMeta } from "@/modules/server/request-meta";
 
 export const profileSchema = z.object({
@@ -122,6 +123,12 @@ export async function getPublicProfile(userId: string) {
     )
     .orderBy(desc(listings.publishedAt))
     .limit(24);
+  // Real statistics only (master spec §8): completed rentals and published reviews, never estimates.
+  const [completedRentals, summary, publishedReviews] = await Promise.all([
+    completedRentalCount(userId),
+    ratingSummary(userId),
+    listPublishedReviews(userId),
+  ]);
   return {
     id: p.id,
     name: p.name,
@@ -129,8 +136,9 @@ export async function getPublicProfile(userId: string) {
     bio: p.bio,
     localityName: p.localityName,
     activeListings: active,
-    // Real statistics only. Completed rentals arrive with bookings in Phase 02.
-    completedRentals: null as number | null,
+    completedRentals,
+    ratings: summary,
+    reviews: publishedReviews,
     identityVerified: false,
   };
 }

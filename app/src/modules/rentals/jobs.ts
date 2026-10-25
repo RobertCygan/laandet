@@ -5,6 +5,7 @@ import { closeLiveContract } from "@/modules/contracts/service";
 import { CONDITION_DEADLINES, decisions, proposedOutcome } from "@/modules/condition/service";
 import { AppError } from "@/modules/errors";
 import { notify } from "@/modules/notifications/notify";
+import { inviteReviews } from "@/modules/reviews/service";
 import { announce, moveBooking } from "./service";
 
 /**
@@ -141,6 +142,7 @@ export async function lapseReturns(now = new Date()): Promise<number> {
       .where(eq(conditionReports.id, report.id));
     await moveBooking(tx, b, "return_lapsed", "system", null, { completedAt: now }, { outcome });
     await announce(tx, b, "booking.return_lapsed", "booking_completed", ["owner", "renter"], title);
+    await inviteReviews(tx, b, title);
     return true;
   });
 }
