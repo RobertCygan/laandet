@@ -15,6 +15,7 @@ It is an independent project in the **G-PSI.ai** portfolio.
 | **Phase 01:** accounts, listings, uploads, explore, legal pages, reporting (`app/`) | **Approved by the owner** on 25.10.2026. Tested locally and in CI. |
 | **Phase 02:** messages, rental requests and bookings, agreements, giveaway claims, condition reports, worker jobs and notices | **Approved by the owner** on 25.10.2026. Tested locally and in CI. Rentals stay closed (`rentals_open` off) until the owner opens them. See `docs/CHANGELOG.md`. |
 | **Phase 03:** cases between the parties with staff help, reviews, account measures and appeals, admin panel, data export, retention and erasure, transparency figures, security pass with OWASP ASVS L1 | **Approved by the owner** on 25.10.2026. Tested locally and in CI. An independent security review found 1 high, 4 medium and 7 low issues; all are fixed with tests. See `docs/CHANGELOG.md`. |
+| **Phase 04:** closed beta (feedback, staging banner, beta plan), release gates (`release:check`, OSV-Scanner, «Vis passord», missing journeys), DPIA draft, launch runbook, operations alerts, pilot support | **Tested** locally and in CI; **waiting for the owner's approval.** The launch itself needs the owner's purchases, a lawyer and beta testers (`docs/RELEASE_GATES.md`). |
 | Deployment (staging/production) | **Not deployed.** Deploy files and runbooks exist (`deploy/`, `docs/runbooks/`) and were tested locally with Docker. A server and domain must first be bought by the owner. |
 | Database reference schema | Designed. **Validated:** applied to PostgreSQL 16 and 23/23 checks passed (`docs/DATA_MODEL.md` §9) |
 | Legal drafts (nb authoritative, en informational) | **Drafts. Not legally reviewed. Must not be used with real users before review.** |
@@ -31,13 +32,18 @@ laandet/
 ├─ docs/                        project documentation (English)
 │  ├─ MASTER_SPECIFICATION.md   owner's master prompt (verbatim) + amendments
 │  ├─ CURRENT_STATE_ASSESSMENT.md  what exists, what works, what to reuse
-│  ├─ DECISIONS.md              ADR log (D-001 … D-055); D-001…D-055 accepted
+│  ├─ DECISIONS.md              ADR log (D-001 … D-055); D-001…D-056 accepted
 │  ├─ ARCHITECTURE.md           smallest viable secure architecture
 │  ├─ DATA_MODEL.md             entities, state machines, privileges, validation record
 │  ├─ AUTH_MODEL.md             authentication + authorisation matrix
 │  ├─ SECURITY.md               security requirements SEC-01 … SEC-63
 │  ├─ SECURITY_VERIFICATION.md  status and evidence for every SEC requirement and N1–N15
 │  ├─ ASVS_L1.md                OWASP ASVS 4.0.3 Level 1 self-assessment
+│  ├─ RELEASE_GATES.md          go/no-go gates with status and evidence
+│  ├─ BETA_PLAN.md, beta/       closed beta plan; tester guide and usability script (nb)
+│  ├─ DPIA.md                   short data protection impact assessment (draft)
+│  ├─ PILOT_SUPPORT.md          duty rota, daily and weekly checks, incidents
+│  ├─ MODERERING.md             guide for moderators (nb)
 │  ├─ THREAT_MODEL.md           assets, actors, 29 threats with controls
 │  ├─ CONDITION_REPORTS.md      handover/return condition report design
 │  ├─ RENTAL_AGREEMENTS.md      agreement selection, snapshots, acceptance, deposit rules

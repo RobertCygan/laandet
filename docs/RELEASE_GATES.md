@@ -45,7 +45,7 @@ evidence for some of the rows below, not for all of them.
 | # | Gate | Status today | Evidence | Who acts |
 |---|---|---|---|---|
 | S-1 | SEC-01 … SEC-63 verified, or an exception accepted by the owner | 🟡 | [`SECURITY_VERIFICATION.md`](SECURITY_VERIFICATION.md). Still open because they need the server or the owner: SEC-01 (HTTPS, HSTS), SEC-41 (separate environments), SEC-53 (restore), SEC-62 (server hardening), SEC-63 (owner 2FA). Partly met: SEC-30, SEC-42, SEC-60. [`ASVS_L1.md`](ASVS_L1.md): 2.1.1 is an accepted exception (6-character minimum, D-056). | Developer, Eier |
-| S-2 | No open high or critical dependency findings | 🟡 | `npm audit --omit=dev --audit-level=high` passes in CI (green on `ecf610e`). OSV-Scanner is being added to CI (P04-02, SEC-60). Re-check on the release commit. | Developer |
+| S-2 | No open high or critical dependency findings | 🟡 | `npm audit --omit=dev --audit-level=high` passes in CI (green on `ecf610e`). OSV-Scanner runs in CI too (P04-02): first run 25.10.2026 found one moderate development-only finding and nothing high or critical. Re-check on the release commit. | Developer |
 | S-3 | Backup restore test performed and logged | ⏳ ❌ | Same as G4-5. | Eier, Developer |
 | S-4 | Negative authorisation tests green | ✅ (re-check on the release commit) | 79 policy unit tests and the negative integration tests per area ([`SECURITY_VERIFICATION.md`](SECURITY_VERIFICATION.md), SEC-20). | Developer |
 | S-5 | Owner account 2FA confirmed | ❌ | The owner confirms 2FA on GitHub, the hosting provider, the domain registrar, the email provider, backup storage and the Laandet admin account. | Eier |

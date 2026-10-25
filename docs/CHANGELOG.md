@@ -2,6 +2,51 @@
 
 All notable changes to Laandet. Dates are DD.MM.YYYY.
 
+## [Phase 04] — 25.10.2026 (waiting for the owner's approval; not deployed)
+
+The code and documents for the beta, the go/no-go gates and the launch. The beta and the launch themselves need the
+owner's purchases (server, domain, email provider), a lawyer, beta testers and a moderator.
+
+### Added
+- **Closed beta (P04-01):**
+  - «Gi tilbakemelding» (`/tilbakemelding`, linked from the footer and the account page). Choices: «Noe virker ikke», «Forslag til forbedring» or «Noe annet»; up to 2 000 characters; the page it came from (path only). Ten a day.
+  - Staff see feedback at `/admin/tilbakemeldinger` and mark it handled (audited).
+  - Feedback is in the data export, removed with the account and purged after 12 months (PRIVACY P14).
+  - A «Testversjon» banner on every page when `APP_ENV=staging`.
+  - `BETA_PLAN.md`, `beta/TESTERVEILEDNING.md` (nb).
+- **Release gates (P04-02):**
+  - `RELEASE_GATES.md`: every G4, security and legal gate with status, evidence and who acts.
+  - `npm run release:check`: lists legal markers, legal texts still marked draft, and in production demo listings and the example sender address. It exits 1 while blockers remain and never prints settings.
+  - OSV-Scanner in CI (SEC-60). It fails on CVSS 7.0 or higher. First run: 758 packages, one moderate development-only finding.
+  - «Vis passord» on every password field (ASVS 2.1.12).
+  - The missing e2e journeys: «Ønskes leid» → a reply with one's own listing → a request on it; a giveaway with two claimants.
+  - `beta/BRUKERTEST.md` (nb), a 30-minute mobile usability session.
+- **DPIA (P04-03):** `DPIA.md`, a short draft. **Not legally reviewed.**
+- **Launch and pilot support (P04-04):**
+  - `runbooks/LAUNCH.md`: launch day in order, with owner steps marked «Eier».
+  - Operations alerts: the worker counts failed runs, and the `ops_alerts` job emails `OPS_ALERT_EMAIL` when a job fails three runs in a row or is overdue. It sends at most one email per job every 6 hours, plus one on recovery, and only the job name, state, time and redacted error.
+  - `/healthz?worker=1` also fails when the worker has been silent for 15 minutes, for the external uptime monitor.
+  - `PILOT_SUPPORT.md` and `MODERERING.md` (nb).
+- **Owner decision D-056:** minimum password length 6 (was 10). ASVS 2.1.1 is recorded as an accepted exception.
+
+### Fixed
+- Logged errors and worker heartbeats could keep a URL's query string, such as a reset token in a fetch or SMTP error. `safeError` now removes it, as SEC-43 says.
+- The feedback form read the previous page from `document.referrer`, which client-side navigation never updates (found by CI). The link now carries the page.
+- A stale, unused message said account measures were done by hand.
+
+### Tested (run locally on 25.10.2026, PostgreSQL 16, Chromium from Playwright 1.63)
+- **Unit (Vitest): 217 passed** (policy for the new actions, password rules, page path cleaning, the release check, error redaction).
+- **Integration (Vitest against `laandet_test`): 116 passed.** New: feedback (limits, rights, export, erasure, retention), operations alerts (failure counting, reminder interval, recovery, overdue jobs, no recipient), `/healthz?worker=1`.
+- **End-to-end (Playwright, production build): 43 passed** (40 before, plus feedback, «Ønskes leid» and «Vis passord»; the giveaway journey now has two claimants).
+- **CI (`laandet-ci`):** green on 25.10.2026 for all five jobs on commit `0a997ff` (lint/format/types, unit, integration on PostgreSQL 17, build + Playwright with 43 passed, secrets/audit with OSV-Scanner).
+
+### Not done / known gaps
+- **Owner steps, not done by the assistant:** server, domain and email provider; the lawyer; 10–20 beta testers; a second moderator; the external uptime monitor. Without them, the go/no-go on 11.12.2026 cannot pass (`RELEASE_GATES.md`).
+- `release:check` today: legal markers, 18 draft legal texts, the example sender address.
+- The privacy notice draft does not mention feedback yet. It is noted for the lawyer (`LEGAL_REVIEW_CHECKLIST.md` L-04).
+- The alerts, the staging banner and the launch runbook have not run on a real server.
+- Not tested here: Safari/WebKit.
+
 ## [Phase 03] — 25.10.2026 (approved by the owner: «Zatwierdzam Phase 03»; not deployed)
 
 ### Added

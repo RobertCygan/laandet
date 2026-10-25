@@ -65,9 +65,9 @@ parallel work (P01-11 and P01-13 can run alongside P01-05…P01-10). If Phase 01
 
 | ID | Task | Depends on | Estimate (ideal days) | Status |
 |---|---|---|---|---|
-| [P04-01](phase-04/P04-01-closed-beta.md) | Closed beta: «Gi tilbakemelding», staging banner, beta plan and tester guide | P03 | 1 | planned |
-| [P04-02](phase-04/P04-02-release-gates.md) | Release gates: gate document, `release:check`, missing journeys, OSV-Scanner, «Vis passord», usability script | P03 | 1.5 | planned |
-| [P04-03](phase-04/P04-03-dpia.md) | Short DPIA | P03 | 0.5 | planned |
-| [P04-04](phase-04/P04-04-launch-and-support.md) | Launch runbook, operations alerts, pilot support, moderator guide | P01-13 | 1 | planned |
+| [P04-01](phase-04/P04-01-closed-beta.md) | Closed beta: «Gi tilbakemelding», staging banner, beta plan and tester guide | P03 | 1 | tested |
+| [P04-02](phase-04/P04-02-release-gates.md) | Release gates: gate document, `release:check`, missing journeys, OSV-Scanner, «Vis passord», usability script | P03 | 1.5 | tested |
+| [P04-03](phase-04/P04-03-dpia.md) | Short DPIA | P03 | 0.5 | written (draft) |
+| [P04-04](phase-04/P04-04-launch-and-support.md) | Launch runbook, operations alerts, pilot support, moderator guide | P01-13 | 1 | tested |
 
 Steps that need the server, the domain, a lawyer or beta testers are the owner's (marked «Eier» in the documents).

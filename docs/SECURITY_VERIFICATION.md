@@ -38,7 +38,7 @@ Legend: ✅ verified by an automated test · 🔎 verified by code review or a l
 | SEC-52 least privilege | ✅ | `privileges.int.test.ts`; append-only and column privileges for contracts, acceptances, condition evidence, case events, grants, reviews and proposals (integration tests per area). Functions with elevated rights use `search_path = public, pg_temp` (review L7, `0010`). |
 | SEC-53 backups and restore | ⏳ | restic backup and scripted restore tested locally with Docker (P01-13). The first real restore test is a Phase 04 gate. |
 | SEC-54 retention jobs | ✅ | `privacy.int.test.ts`: each job deletes what PRIVACY §5 says and nothing newer; account erasure waits for open bookings. **Review fixes:** the app role cannot backdate a row into an early purge (database-stamped `last_changed_at`, M1 test); inactivity is measured by `last_seen_at`, so staff and members with rolling sessions are not warned or erased while active (H1 test). |
-| SEC-60 dependencies | 🟡 | Lockfile, Dependabot, `npm audit --omit=dev --audit-level=high` in CI. OSV-Scanner is not in CI yet. |
+| SEC-60 dependencies | ✅ | Lockfile, Dependabot, `npm audit --omit=dev --audit-level=high` and **OSV-Scanner** (added in P04-02) in CI. OSV fails the job on CVSS ≥ 7.0 (`scripts/osv-gate.mjs`). First run, 25.10.2026: 758 packages, one moderate finding (esbuild 0.18.20 via drizzle-kit, development only), none high or critical. |
 | SEC-61 container | 🔎 | Pinned base image digest, non-root, read-only root filesystem (Dockerfile, checked with Docker in P01-13). |
 | SEC-62 server hardening | ⏳ | Release checklist; needs the server. |
 | SEC-63 owner 2FA | ⏳ | The owner confirms at release. |

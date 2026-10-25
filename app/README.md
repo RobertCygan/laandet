@@ -4,7 +4,8 @@ Next.js (App Router) + PostgreSQL + Drizzle + Better Auth. Phase 01 covers user 
 image uploads, explore/search, legal pages, reporting and minimal moderation. Phase 02 adds messages, rental
 requests and bookings, agreements, giveaway claims, condition reports, and the worker jobs and notices around them.
 Phase 03 adds cases between the parties with staff help, reviews, account measures and appeals, the admin panel,
-data export, retention and account erasure, and the transparency page. Architecture and decisions:
+data export, retention and account erasure, and the transparency page. Phase 04 adds feedback, the staging banner,
+operations alerts (`OPS_ALERT_EMAIL`), «Vis passord» and `npm run release:check`. Architecture and decisions:
 `../docs/ARCHITECTURE.md` and `../docs/DECISIONS.md`.
 
 The UI is in Norwegian Bokmål (default, no URL prefix) and English (`/en/...`). Code and comments are in English.
@@ -59,8 +60,8 @@ src/
   app/api/auth/…     Better Auth handler
   app/media/…        authorised image delivery
   modules/           domain logic: auth, authz (central policy), listings, media, messaging, rentals, giveaways,
-                     condition, disputes, reviews, moderation, admin, privacy, legal, users, notifications,
-                     audit, ratelimit, flags, config (validated env)
+                     condition, disputes, reviews, moderation, admin, privacy, feedback, ops (alerts), release
+                     (release check), legal, users, notifications, audit, ratelimit, flags, config (validated env)
   ui/                components (forms are client components using Server Actions)
   db/schema/         Drizzle schema (snake_case); drizzle/ holds the SQL migrations
   proxy.ts           CSP nonce, request id and locale routing

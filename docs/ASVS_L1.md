@@ -123,7 +123,7 @@ Legend: ✅ met · 🟡 partly met or met differently · ❌ not met · ⏳ need
 
 | ID | Requirement (short) | Status | Note |
 |---|---|---|---|
-| 14.2.1 | Components up to date | 🟡 | Dependabot and `npm audit` in CI; OSV-Scanner not yet. |
+| 14.2.1 | Components up to date | ✅ | Dependabot, `npm audit` and OSV-Scanner in CI (P04-02). |
 | 14.2.3 | Subresource integrity for third-party assets | n/a | No third-party scripts or styles. |
 | 14.3.2 / 14.3.3 | No debug output; no version headers | ✅ | Production build; `poweredByHeader: false`. |
 | 14.4.1 | Content-Type with charset | ✅ | Next.js defaults. |
@@ -137,5 +137,5 @@ Legend: ✅ met · 🟡 partly met or met differently · ❌ not met · ⏳ need
 2. **2.1.8** strength meter — not built (the breached-password check is the control). «Vis passord» (2.1.12) is done.
 3. **3.3.2** rolling 30-day sessions for members — kept as the default (explained to the owner 25.10.2026).
 4. **12.4.2** no antivirus — accepted risk while only re-encoded images are allowed.
-5. **14.2.1** add OSV-Scanner to CI.
+5. **14.2.1** OSV-Scanner — in CI since P04-02.
 6. **V9, 10.3.2, 14.4.5** — verify on the server in Phase 04.
