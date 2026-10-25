@@ -483,7 +483,20 @@
     "reportDetails": "Detaljer fra den som rapporterte",
     "listingHiddenLabel": "Annonse skjult",
     "reasonsLabel": "Regel",
-    "ownCase": "Dette er din egen sak (du rapporterte, eller den gjelder din annonse eller profil). En annen moderator må behandle den."
+    "ownCase": "Dette er din egen sak (du rapporterte, eller den gjelder din annonse eller profil). En annen moderator må behandle den.",
+    "nav": {
+      "dashboard": "Oversikt",
+      "reports": "Rapporter",
+      "appeals": "Klager",
+      "disputes": "Saker",
+      "categories": "Kategorier",
+      "localities": "Steder",
+      "flags": "Funksjonsbrytere",
+      "legal": "Juridiske tekster",
+      "security": "Sikkerhetslogg",
+      "metrics": "Driftstall",
+      "transparency": "Åpenhet"
+    }
   },
   "errors": {
     "auth_required": "Du må logge inn først.",

@@ -22,6 +22,12 @@ const listing = (status: "draft" | "published" | "removed" = "published"): Resou
   status,
 });
 
+const THIRD = "00000000-0000-0000-0000-00000000000c";
+const stranger = testUser({ id: THIRD });
+const moderator3 = testUser({ id: THIRD, role: "moderator", staff2fa: true });
+const booking = (): Resource => ({ type: "booking", ownerId: OWNER, renterId: OTHER });
+const dispute = (): Resource => ({ type: "dispute", openerId: OWNER, respondentId: OTHER });
+
 type Row = [string, Actor, Action, Resource | undefined, boolean, string?];
 
 const rows: Row[] = [
@@ -109,6 +115,65 @@ const rows: Row[] = [
   ["admin manages flags", admin, "flag.manage", undefined, true],
   ["admin grants roles", admin, "role.grant", undefined, true],
   ["moderator cannot grant roles", moderator, "role.grant", undefined, false, "forbidden"],
+  // ---- Phase 03
+  ["a booking party opens a dispute", member, "dispute.open", booking(), true],
+  ["a stranger cannot open a dispute (404)", stranger, "dispute.open", booking(), false, "not_found"],
+  ["unverified cannot open a dispute", unverified, "dispute.open", booking(), false, "email_unverified"],
+  ["a party reads the case", otherMember, "dispute.view", dispute(), true],
+  ["a stranger cannot read the case (404)", stranger, "dispute.view", dispute(), false, "not_found"],
+  ["staff cannot read a case as a party would (404)", moderator3, "dispute.view", dispute(), false, "not_found"],
+  ["suspended party can still read the case", suspended, "dispute.view", dispute(), true],
+  ["suspended party cannot add to the case", suspended, "dispute.participate", dispute(), false, "account_restricted"],
+  ["restricted party can still take part", restricted, "dispute.participate", dispute(), true],
+  ["staff facilitate a case", moderator3, "dispute.support", dispute(), true],
+  ["staff never facilitate their own case", moderator, "dispute.support", dispute(), false, "forbidden"],
+  [
+    "moderator without 2FA cannot facilitate",
+    moderatorNo2fa,
+    "dispute.support",
+    dispute(),
+    false,
+    "staff_2fa_required",
+  ],
+  ["members cannot facilitate", stranger, "dispute.support", dispute(), false, "forbidden"],
+  ["a party writes a review", member, "review.write", booking(), true],
+  ["a stranger cannot write a review", stranger, "review.write", booking(), false, "not_found"],
+  [
+    "staff moderate reviews",
+    moderator3,
+    "review.moderate",
+    { type: "review", authorId: OWNER, subjectId: OTHER },
+    true,
+  ],
+  [
+    "staff never moderate a review about themselves",
+    moderator,
+    "review.moderate",
+    { type: "review", authorId: OWNER, subjectId: OTHER },
+    false,
+    "forbidden",
+  ],
+  ["staff restrict a user", moderator, "user.moderate", { type: "profile", userId: OWNER }, true],
+  [
+    "staff never moderate themselves",
+    moderator,
+    "user.moderate",
+    { type: "profile", userId: OTHER },
+    false,
+    "forbidden",
+  ],
+  ["a member cannot moderate users", member, "user.moderate", { type: "profile", userId: OTHER }, false, "forbidden"],
+  ["a suspended user can still export their data", suspended, "account.export", undefined, true],
+  ["a visitor cannot export data", anon, "account.export", undefined, false, "auth_required"],
+  ["moderators see platform metrics", moderator, "metrics.view", undefined, true],
+  ["moderators cannot manage localities", moderator, "locality.manage", undefined, false, "forbidden"],
+  ["admins manage localities", admin, "locality.manage", undefined, true],
+  ["moderators cannot see legal versions admin", moderator, "legal.view", undefined, false, "forbidden"],
+  ["moderators cannot enter transparency figures", moderator, "transparency.manage", undefined, false, "forbidden"],
+  ["admins enter transparency figures", admin, "transparency.manage", undefined, true],
+  ["moderators set category policy", moderator, "category.policy", undefined, true],
+  ["moderators cannot edit categories otherwise", moderator, "category.manage", undefined, false, "forbidden"],
+  ["moderators cannot view the audit log", moderator, "audit.view", undefined, false, "forbidden"],
   [
     "original decider cannot decide the appeal when other staff exist",
     moderator,

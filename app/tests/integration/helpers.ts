@@ -51,6 +51,12 @@ const MUTABLE_TABLES = [
   "condition_photos",
   "condition_confirmations",
   "disputes",
+  // Phase 03
+  "dispute_events",
+  "dispute_proposals",
+  "support_access_grants",
+  "reviews",
+  "transparency_months",
 ];
 
 export async function resetDb(): Promise<void> {

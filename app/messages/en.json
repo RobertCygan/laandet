@@ -483,7 +483,20 @@
     "reportDetails": "Details from the reporter",
     "listingHiddenLabel": "Listing hidden",
     "reasonsLabel": "Rule",
-    "ownCase": "This is your own case (you reported it, or it concerns your listing or profile). Another moderator must handle it."
+    "ownCase": "This is your own case (you reported it, or it concerns your listing or profile). Another moderator must handle it.",
+    "nav": {
+      "dashboard": "Overview",
+      "reports": "Reports",
+      "appeals": "Appeals",
+      "disputes": "Cases",
+      "categories": "Categories",
+      "localities": "Localities",
+      "flags": "Feature flags",
+      "legal": "Legal texts",
+      "security": "Security log",
+      "metrics": "Operations",
+      "transparency": "Transparency"
+    }
   },
   "errors": {
     "auth_required": "Please sign in first.",

@@ -40,7 +40,20 @@ export type Action =
   | "claim.create"
   | "claim.view"
   | "claim.respond"
-  | "claim.participate";
+  | "claim.participate"
+  // Phase 03
+  | "dispute.open"
+  | "dispute.view"
+  | "dispute.participate"
+  | "dispute.support"
+  | "review.write"
+  | "review.moderate"
+  | "user.moderate"
+  | "account.export"
+  | "metrics.view"
+  | "locality.manage"
+  | "legal.view"
+  | "transparency.manage";
 
 export type Resource =
   | { type: "none" }
@@ -55,7 +68,9 @@ export type Resource =
     }
   | { type: "conversation"; participantIds: string[] }
   | { type: "booking"; ownerId: string; renterId: string }
-  | { type: "claim"; giverId: string; claimantId: string };
+  | { type: "claim"; giverId: string; claimantId: string }
+  | { type: "dispute"; openerId: string; respondentId: string }
+  | { type: "review"; authorId: string; subjectId: string };
 
 export type Decision = { allow: true } | { allow: false; reason: ErrorCode };
 
@@ -78,6 +93,8 @@ const ALLOWED_WHEN_SUSPENDED: ReadonlySet<Action> = new Set([
   "appeal.create",
   "booking.view",
   "claim.view",
+  "dispute.view",
+  "account.export",
 ]);
 /** Actions a restricted account may not perform (AUTH_MODEL §3). */
 const DENIED_WHEN_RESTRICTED: ReadonlySet<Action> = new Set([
@@ -105,6 +122,9 @@ const NEEDS_VERIFIED_EMAIL: ReadonlySet<Action> = new Set([
   "claim.create",
   "claim.respond",
   "claim.participate",
+  "dispute.open",
+  "dispute.participate",
+  "review.write",
 ]);
 
 export function can(actor: Actor, action: Action, resource: Resource = NONE): Decision {
@@ -200,10 +220,50 @@ export function can(actor: Actor, action: Action, resource: Resource = NONE): De
         return deny("not_found");
       }
       return resource.giverId === actor.id ? ALLOW : deny("forbidden");
+    // ---- Phase 03
+    case "account.export":
+      return ALLOW;
+    case "dispute.open":
+    case "review.write":
+      // Only a party of the booking (the service checks status and deadlines).
+      return resource.type === "booking" && (resource.ownerId === actor.id || resource.renterId === actor.id)
+        ? ALLOW
+        : deny("not_found");
+    case "dispute.view":
+    case "dispute.participate":
+      return resource.type === "dispute" && (resource.openerId === actor.id || resource.respondentId === actor.id)
+        ? ALLOW
+        : deny("not_found");
+    case "dispute.support": {
+      // Staff facilitation; the time-boxed grant is checked by the service. Never in a case of one's own.
+      const s = staffAccess(actor);
+      if (!s.allow) return s;
+      if (resource.type === "dispute" && (resource.openerId === actor.id || resource.respondentId === actor.id))
+        return deny("forbidden");
+      return ALLOW;
+    }
+    case "review.moderate": {
+      const s = staffAccess(actor);
+      if (!s.allow) return s;
+      if (resource.type === "review" && (resource.authorId === actor.id || resource.subjectId === actor.id))
+        return deny("forbidden");
+      return ALLOW;
+    }
+    case "user.moderate": {
+      const s = staffAccess(actor);
+      if (!s.allow) return s;
+      if (resource.type === "profile" && resource.userId === actor.id) return deny("forbidden");
+      return ALLOW;
+    }
+    case "metrics.view":
+      return staffAccess(actor);
     case "category.manage":
     case "flag.manage":
     case "role.grant":
-    case "audit.view": {
+    case "audit.view":
+    case "locality.manage":
+    case "legal.view":
+    case "transparency.manage": {
       const s = staffAccess(actor);
       if (!s.allow) return s;
       return actor.role === "admin" ? ALLOW : deny("forbidden");

@@ -49,17 +49,22 @@ parallel work (P01-11 and P01-13 can run alongside P01-05…P01-10). If Phase 01
 | [P02-05](phase-02/P02-05-condition-reports.md) | Handover and return condition reports with photos | P02-04 | 2.5 | approved |
 | [P02-06](phase-02/P02-06-worker-notifications.md) | Worker jobs, reminders, in-app notifications, emails | P02-02…05 | 1 | approved |
 
-## Phase 03–04 (outline — detailed task files are written at the end of the previous phase)
+## Phase 03 — Trust and moderation (week 49)
+
+| ID | Task | Depends on | Estimate (ideal days) | Status |
+|---|---|---|---|---|
+| [P03-01](phase-03/P03-01-disputes.md) | Dispute workflow steps 1–6 with staff facilitation and access grants | P02 | 2.5 | planned |
+| [P03-02](phase-03/P03-02-reviews.md) | Two-sided, double-blind reviews | P02 | 1 | planned |
+| [P03-03](phase-03/P03-03-moderation.md) | Moderation: full queue, user measures, appeals, support access grants | P01-12 | 1.5 | planned |
+| [P03-04](phase-03/P03-04-admin.md) | Admin: categories, localities, feature flags, legal versions, security log, metrics | P01 | 1.5 | planned |
+| [P03-05](phase-03/P03-05-security.md) | Security test pass, ASVS L1 checklist | P03-01…07 | 1.5 | planned |
+| [P03-06](phase-03/P03-06-data-export-retention.md) | Data export, retention jobs, account erasure | P02 | 1.5 | planned |
+| [P03-07](phase-03/P03-07-transparency.md) | Transparency figures (owner input) | P03-04 | 0.5 | planned |
+
+## Phase 04 (outline — detailed task files are written at the end of Phase 03)
 
 | ID | Task |
 |---|---|
-| P03-01 | Dispute workflow steps 1–6 (`DISPUTE_POLICY.md`) |
-| P03-02 | Reviews (double-blind) |
-| P03-03 | Moderation: full queue, actions, appeals, support access grants |
-| P03-04 | Admin: categories, localities, feature flags, legal versions, metrics |
-| P03-05 | Security test pass (`#SECURITY`), ASVS L1 checklist |
-| P03-06 | Data export and retention jobs (`PRIVACY.md`) |
-| P03-07 | Transparency page figures (owner input) |
 | P04-01 | Closed beta with residents, feedback loop |
 | P04-02 | Release gates: security, legal, restore test, mobile usability |
 | P04-03 | DPIA document (short) |

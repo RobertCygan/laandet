@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import {
   bigint,
+  boolean,
   check,
   customType,
   index,
@@ -535,10 +536,14 @@ export const disputes = pgTable(
     openedAt: ts("opened_at").notNull().defaultNow(),
     closedAt: ts("closed_at"),
     closureNote: text("closure_note"),
+    // Opened after the recommended Laandet deadline: still accepted, but marked (DISPUTE_POLICY §3).
+    reportedLate: boolean("reported_late").notNull().default(false),
+    reopenedAt: ts("reopened_at"),
   },
   (t) => [
     check("disputes_not_self", sql`${t.openedBy} <> ${t.respondentId}`),
     check("disputes_summary_len", sql`char_length(${t.summary}) BETWEEN 10 AND 4000`),
+    check("disputes_closure_note_len", sql`char_length(${t.closureNote}) <= 4000`),
     check(
       "disputes_category_chk",
       sql`${t.category} IN ('damaged','not_returned','not_as_described','missing_accessories','late_return','payment_disagreement','deposit_disagreement','unsafe_equipment','other')`,
