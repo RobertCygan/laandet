@@ -42,12 +42,12 @@ parallel work (P01-11 and P01-13 can run alongside P01-05…P01-10). If Phase 01
 
 | ID | Task | Depends on | Estimate (ideal days) | Status |
 |---|---|---|---|---|
-| [P02-01](phase-02/P02-01-messaging.md) | Conversations and messages (block, report, polling, email batching) | P01 | 2 | tested |
-| [P02-02](phase-02/P02-02-rental-requests-bookings.md) | Rental requests and the booking state machine (incl. the exclusion constraint) | P01 | 2.5 | tested |
-| [P02-03](phase-02/P02-03-giveaway-claims.md) | Giveaway claims and transfer confirmation | P02-01, P02-04 | 1 | tested |
-| [P02-04](phase-02/P02-04-agreements.md) | Agreement generation, rendering, acceptance, revisions | P02-02 | 2 | tested |
-| [P02-05](phase-02/P02-05-condition-reports.md) | Handover and return condition reports with photos | P02-04 | 2.5 | tested |
-| [P02-06](phase-02/P02-06-worker-notifications.md) | Worker jobs, reminders, in-app notifications, emails | P02-02…05 | 1 | tested |
+| [P02-01](phase-02/P02-01-messaging.md) | Conversations and messages (block, report, polling, email batching) | P01 | 2 | approved |
+| [P02-02](phase-02/P02-02-rental-requests-bookings.md) | Rental requests and the booking state machine (incl. the exclusion constraint) | P01 | 2.5 | approved |
+| [P02-03](phase-02/P02-03-giveaway-claims.md) | Giveaway claims and transfer confirmation | P02-01, P02-04 | 1 | approved |
+| [P02-04](phase-02/P02-04-agreements.md) | Agreement generation, rendering, acceptance, revisions | P02-02 | 2 | approved |
+| [P02-05](phase-02/P02-05-condition-reports.md) | Handover and return condition reports with photos | P02-04 | 2.5 | approved |
+| [P02-06](phase-02/P02-06-worker-notifications.md) | Worker jobs, reminders, in-app notifications, emails | P02-02…05 | 1 | approved |
 
 ## Phase 03–04 (outline — detailed task files are written at the end of the previous phase)
 

@@ -2,7 +2,7 @@
 
 All notable changes to Laandet. Dates are DD.MM.YYYY.
 
-## [Phase 02] — 25.10.2026 (implemented and tested; awaiting owner approval; not deployed)
+## [Phase 02] — 25.10.2026 (approved by the owner: «Zatwierdzam Phase 02»; not deployed)
 
 ### Added
 - **Messages (P02-01):**
