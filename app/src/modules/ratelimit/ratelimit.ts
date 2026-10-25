@@ -65,4 +65,6 @@ export const LIMITS = {
   // changes of terms), per person and day.
   caseSteps: { max: 60, windowSeconds: 24 * 60 * 60 },
   bookingSteps: { max: 40, windowSeconds: 24 * 60 * 60 },
+  // Phase 04
+  feedback: { max: 10, windowSeconds: 24 * 60 * 60 },
 } satisfies Record<string, RateRule>;

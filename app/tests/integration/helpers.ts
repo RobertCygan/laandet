@@ -26,6 +26,7 @@ const MUTABLE_TABLES = [
   "email_outbox",
   "app_rate_limits",
   "worker_heartbeats",
+  "feedback",
   "audit_events",
   "legal_acceptances",
   "category_suggestions",

@@ -5,6 +5,7 @@ import {
   conversationParticipants,
   conversations,
   emailOutbox,
+  feedback,
   listingImages,
   listings,
   listingUnavailability,
@@ -126,6 +127,15 @@ export async function purgeCategorySuggestions(now = new Date()): Promise<number
   return rows.length;
 }
 
+/** «Gi tilbakemelding» (P04-01): 12 months, handled or not. */
+export async function purgeFeedback(now = new Date()): Promise<number> {
+  const rows = await db
+    .delete(feedback)
+    .where(lt(feedback.createdAt, ago(now, MONTHS_12)))
+    .returning({ id: feedback.id });
+  return rows.length;
+}
+
 /**
  * Condition and dispute photos that never got attached within 24 hours, or whose entry or event was
  * purged. The listing scope is handled by media/cleanup.ts.
@@ -168,6 +178,7 @@ export async function runRetention(now = new Date()) {
     messages: await purgeOldMessages(now),
     notificationsAndOutbox: await purgeNotificationsAndOutbox(now),
     categorySuggestions: await purgeCategorySuggestions(now),
+    feedback: await purgeFeedback(now),
     ...(await purgeAppendOnly()),
     privateMedia: await deleteOrphanPrivateMedia(now),
   };

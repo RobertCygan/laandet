@@ -73,7 +73,8 @@
     "rankingHeading": "Slik sorterer vi",
     "rankingText": "Annonser vises med de nyeste først. Ingen kan betale for å komme høyere opp.",
     "rankingLink": "Les mer om rangering",
-    "pilotNote": "Laandet er i en pilotfase. Eksempelannonser er merket «Eksempel»."
+    "pilotNote": "Laandet er i en pilotfase. Eksempelannonser er merket «Eksempel».",
+    "feedback": "Gi tilbakemelding"
   },
   "home": {
     "eyebrow": "Gode naboer. Gode muligheter.",
@@ -385,7 +386,10 @@
     "changeEmailButton": "Endre e-post",
     "emailChangeSent": "Hvis adressen kan brukes, har vi sendt en lenke til den nye adressen. E-postadressen endres når du åpner lenken.",
     "emailChanged": "E-postadressen er endret og bekreftet.",
-    "changeEmailHint": "Vi sender en bekreftelseslenke til den nye adressen."
+    "changeEmailHint": "Vi sender en bekreftelseslenke til den nye adressen.",
+    "feedbackHeading": "Noe som ikke virker?",
+    "feedbackLead": "Fortell oss om feil, uklare tekster eller ideer. Alt leses av Laandet.",
+    "feedbackLink": "Gi tilbakemelding"
   },
   "profile": {
     "memberSince": "Medlem siden {date}",
@@ -509,7 +513,8 @@
       "legal": "Juridiske tekster",
       "security": "Sikkerhetslogg",
       "metrics": "Driftstall",
-      "transparency": "Åpenhet"
+      "transparency": "Åpenhet",
+      "feedback": "Tilbakemeldinger"
     },
     "targetTypes": {
       "listing": "Annonser",
@@ -1621,5 +1626,31 @@
     "download": "Last ned mine data (JSON)",
     "note": "Filen inneholder personopplysninger. Lagre den trygt. Du kan laste ned fem ganger per døgn.",
     "limit": "Du har lastet ned dataene dine fem ganger det siste døgnet. Prøv igjen senere."
+  },
+  "staging": {
+    "banner": "Testversjon. Alt du legger inn her kan bli slettet. Ikke inngå ekte avtaler her."
+  },
+  "feedback": {
+    "title": "Gi tilbakemelding",
+    "lead": "Fant du en feil, noe som var vanskelig å forstå, eller har du en idé? Skriv det her. Vi leser alt.",
+    "kindLabel": "Hva gjelder det?",
+    "kind": {
+      "error": "Noe virker ikke",
+      "suggestion": "Forslag til forbedring",
+      "other": "Noe annet"
+    },
+    "bodyLabel": "Beskriv det med egne ord",
+    "bodyHint": "Hva prøvde du å gjøre, og hva skjedde? Ikke skriv passord eller andres personopplysninger.",
+    "fromPage": "Siden du kom fra: {path}",
+    "send": "Send tilbakemelding",
+    "thanks": "Takk! Tilbakemeldingen er sendt til Laandet.",
+    "privacy": "Tilbakemeldingen lagres sammen med kontoen din i 12 måneder, slik personvernerklæringen beskriver.",
+    "adminTitle": "Tilbakemeldinger",
+    "adminLead": "Fra medlemmer og testere. Marker som behandlet når saken er fulgt opp.",
+    "openHeading": "Ubehandlet ({count})",
+    "noneOpen": "Ingen ubehandlede tilbakemeldinger.",
+    "handledHeading": "Behandlet",
+    "markHandled": "Marker som behandlet",
+    "handledSaved": "Tilbakemeldingen er markert som behandlet."
   }
 }

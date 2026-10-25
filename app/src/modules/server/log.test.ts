@@ -17,5 +17,8 @@ describe("safeError (SEC-43)", () => {
     expect(safeError(new Error("x".repeat(1000))).message).toHaveLength(300);
     expect(safeError("boom")).toEqual({ name: "NonError", message: "non-error thrown" });
     expect(safeError(new Error("Kontakt ola@example.no")).message).toBe("Kontakt [email]");
+    expect(safeError(new Error("GET https://laandet.no/nytt-passord?token=abc123 failed")).message).toBe(
+      "GET https://laandet.no/nytt-passord?[redacted] failed",
+    );
   });
 });

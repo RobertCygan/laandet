@@ -30,6 +30,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   setRequestLocale(locale);
   const t = await getTranslations("common");
   const tl = await getTranslations("legalPage");
+  const ts = await getTranslations("staging");
   const actor = await getActor();
   const mustAccept = (await pendingAcceptances(actor)).length > 0;
 
@@ -39,6 +40,12 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
         <a className="skip-link" href="#main">
           {t("skipToContent")}
         </a>
+        {/* Closed beta (P04-01): testers must never mistake staging for the real service. */}
+        {process.env.APP_ENV === "staging" && (
+          <div className="bg-accent py-2 text-center text-sm font-semibold" role="note">
+            {ts("banner")}
+          </div>
+        )}
         <NextIntlClientProvider>
           <SiteHeader actor={actor} locale={locale} />
           {mustAccept && (

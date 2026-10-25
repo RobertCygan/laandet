@@ -13,6 +13,7 @@ import {
 } from "@/modules/rentals/jobs";
 import { sendMessageEmails } from "@/modules/messaging/email-batch";
 import { expireRestrictions } from "@/modules/moderation/users";
+import { checkOpsAlerts } from "@/modules/ops/alerts";
 import { eraseDueAccounts, handleInactiveAccounts } from "@/modules/privacy/erasure";
 import { deleteOrphanPrivateMedia, runRetention } from "@/modules/privacy/retention";
 import { publishDueReviews } from "@/modules/reviews/service";
@@ -59,6 +60,12 @@ export const JOBS: Job[] = [
     everySeconds: 24 * 3600,
     run: (db) => db.execute(sql`SELECT purge_expired_audit_events()`),
   },
+  // P04-04: emails the operator when a job above keeps failing or stops running.
+  {
+    name: "ops_alerts",
+    everySeconds: 300,
+    run: () => checkOpsAlerts(Object.fromEntries(JOBS.map((j) => [j.name, j.everySeconds]))),
+  },
 ];
 
 export async function runJob(db: DbOrTx, job: Job): Promise<void> {
@@ -67,14 +74,20 @@ export async function runJob(db: DbOrTx, job: Job): Promise<void> {
     await job.run(db);
     await db
       .insert(workerHeartbeats)
-      .values({ job: job.name, lastRunAt: now, lastOkAt: now, lastError: null })
-      .onConflictDoUpdate({ target: workerHeartbeats.job, set: { lastRunAt: now, lastOkAt: now, lastError: null } });
+      .values({ job: job.name, lastRunAt: now, lastOkAt: now, lastError: null, failCount: 0 })
+      .onConflictDoUpdate({
+        target: workerHeartbeats.job,
+        set: { lastRunAt: now, lastOkAt: now, lastError: null, failCount: 0 },
+      });
   } catch (err) {
     const message = safeError(err).message;
     logError(`[worker] ${job.name} failed:`, err);
     await db
       .insert(workerHeartbeats)
-      .values({ job: job.name, lastRunAt: now, lastError: message })
-      .onConflictDoUpdate({ target: workerHeartbeats.job, set: { lastRunAt: now, lastError: message } });
+      .values({ job: job.name, lastRunAt: now, lastError: message, failCount: 1 })
+      .onConflictDoUpdate({
+        target: workerHeartbeats.job,
+        set: { lastRunAt: now, lastError: message, failCount: sql`${workerHeartbeats.failCount} + 1` },
+      });
   }
 }

@@ -86,6 +86,7 @@ Legend:
   - Retaining the display name in agreements after account deletion.
   - Inactive-account deletion after 24 + 2 months.
   - Processor agreements and transfer assessment for Sentry (US company, EU data region) and, if enabled, Cloudflare Turnstile.
+  - Added after the drafts were written: feedback («Gi tilbakemelding», `PRIVACY.md` P14, 12 months) and the operator alert emails (no personal data). The privacy notice draft does not mention feedback yet; add it in the reviewed version.
 
 ### L-05 Cookies (ekomloven § 3-15)
 - **V (excerpt):**
@@ -163,7 +164,7 @@ Legend:
   - Is the unilateral change clause (§23, 30 days' notice) acceptable?
 
 ### L-12 DPIA and special categories
-- **A:** A DPIA is not clearly mandatory (see `PRIVACY.md` §4). A short DPIA document is planned before the pilot.
+- **A:** A DPIA is not clearly mandatory (see `PRIVACY.md` §4). A short DPIA draft is in `DPIA.md` (P04-03), not legally reviewed.
 - **Q:**
   - Confirm.
   - How to handle incidental health data in injury-related dispute statements.

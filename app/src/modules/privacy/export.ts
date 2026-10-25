@@ -13,6 +13,7 @@ import {
   disputeEvents,
   disputeProposals,
   disputes,
+  feedback,
   giveawayClaims,
   legalAcceptances,
   legalDocumentVersions,
@@ -246,6 +247,11 @@ export async function buildDataExport(actor: Actor, now = new Date()) {
       ])
     : [[], []];
 
+  const sentFeedback = await db
+    .select({ kind: feedback.kind, body: feedback.body, status: feedback.status, createdAt: feedback.createdAt })
+    .from(feedback)
+    .where(eq(feedback.userId, me))
+    .orderBy(asc(feedback.createdAt));
   const notices = await db
     .select({
       type: notifications.type,
@@ -406,6 +412,7 @@ export async function buildDataExport(actor: Actor, now = new Date()) {
         })),
     })),
     notifications: notices,
+    feedback: sentFeedback,
   };
 }
 

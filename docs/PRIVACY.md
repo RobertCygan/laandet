@@ -37,6 +37,7 @@
 | P11 | Error monitoring (optional) | pseudonymous user id, technical error data, no request bodies | users | stability | 6(1)(f) | Sentry (EU region) |
 | P12 | Backups | copies of the above | all | durability | same as source | backup storage provider (EU), client-side encrypted |
 | P13 | Contact and complaints by email | email, message | anyone | answer inquiries | 6(1)(f) | email host |
+| P14 | Feedback («Gi tilbakemelding», P04-01) | feedback text, kind, the page path it came from, user id | users, beta testers | improve the service, find errors | 6(1)(f) | staff |
 
 **Special categories (art. 9):** not intended. Users are told not to share health or other
 sensitive data. Injury-related dispute statements may contain health data. Staff are told to keep only
@@ -97,6 +98,7 @@ legal review (L-12).
 | Error monitoring events | 30 days (provider setting) | stability |
 | Backups | rolling, max 6 months | durability. Deleted data disappears from backups within 6 months. |
 | Category suggestions | 12 months | minimisation |
+| Feedback («Gi tilbakemelding») | 12 months, and removed with the account | minimisation |
 | Legal acceptances | while the account exists + 3 years | proof of acceptance |
 
 For append-only records (bookings, claims, cases, reports, legal acceptances) the period runs from the closing date **and** from the last change the application made to the record, whichever is later. The database stamps that time itself, so the application cannot pull a purge forward (security review M1, migration `0010`).

@@ -21,6 +21,7 @@ export async function SiteFooter() {
           <Link href="/stott-laandet">{t("support")}</Link>
           <Link href="/apenhet">{t("transparency")}</Link>
           <Link href="/kontakt">{t("contact")}</Link>
+          <Link href="/tilbakemelding">{t("feedback")}</Link>
         </div>
         <div>
           <h3>{t("rulesHeading")}</h3>

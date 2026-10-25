@@ -54,7 +54,10 @@ export type Action =
   | "metrics.view"
   | "locality.manage"
   | "legal.view"
-  | "transparency.manage";
+  | "transparency.manage"
+  // Phase 04
+  | "feedback.create"
+  | "feedback.handle";
 
 export type Resource =
   | { type: "none" }
@@ -239,7 +242,11 @@ export function can(actor: Actor, action: Action, resource: Resource = NONE): De
     // Condition and case photos: a restricted account still documents its own rentals (review L5). The
     // photo stays private to the uploader until the booking or case service attaches it for a party.
     case "evidence.upload":
+    // «Gi tilbakemelding» (P04-01): also before the email is verified, since sign-up trouble is feedback too.
+    case "feedback.create":
       return ALLOW;
+    case "feedback.handle":
+      return staffAccess(actor);
     case "dispute.open":
     case "review.write":
       // Only a party of the booking (the service checks status and deadlines).

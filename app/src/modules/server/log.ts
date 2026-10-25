@@ -11,6 +11,8 @@ export function safeError(err: unknown): { name: string; message: string; code?:
     .replace(/\bparams:[\s\S]*$/i, "params: [redacted]")
     .replace(/Failed query:[\s\S]*?(params: \[redacted\]|$)/i, "Failed query: [redacted] $1")
     .replace(/[\w.+-]+@[\w-]+(\.[\w-]+)+/g, "[email]")
+    // A URL's query string can carry a token or a reset link (e.g. in a fetch or SMTP error).
+    .replace(/(https?:\/\/[^\s?#]+)[?#]\S*/g, "$1?[redacted]")
     .slice(0, 300);
   return { name: err.name, message, ...(typeof code === "string" ? { code } : {}) };
 }

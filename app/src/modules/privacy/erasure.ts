@@ -6,6 +6,7 @@ import {
   bookings,
   disputes,
   emailOutbox,
+  feedback,
   giveawayClaims,
   identityVerifications,
   listingImages,
@@ -132,6 +133,7 @@ export async function eraseAccount(userId: string): Promise<void> {
     await tx.delete(savedListings).where(eq(savedListings.userId, userId));
     await tx.delete(userBlocks).where(or(eq(userBlocks.blockerId, userId), eq(userBlocks.blockedId, userId)));
     await tx.delete(notifications).where(eq(notifications.userId, userId));
+    await tx.delete(feedback).where(eq(feedback.userId, userId));
     await tx.delete(emailOutbox).where(eq(emailOutbox.toUserId, userId));
 
     // Listings: images always go; the row goes when no rental, claim or conversation refers to it.

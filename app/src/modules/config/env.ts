@@ -33,6 +33,8 @@ export const envSchema = z
     SUPPORT_FEE_TEXT: optionalText,
     SUPPORT_RECIPIENT_NAME: optionalText,
     SUPPORT_RECIPIENT_ORGNR: optionalText,
+    // Operations alerts from the worker (P04-04); empty = no alerts.
+    OPS_ALERT_EMAIL: optionalText.pipe(z.email().optional()),
   })
   .superRefine((e, ctx) => {
     if (e.APP_ENV === "production") {

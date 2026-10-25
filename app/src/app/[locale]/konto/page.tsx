@@ -157,6 +157,16 @@ export default async function AccountPage({ params, searchParams }: PageProps<"/
           <p className="fine-print mt-3">{tp("note")}</p>
         </section>
 
+        <section className="card p-6" aria-labelledby="feedback-h">
+          <h2 id="feedback-h" className="mb-3 text-xl">
+            {t("feedbackHeading")}
+          </h2>
+          <p className="mb-4">{t("feedbackLead")}</p>
+          <Link href="/tilbakemelding" className="button button-outline">
+            {t("feedbackLink")}
+          </Link>
+        </section>
+
         <section className="card p-6" aria-labelledby="delete-h">
           <h2 id="delete-h" className="mb-3 text-xl">
             {t("deleteHeading")}

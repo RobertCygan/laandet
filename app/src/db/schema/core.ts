@@ -180,7 +180,40 @@ export const workerHeartbeats = pgTable("worker_heartbeats", {
   lastRunAt: ts("last_run_at").notNull(),
   lastOkAt: ts("last_ok_at"),
   lastError: text("last_error"),
+  // Operations alerts (P04-04): failed runs in a row, and whether the owner has been told.
+  failCount: integer("fail_count").notNull().default(0),
+  alerting: boolean("alerting").notNull().default(false),
+  alertedAt: ts("alerted_at"),
 });
+
+export const FEEDBACK_KINDS = ["error", "suggestion", "other"] as const;
+
+/** «Gi tilbakemelding» (P04-01): kept 12 months, removed with the account (PRIVACY §5–6). */
+export const feedback = pgTable(
+  "feedback",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    kind: text("kind", { enum: FEEDBACK_KINDS }).notNull(),
+    body: text("body").notNull(),
+    pagePath: text("page_path"),
+    status: text("status", { enum: ["open", "handled"] })
+      .notNull()
+      .default("open"),
+    handledBy: uuid("handled_by").references(() => users.id, { onDelete: "set null" }),
+    handledAt: ts("handled_at"),
+    createdAt: ts("created_at").notNull().defaultNow(),
+  },
+  (t) => [
+    index("feedback_status_idx").on(t.status, t.createdAt),
+    check("feedback_kind_chk", sql`${t.kind} IN ('error','suggestion','other')`),
+    check("feedback_status_chk", sql`${t.status} IN ('open','handled')`),
+    check("feedback_body_len", sql`char_length(${t.body}) BETWEEN 3 AND 2000`),
+    check("feedback_path_len", sql`char_length(${t.pagePath}) <= 300`),
+  ],
+);
 
 // Append-only security and admin log (runtime role: SELECT, INSERT only).
 export const auditEvents = pgTable(

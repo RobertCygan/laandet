@@ -73,7 +73,8 @@
     "rankingHeading": "How we sort",
     "rankingText": "Listings are shown newest first. Nobody can pay to appear higher up.",
     "rankingLink": "Read more about ranking",
-    "pilotNote": "Laandet is in a pilot phase. Example listings are marked «Example»."
+    "pilotNote": "Laandet is in a pilot phase. Example listings are marked «Example».",
+    "feedback": "Give feedback"
   },
   "home": {
     "eyebrow": "Good neighbours. Good opportunities.",
@@ -385,7 +386,10 @@
     "changeEmailButton": "Change email",
     "emailChangeSent": "If the address can be used, we have sent a link to the new address. The email address changes when you open the link.",
     "emailChanged": "Your email address has been changed and confirmed.",
-    "changeEmailHint": "We send a confirmation link to the new address."
+    "changeEmailHint": "We send a confirmation link to the new address.",
+    "feedbackHeading": "Something not working?",
+    "feedbackLead": "Tell us about errors, unclear texts or ideas. Laandet reads everything.",
+    "feedbackLink": "Give feedback"
   },
   "profile": {
     "memberSince": "Member since {date}",
@@ -509,7 +513,8 @@
       "legal": "Legal texts",
       "security": "Security log",
       "metrics": "Operations",
-      "transparency": "Transparency"
+      "transparency": "Transparency",
+      "feedback": "Feedback"
     },
     "targetTypes": {
       "listing": "Listings",
@@ -1621,5 +1626,31 @@
     "download": "Download my data (JSON)",
     "note": "The file contains personal data. Keep it safe. You can download it five times a day.",
     "limit": "You have downloaded your data five times in the last day. Please try again later."
+  },
+  "staging": {
+    "banner": "Test version. Anything you enter here may be deleted. Do not make real agreements here."
+  },
+  "feedback": {
+    "title": "Give feedback",
+    "lead": "Did you find an error, something hard to understand, or do you have an idea? Write it here. We read everything.",
+    "kindLabel": "What is it about?",
+    "kind": {
+      "error": "Something does not work",
+      "suggestion": "Suggestion for improvement",
+      "other": "Something else"
+    },
+    "bodyLabel": "Describe it in your own words",
+    "bodyHint": "What were you trying to do, and what happened? Do not write passwords or other people's personal data.",
+    "fromPage": "The page you came from: {path}",
+    "send": "Send feedback",
+    "thanks": "Thank you! Your feedback has been sent to Laandet.",
+    "privacy": "Your feedback is stored with your account for 12 months, as the privacy notice describes.",
+    "adminTitle": "Feedback",
+    "adminLead": "From members and testers. Mark an item as handled once it has been followed up.",
+    "openHeading": "Not handled ({count})",
+    "noneOpen": "No feedback waiting.",
+    "handledHeading": "Handled",
+    "markHandled": "Mark as handled",
+    "handledSaved": "The feedback is marked as handled."
   }
 }

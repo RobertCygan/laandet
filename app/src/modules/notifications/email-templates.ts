@@ -15,6 +15,7 @@ export type EmailTemplate =
   | "role_granted"
   | "account_erased"
   | "inactivity_warning"
+  | "ops_alert"
   | "activity";
 
 type Rendered = { subject: string; text: string };
@@ -258,6 +259,17 @@ const templates: Record<EmailTemplate, Record<"nb" | "en", (p: Payload) => Rende
     en: (p) => ({
       subject: "Do you want to keep your Laandet account?",
       text: `Hi ${p.name}!\n\nYou have not signed in to Laandet for two years. If you want to keep the account, sign in before ${p.date}. Otherwise we will delete it, as the privacy notice describes.\n\n${p.url}`,
+    }),
+  },
+  // P04-04: to the operator only. Job name, state, time and the redacted error; never personal data.
+  ops_alert: {
+    nb: (p) => ({
+      subject: `Laandet drift: ${p.job} ${p.state === "recovered" ? "virker igjen" : "trenger tilsyn"}`,
+      text: `Jobben «${p.job}» ${p.state === "recovered" ? "virker igjen" : p.state === "overdue" ? "har ikke kjørt som planlagt" : "har feilet tre ganger på rad"}.\n\nSist kjørt: ${p.lastRun}\nFeilmelding: ${p.error || "–"}\n\nSe /admin/tall og docs/PILOT_SUPPORT.md.`,
+    }),
+    en: (p) => ({
+      subject: `Laandet operations: ${p.job} ${p.state === "recovered" ? "works again" : "needs attention"}`,
+      text: `The job "${p.job}" ${p.state === "recovered" ? "works again" : p.state === "overdue" ? "has not run as planned" : "has failed three runs in a row"}.\n\nLast run: ${p.lastRun}\nError: ${p.error || "–"}\n\nSee /admin/tall and docs/PILOT_SUPPORT.md.`,
     }),
   },
 };
