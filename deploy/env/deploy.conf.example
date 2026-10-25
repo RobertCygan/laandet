@@ -1,0 +1,5 @@
+# /opt/laandet/<environment>/deploy.conf — read by deploy.sh and the backup scripts (root-owned, 0644).
+# Image repository in GitHub Container Registry (lower case).
+LAANDET_IMAGE_REPO=ghcr.io/OWNER/laandet-app
+# How many released compose bundles to keep under releases/.
+LAANDET_KEEP_RELEASES=5

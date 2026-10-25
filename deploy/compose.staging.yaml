@@ -1,0 +1,26 @@
+# Staging override: docker compose -f compose.yaml -f compose.staging.yaml …
+#
+# A separate Compose project (own network, volumes, database and secrets directory). Staging only
+# ever holds synthetic data — never copies of production (SEC-41). Basic auth and
+# `X-Robots-Tag: noindex` are set by Caddy; the app adds `noindex` meta outside production.
+name: laandet-staging
+
+services:
+  app:
+    # Replace the network list so the staging app never answers to the production alias.
+    networks: !override
+      default: {}
+      edge:
+        aliases: [laandet-staging-app]
+
+  legal:
+    # Draft legal texts are allowed in staging only.
+    command: ["node", "scripts/load-legal.mjs", "--allow-draft"]
+
+  seed:
+    # Labelled example listings (D-024).
+    command: ["node", "scripts/seed.mjs", "--demo"]
+
+networks:
+  edge:
+    name: laandet-edge-staging

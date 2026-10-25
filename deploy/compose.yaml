@@ -1,0 +1,127 @@
+# Laandet — one environment (production by default). P01-13, DECISIONS D-005.
+#
+# Production:  docker compose -f compose.yaml up -d
+# Staging:     docker compose -f compose.yaml -f compose.staging.yaml up -d
+# Normally run by deploy.sh, which sets:
+#   LAANDET_IMAGE        e.g. ghcr.io/OWNER/laandet-app:laandet-v0.1.0
+#   LAANDET_SECRETS_DIR  e.g. /opt/laandet/production/secrets (root:laandet-deploy, 0750)
+#
+# Each environment is its own Compose project, with its own network, volumes, database and
+# secrets. PostgreSQL has no published port. Only `app` joins this environment's edge network
+# (laandet-edge-production / laandet-edge-staging), where Caddy (compose.edge.yaml) reaches it;
+# the two environments cannot reach each other.
+name: laandet
+
+x-runtime: &runtime
+  image: ${LAANDET_IMAGE:?LAANDET_IMAGE must name the image to run}
+  restart: unless-stopped
+  # SEC-61: non-root (set in the image), read-only root filesystem, no extra capabilities.
+  read_only: true
+  tmpfs:
+    - /tmp:size=256m,mode=1777
+  volumes:
+    - media:/data/media
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+  depends_on:
+    db:
+      condition: service_healthy
+
+x-tool: &tool
+  <<: *runtime
+  profiles: ["tools"]
+  restart: "no"
+  working_dir: /app/tools
+  healthcheck:
+    disable: true
+
+services:
+  db:
+    image: postgres:17.11-bookworm@sha256:858bb5e98eed02eb8cafbcdc007f9a65d1b613972028944a8ec2133ccaf80d27
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/pg_superuser_password
+      LAANDET_OWNER_PASSWORD_FILE: /run/secrets/pg_owner_password
+      LAANDET_APP_PASSWORD_FILE: /run/secrets/pg_app_password
+    secrets: [pg_superuser_password, pg_owner_password, pg_app_password]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Runs once, on an empty data directory: roles, database, extensions.
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    shm_size: 128mb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    security_opt: ["no-new-privileges:true"]
+    # No `ports:` — the database is reachable only from this project's network (SEC-62).
+
+  app:
+    <<: *runtime
+    env_file:
+      - ${LAANDET_SECRETS_DIR:?LAANDET_SECRETS_DIR must point to the secrets directory}/app.env
+    networks:
+      default: {}
+      edge:
+        aliases: [laandet-app]
+
+  worker:
+    <<: *runtime
+    env_file:
+      - ${LAANDET_SECRETS_DIR}/app.env
+    working_dir: /app/tools
+    command: ["node", "worker/index.mjs"]
+    healthcheck:
+      disable: true
+
+  # ---- one-off tools (profile "tools"; deploy.sh runs them with `docker compose run --rm`) ----
+
+  # Migrations with the owner role. Only DATABASE_MIGRATION_URL and APP_ENV are needed.
+  migrate:
+    <<: *tool
+    env_file:
+      - ${LAANDET_SECRETS_DIR}/migrate.env
+    command: ["node", "scripts/migrate.mjs"]
+
+  # Legal texts → legal_document_versions. Refuses unfinished texts when APP_ENV=production.
+  legal:
+    <<: *tool
+    env_file:
+      - ${LAANDET_SECRETS_DIR}/migrate.env
+    command: ["node", "scripts/load-legal.mjs"]
+
+  # Idempotent reference data (localities, categories, flags, keywords). Staging adds --demo.
+  seed:
+    <<: *tool
+    env_file:
+      - ${LAANDET_SECRETS_DIR}/app.env
+      - ${LAANDET_SECRETS_DIR}/migrate.env
+    command: ["node", "scripts/seed.mjs"]
+
+  # Ad-hoc commands with the runtime role, e.g.
+  #   docker compose run --rm tools node scripts/grant-role.mjs --email … --role moderator --reason "…"
+  tools:
+    <<: *tool
+    env_file:
+      - ${LAANDET_SECRETS_DIR}/app.env
+    command: ["node", "-e", "console.log('Usage: docker compose run --rm tools node scripts/<name>.mjs …')"]
+
+networks:
+  default: {}
+  edge:
+    external: true
+    name: laandet-edge-production
+
+volumes:
+  pgdata: {}
+  media: {}
+
+secrets:
+  pg_superuser_password:
+    file: ${LAANDET_SECRETS_DIR}/pg_superuser_password
+  pg_owner_password:
+    file: ${LAANDET_SECRETS_DIR}/pg_owner_password
+  pg_app_password:
+    file: ${LAANDET_SECRETS_DIR}/pg_app_password
