@@ -4,6 +4,7 @@
  */
 import { db } from "@/db/client";
 import { JOBS, runJob } from "./jobs";
+import { logError } from "@/modules/server/log";
 
 const LOOP_MS = 60_000;
 const lastRun = new Map<string, number>();
@@ -35,6 +36,6 @@ process.on("SIGTERM", () => {
 });
 
 main().catch((err) => {
-  console.error(err);
+  logError("[worker] stopped", err);
   process.exit(1);
 });

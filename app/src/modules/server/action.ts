@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { isAppError, type ErrorCode } from "@/modules/errors";
+import { logError } from "./log";
 
 /**
  * Uniform result for Server Actions used with `useActionState`.
@@ -67,7 +68,7 @@ export async function runAction<T>(fn: () => Promise<T>, values?: Record<string,
     }
     // Next.js control flow (redirect/notFound) must propagate.
     if (err && typeof err === "object" && "digest" in err) throw err;
-    console.error("[action] unexpected error", err);
+    logError("[action] unexpected error", err);
     return { status: "error", code: "unexpected", ...echo };
   }
 }

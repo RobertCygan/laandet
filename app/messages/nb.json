@@ -635,7 +635,11 @@
     "review_window_closed": "Fristen for å skrive vurdering er ute.",
     "already_reviewed": "Du har allerede vurdert dette leieforholdet.",
     "review_changed": "Vurderingen er endret i mellomtiden. Last inn siden på nytt.",
-    "review_invalid": "Sjekk feltene som er merket."
+    "review_invalid": "Sjekk feltene som er merket.",
+    "errorTitle": "Noe gikk galt",
+    "errorText": "Vi beklager. Prøv igjen om litt. Hvis feilen fortsetter, kontakt oss og oppgi referansen.",
+    "errorReference": "Referanse",
+    "tryAgain": "Prøv igjen"
   },
   "validation": {
     "required": "Må fylles ut.",

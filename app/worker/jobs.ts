@@ -16,6 +16,7 @@ import { expireRestrictions } from "@/modules/moderation/users";
 import { eraseDueAccounts, handleInactiveAccounts } from "@/modules/privacy/erasure";
 import { deleteOrphanPrivateMedia, runRetention } from "@/modules/privacy/retention";
 import { publishDueReviews } from "@/modules/reviews/service";
+import { logError, safeError } from "@/modules/server/log";
 
 export type Job = { name: string; everySeconds: number; run: (db: DbOrTx) => Promise<unknown> };
 
@@ -69,8 +70,8 @@ export async function runJob(db: DbOrTx, job: Job): Promise<void> {
       .values({ job: job.name, lastRunAt: now, lastOkAt: now, lastError: null })
       .onConflictDoUpdate({ target: workerHeartbeats.job, set: { lastRunAt: now, lastOkAt: now, lastError: null } });
   } catch (err) {
-    const message = err instanceof Error ? err.message.slice(0, 500) : "failed";
-    console.error(`[worker] ${job.name} failed:`, err);
+    const message = safeError(err).message;
+    logError(`[worker] ${job.name} failed:`, err);
     await db
       .insert(workerHeartbeats)
       .values({ job: job.name, lastRunAt: now, lastError: message })

@@ -7,6 +7,7 @@ import { AppError } from "@/modules/errors";
 import { notify } from "@/modules/notifications/notify";
 import { inviteReviews } from "@/modules/reviews/service";
 import { announce, moveBooking } from "./service";
+import { logError } from "@/modules/server/log";
 
 /**
  * Time-based booking steps (P02-06, DATA_MODEL §5, CONDITION_REPORTS §7). Each job picks due rows,
@@ -52,7 +53,7 @@ async function eachBooking(
       if (moved) done++;
     } catch (err) {
       if (err instanceof AppError && err.code === "conflict") continue;
-      console.error(`[worker] booking ${id}:`, err);
+      logError(`[worker] booking ${id}:`, err);
       failure ??= err;
     }
   }

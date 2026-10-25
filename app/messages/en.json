@@ -635,7 +635,11 @@
     "review_window_closed": "The deadline for writing a review has passed.",
     "already_reviewed": "You have already reviewed this rental.",
     "review_changed": "The review has changed in the meantime. Please reload the page.",
-    "review_invalid": "Please check the marked fields."
+    "review_invalid": "Please check the marked fields.",
+    "errorTitle": "Something went wrong",
+    "errorText": "We are sorry. Please try again in a moment. If it keeps happening, contact us and quote the reference.",
+    "errorReference": "Reference",
+    "tryAgain": "Try again"
   },
   "validation": {
     "required": "Required.",
