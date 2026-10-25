@@ -16,8 +16,10 @@ import type { Actor, UserActor } from "@/modules/authz/actor-types";
 import { assertCan } from "@/modules/authz/policy";
 import { AppError } from "@/modules/errors";
 import { isFlagEnabled } from "@/modules/flags/flags";
+import { releaseListingClaims } from "@/modules/giveaways/service";
 import { assertNoPendingAcceptance } from "@/modules/legal/acceptance";
 import { enforceRateLimits, LIMITS } from "@/modules/ratelimit/ratelimit";
+import { releaseListingBookings } from "@/modules/rentals/service";
 import { getRequestMeta } from "@/modules/server/request-meta";
 import {
   containsContactInfo,
@@ -263,8 +265,12 @@ export async function changeListingStatus(actor: Actor, listingId: string, actio
   );
   const t = TRANSITIONS[action];
   if (!t.from.includes(row.status)) throw new AppError("conflict", "status_transition");
-  // Phase 02: refuse while a booking or giveaway claim is active.
   await db.transaction(async (tx) => {
+    // Refused while a booking or a giveaway is under way; open requests are declined (P02-02, P02-03).
+    if (action === "archive" || action === "delete") {
+      await releaseListingBookings(tx, row.id, row.ownerId, row.title);
+      await releaseListingClaims(tx, row.id, row.title);
+    }
     const updated = await tx
       .update(listings)
       .set({ status: t.to, updatedAt: new Date(), ...(action === "delete" ? { deletedAt: new Date() } : {}) })

@@ -205,6 +205,16 @@ export async function cancelSelectedClaim(actor: Actor, claimId: string): Promis
   });
 }
 
+/** Before a listing is archived or deleted: refused while someone is selected; open claims are declined. */
+export async function releaseListingClaims(tx: Tx, listingId: string, title: string) {
+  const rows = await tx.select().from(giveawayClaims).where(eq(giveawayClaims.listingId, listingId)).for("update");
+  if (rows.some((g) => g.status === "selected")) throw new AppError("conflict", "listing_in_use");
+  for (const g of rows.filter((x) => x.status === "requested")) {
+    await moveClaim(tx, g, "declined");
+    await tell(tx, g, "claim.declined", "claim_cancelled", g.claimantId, title);
+  }
+}
+
 async function reopenListing(tx: Tx, g: ClaimRow) {
   await closeLiveContract(tx, { claimId: g.id }, "void");
   await tx

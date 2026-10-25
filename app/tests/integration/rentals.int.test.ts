@@ -1,7 +1,7 @@
 import { and, eq, sql } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import * as schema from "@/db/schema";
-import { saveListing } from "@/modules/listings/service";
+import { changeListingStatus, saveListing } from "@/modules/listings/service";
 import {
   acceptAgreement,
   acceptBooking,
@@ -184,5 +184,21 @@ describe("rental requests and bookings (P02-02, P02-04)", () => {
       ),
     ).rejects.toThrow();
     await expect(db.execute(sql`DELETE FROM booking_events WHERE booking_id = ${id}`)).rejects.toThrow();
+  });
+
+  it("a listing cannot be archived or deleted during a booking; open requests are declined", async () => {
+    const { lender, renter, listingId } = await setup();
+    const other = await createUser();
+    const active = await requestBooking(renter, req(listingId, 3, 5));
+    const open = await requestBooking(other, req(listingId, 10, 12));
+    await acceptBooking(lender, active.id);
+    await expect(changeListingStatus(lender, listingId, "archive")).rejects.toMatchObject({
+      code: "conflict",
+      message: "listing_in_use",
+    });
+    await cancelBooking(lender, { bookingId: active.id, reason: "Verktøyet er ødelagt" });
+    await changeListingStatus(lender, listingId, "delete");
+    const [b] = await owner.select().from(schema.bookings).where(eq(schema.bookings.id, open.id));
+    expect(b!.status).toBe("declined");
   });
 });

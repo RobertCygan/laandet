@@ -30,7 +30,7 @@ import type { ActivityKind } from "@/modules/notifications/email-templates";
 import { enforceRateLimits, LIMITS } from "@/modules/ratelimit/ratelimit";
 import { getRequestMeta } from "@/modules/server/request-meta";
 import { periodError, toRange, totalOre, units } from "./pricing";
-import { transition, type BookingEvent, type BookingRole } from "./state";
+import { TERMINAL_STATUSES, transition, type BookingEvent, type BookingRole } from "./state";
 
 const HOUR = 60 * 60 * 1000;
 export const OWNER_RESPONSE_HOURS = 72;
@@ -243,6 +243,20 @@ export async function declineBooking(actor: Actor, bookingId: string): Promise<v
     await moveBooking(tx, b, "decline", "owner", (actor as UserActor).id, { decidedAt: new Date() });
     await announce(tx, b, "booking.declined", "booking_declined", ["renter"], title);
   });
+}
+
+/**
+ * Before a listing is archived or deleted (P02-02): refused while a booking is under way; open
+ * requests are declined so nobody waits for an answer that cannot come.
+ */
+export async function releaseListingBookings(tx: Tx, listingId: string, ownerId: string, title: string) {
+  const rows = await tx.select().from(bookings).where(eq(bookings.listingId, listingId)).for("update");
+  if (rows.some((b) => b.status !== "requested" && !TERMINAL_STATUSES.includes(b.status)))
+    throw new AppError("conflict", "listing_in_use");
+  for (const b of rows.filter((x) => x.status === "requested")) {
+    await moveBooking(tx, b, "decline", "owner", ownerId, { decidedAt: new Date() });
+    await announce(tx, b, "booking.declined", "booking_declined", ["renter"], title);
+  }
 }
 
 export async function withdrawBooking(actor: Actor, bookingId: string): Promise<void> {
