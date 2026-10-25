@@ -65,7 +65,9 @@ export async function publishRental(
     await expect(page.locator('input[name="imageId"]')).toHaveCount(1, { timeout: 20_000 });
     // The preview of the not-yet-attached upload is served to its uploader only, and must load.
     const preview = page.locator('img[src^="/media/"]').first();
-    await expect.poll(() => preview.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth)).toBeGreaterThan(0);
+    await expect
+      .poll(() => preview.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth))
+      .toBeGreaterThan(0);
   }
   await page.getByRole("button", { name: "Neste" }).click();
   await page.getByLabel("Pris (kr)").fill("150");
