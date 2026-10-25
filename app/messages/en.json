@@ -313,6 +313,8 @@
     "email": "Email",
     "password": "Password",
     "passwordHint": "At least 6 characters. A few words you remember work well.",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
     "localityOptional": "Area (optional)",
     "chooseLocality": "Choose area",
     "age18": "I am 18 years or older.",

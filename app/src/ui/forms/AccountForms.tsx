@@ -8,12 +8,12 @@ import {
   confirmTwoFactorAction,
   startTwoFactorAction,
 } from "@/modules/auth/actions";
-import { PASSWORD_MAX, PASSWORD_MIN } from "@/modules/auth/password-rules";
 import { idle } from "@/modules/server/action";
 import { updateProfileAction } from "@/modules/users/actions";
 import { Notice } from "@/ui/Notice";
 import { SubmitButton } from "@/ui/SubmitButton";
 import { FieldError, FormError, invalid, prev } from "./FormMessages";
+import { PasswordField } from "./PasswordField";
 
 type Profile = {
   name: string;
@@ -119,11 +119,7 @@ export function TwoFactorSetup() {
     return (
       <form action={startAction} className="flex flex-col gap-5">
         <FormError state={start} />
-        <label className="field">
-          {ta("password")}
-          <input name="password" type="password" autoComplete="current-password" required />
-          <FieldError state={start} name="password" />
-        </label>
+        <PasswordField label={ta("password")} name="password" autoComplete="current-password" state={start} />
         <SubmitButton>{t("setup2faStart")}</SubmitButton>
       </form>
     );
@@ -182,31 +178,19 @@ export function ChangePasswordForm() {
           {t("passwordChanged")}
         </Notice>
       )}
-      <label className="field">
-        {t("currentPassword")}
-        <input
-          name="currentPassword"
-          type="password"
-          autoComplete="current-password"
-          required
-          aria-invalid={invalid(state, "currentPassword")}
-        />
-        <FieldError state={state} name="currentPassword" />
-      </label>
-      <label className="field">
-        {ta("newPassword")}
-        <span className="field-hint">{ta("passwordHint")}</span>
-        <input
-          name="newPassword"
-          type="password"
-          autoComplete="new-password"
-          required
-          minLength={PASSWORD_MIN}
-          maxLength={PASSWORD_MAX}
-          aria-invalid={invalid(state, "newPassword")}
-        />
-        <FieldError state={state} name="newPassword" />
-      </label>
+      <PasswordField
+        label={t("currentPassword")}
+        name="currentPassword"
+        autoComplete="current-password"
+        state={state}
+      />
+      <PasswordField
+        label={ta("newPassword")}
+        hint={ta("passwordHint")}
+        name="newPassword"
+        autoComplete="new-password"
+        state={state}
+      />
       <SubmitButton className="button button-outline" pendingLabel={tc("saving")}>
         {t("changePasswordButton")}
       </SubmitButton>
@@ -242,17 +226,7 @@ export function ChangeEmailForm({ locale }: { locale: "nb" | "en" }) {
         />
         <FieldError state={state} name="newEmail" />
       </label>
-      <label className="field">
-        {t("currentPassword")}
-        <input
-          name="password"
-          type="password"
-          autoComplete="current-password"
-          required
-          aria-invalid={invalid(state, "password")}
-        />
-        <FieldError state={state} name="password" />
-      </label>
+      <PasswordField label={t("currentPassword")} name="password" autoComplete="current-password" state={state} />
       <SubmitButton className="button button-outline" pendingLabel={tc("sending")}>
         {t("changeEmailButton")}
       </SubmitButton>
