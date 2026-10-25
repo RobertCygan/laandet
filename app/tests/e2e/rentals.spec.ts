@@ -1,0 +1,182 @@
+import path from "node:path";
+import AxeBuilder from "@axe-core/playwright";
+import { expect, test, type Page } from "@playwright/test";
+import { publishRental, query, registerAndVerify, uniqueEmail, watchForInjection } from "./support";
+
+const PHOTO = path.resolve("seed/demo-images/equipment-1.webp");
+const osloDate = (d: Date) => new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Oslo" }).format(d);
+const inDays = (n: number) => osloDate(new Date(Date.now() + n * 24 * 3600 * 1000));
+
+async function setRentalsOpen(on: boolean) {
+  await query(
+    `INSERT INTO feature_flags (key, enabled, description) VALUES ('rentals_open', $1, 'e2e')
+     ON CONFLICT (key) DO UPDATE SET enabled = $1`,
+    [on],
+  );
+}
+
+/** No serious or critical axe violations (WCAG 2.1 AA), as in the smoke tests. */
+async function accessible(page: Page) {
+  const results = await new AxeBuilder({
+    page: page as unknown as ConstructorParameters<typeof AxeBuilder>[0]["page"],
+  })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    .analyze();
+  const serious = results.violations.filter((v) => v.impact === "serious" || v.impact === "critical");
+  expect(serious.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`)).toEqual([]);
+}
+
+async function noHorizontalScroll(page: Page) {
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  expect(overflow).toBeLessThanOrEqual(0);
+}
+
+/** Records this party's condition entry on the open page (handover or return). */
+async function addEntry(page: Page, opts: { photo?: boolean; outcome?: string } = {}) {
+  await page.getByRole("combobox", { name: "Tilstand", exact: true }).selectOption("good");
+  await page.getByRole("combobox", { name: "Fungerer den?" }).selectOption("works");
+  if (opts.outcome) await page.getByLabel(opts.outcome).check();
+  if (opts.photo) {
+    await page.locator('input[type="file"][capture="environment"]').setInputFiles(PHOTO);
+    await expect(page.locator('input[name="photoId"]')).toHaveCount(1, { timeout: 20_000 });
+  }
+  await page.getByRole("button", { name: "Lagre registreringen" }).click();
+  await expect(page.getByText("Registreringen er lagret.")).toBeVisible();
+}
+
+async function confirmEntry(page: Page, checklist: boolean) {
+  if (checklist) for (const box of await page.locator('input[name="check"]').all()) await box.check();
+  await page.getByRole("button", { name: "Bekreft", exact: true }).click();
+}
+
+test.describe("Phase 02 journeys at 390 px", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+  test.beforeAll(() => setRentalsOpen(true));
+  test.afterAll(() => setRentalsOpen(false));
+
+  test("request → accept → both accept the agreement → handover → return → completed", async ({ browser }) => {
+    test.setTimeout(240_000);
+    const owner = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
+    const problems = watchForInjection(owner);
+    await registerAndVerify(owner, uniqueEmail("p02-eier"), "Eva E.");
+    const listingId = await publishRental(owner, "Stikksag med blader");
+
+    // The renter asks for tomorrow 10:00 to the day after 18:00 and sees the price first.
+    const renter = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
+    await registerAndVerify(renter, uniqueEmail("p02-leier"), "Rolf R.");
+    await renter.goto(`/annonse/${listingId}`);
+    const form = renter.locator("form").filter({ has: renter.locator('input[name="startDate"]') });
+    await form.getByLabel("Fra dato").fill(inDays(1));
+    await form.getByLabel("Til dato").fill(inDays(2));
+    await expect(form.getByText(/Pris for 2 dager: 300/)).toBeVisible();
+    await expect(form.getByText(/Laandet håndterer ikke penger/)).toBeVisible();
+    await noHorizontalScroll(renter);
+    await accessible(renter);
+    await form.getByRole("button", { name: "Send forespørsel" }).click();
+    await expect(renter).toHaveURL(/\/leieforhold\/[0-9a-f-]{36}\?ok=requested/);
+    const bookingPath = new URL(renter.url()).pathname;
+
+    // The owner gets a notice and accepts.
+    await owner.goto("/varsler");
+    await accessible(owner);
+    await owner.getByRole("link", { name: /forespørsel om å leie «Stikksag med blader»/ }).click();
+    await expect(owner).toHaveURL(new RegExp(`${bookingPath}$`));
+    await accessible(owner);
+    await owner.getByRole("button", { name: "Godta forespørselen" }).click();
+    await expect(owner.getByText("Du har godtatt forespørselen.")).toBeVisible();
+
+    // Both read and accept the exact agreement text.
+    for (const p of [owner, renter]) {
+      await p.goto(`${bookingPath}/avtale`);
+      await expect(p.getByRole("article").getByRole("heading", { name: "Kort fortalt" })).toBeVisible();
+      await expect(p.getByText(/LA-\d{4}-\d{6}/).first()).toBeVisible();
+      await noHorizontalScroll(p);
+      await accessible(p);
+      await p.getByLabel("Jeg har lest hele avtalen og godtar den.").check();
+      await p.getByRole("button", { name: "Jeg godtar avtalen" }).click();
+    }
+    await expect(renter.getByText("Begge har godtatt. Leieforholdet er bekreftet.")).toBeVisible();
+
+    // Handover: the owner records the condition with a photo and confirms; the renter confirms.
+    await owner.goto(`${bookingPath}/utlevering`);
+    await accessible(owner);
+    await addEntry(owner, { photo: true });
+    await confirmEntry(owner, true);
+    await expect(owner.getByText("Du har bekreftet. Venter på den andre parten.")).toBeVisible();
+    await renter.goto(`${bookingPath}/utlevering`);
+    const photo = renter.locator('main img[src^="/media/"]').first();
+    await expect
+      .poll(() => photo.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth))
+      .toBeGreaterThan(0);
+    const photoSrc = (await photo.getAttribute("src"))!;
+    await confirmEntry(renter, true);
+    await expect(renter.getByText("Begge har bekreftet.").first()).toBeVisible();
+
+    // N13: nobody else can open the condition photo.
+    const stranger = await (await browser.newContext()).newPage();
+    await registerAndVerify(stranger, uniqueEmail("p02-annen"), "Siri S.");
+    expect((await stranger.goto(photoSrc))?.status()).toBe(404);
+    expect((await stranger.goto(bookingPath))?.status()).toBe(404);
+
+    // Return: the renter records it and proposes an outcome; both confirm.
+    await renter.goto(`${bookingPath}/tilbakelevering`);
+    await addEntry(renter, { outcome: "Levert tilbake i orden" });
+    await confirmEntry(renter, false);
+    await owner.goto(`${bookingPath}/tilbakelevering`);
+    await confirmEntry(owner, false);
+    await expect(owner.getByText("Begge har bekreftet.").first()).toBeVisible();
+    await owner.goto(bookingPath);
+    await expect(owner.getByText("Fullført").first()).toBeVisible();
+    await expect(owner.getByText("Tilbakelevering bekreftet av begge")).toBeVisible();
+    await noHorizontalScroll(owner);
+    expect(problems).toEqual([]);
+  });
+
+  test("giveaway: claim → the giver chooses → both confirm → «Gitt bort»", async ({ browser }) => {
+    test.setTimeout(180_000);
+    const giver = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
+    await registerAndVerify(giver, uniqueEmail("p02-giver"), "Gunn G.");
+    await giver.goto("/ny-annonse");
+    await giver.getByText("Gi bort", { exact: true }).click();
+    await giver.getByLabel("Kategori").selectOption({ label: "Verktøy" });
+    await giver.getByRole("button", { name: "Neste" }).click();
+    await giver.getByLabel("Overskrift").fill("Gammel bormaskin");
+    await giver.getByLabel("Beskrivelse").fill("Fungerer fint, men er litt bråkete. Hentes i Nordfold.");
+    await giver.getByLabel("Tilstand").selectOption("worn");
+    await giver.getByLabel("Kjente feil og mangler").fill("Litt slark i chucken");
+    const area = giver.getByRole("combobox", { name: "Område", exact: true });
+    while (!(await area.isVisible())) await giver.getByRole("button", { name: "Neste" }).click();
+    await area.selectOption({ label: "Nordfold" });
+    const publish = giver.getByRole("button", { name: "Publiser" });
+    while (!(await publish.isVisible())) await giver.getByRole("button", { name: "Neste" }).click();
+    await publish.click();
+    await expect(giver).toHaveURL(/\/annonse\/[0-9a-f-]{36}\?lagret=published/);
+    const listingPath = new URL(giver.url()).pathname;
+
+    const taker = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
+    await registerAndVerify(taker, uniqueEmail("p02-mottaker"), "Tor T.");
+    await taker.goto(listingPath);
+    const claim = taker.locator("form", { hasText: "Giveren velger selv" });
+    await claim.getByLabel("Melding til giveren (valgfritt)").fill("Kan hente i morgen.");
+    await claim.getByRole("button", { name: "Jeg vil gjerne ha den" }).click();
+    await expect(taker).toHaveURL(/\/overlevering\/[0-9a-f-]{36}\?ok=claimed/);
+    await accessible(taker);
+    const claimPath = new URL(taker.url()).pathname;
+
+    await giver.goto(listingPath);
+    await expect(giver.getByText("Tor T.")).toBeVisible();
+    await giver.getByRole("button", { name: "Velg" }).click();
+    await expect(giver).toHaveURL(new RegExp(`${claimPath}\\?ok=select`));
+    await expect(giver.getByRole("heading", { name: /GB-\d{4}-\d{6}/ })).toBeVisible();
+
+    for (const p of [giver, taker]) {
+      await p.goto(claimPath);
+      await p.getByLabel("Gjenstanden er overlevert, og jeg har lest teksten over.").check();
+      await p.getByRole("button", { name: "Bekreft overleveringen" }).click();
+    }
+    await expect(taker.getByText("Begge har bekreftet. Gjenstanden er gitt bort.")).toBeVisible();
+    await giver.goto(listingPath);
+    await expect(giver.getByText(/Gitt bort/).first()).toBeVisible();
+    await noHorizontalScroll(giver);
+  });
+});

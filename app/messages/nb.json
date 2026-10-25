@@ -863,7 +863,7 @@
   },
   "agreement": {
     "title": "Leieavtale",
-    "short": "Kort fortalt",
+    "short": "Oversikt",
     "shortParties": "{owner} låner ut, {renter} leier.",
     "shortPrice": "Leiepris totalt: {total}, betales direkte mellom dere.",
     "shortDeposit": "Depositum: {amount}, betales direkte mellom dere og tilbakebetales når alt er i orden.",

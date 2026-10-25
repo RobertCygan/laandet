@@ -863,7 +863,7 @@
   },
   "agreement": {
     "title": "Rental agreement",
-    "short": "In short",
+    "short": "Overview",
     "shortParties": "{owner} lends, {renter} rents.",
     "shortPrice": "Total rental price: {total}, paid directly between you.",
     "shortDeposit": "Deposit: {amount}, paid directly between you and returned when everything is in order.",
