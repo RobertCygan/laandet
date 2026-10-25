@@ -12,7 +12,15 @@ import { mediaStore } from "./store";
 export type UploadedMedia = { id: string; width: number; height: number };
 
 /** Validate, re-encode and store one listing image (P01-09). Nothing is kept if any step fails. */
-export async function uploadListingImage(actor: Actor, file: File): Promise<UploadedMedia> {
+export function uploadListingImage(actor: Actor, file: File): Promise<UploadedMedia> {
+  return uploadImage(actor, file, "listing");
+}
+
+/**
+ * Same pipeline for condition-report photos (P02-05): stored under `condition/`, visible only to the
+ * uploader until attached to an entry, then only to the two booking parties.
+ */
+export async function uploadImage(actor: Actor, file: File, scope: "listing" | "condition"): Promise<UploadedMedia> {
   assertCan(actor, "media.upload");
   await enforceRateLimits(db, [
     {
@@ -47,8 +55,8 @@ export async function uploadListingImage(actor: Actor, file: File): Promise<Uplo
   }
 
   const id = randomUUID();
-  const storageKey = `listing/${id}.webp`;
-  const thumbKey = `listing/${id}-thumb.webp`;
+  const storageKey = `${scope}/${id}.webp`;
+  const thumbKey = `${scope}/${id}-thumb.webp`;
   const store = mediaStore();
   await store.put(storageKey, processed.display);
   await store.put(thumbKey, processed.thumb);
@@ -56,7 +64,7 @@ export async function uploadListingImage(actor: Actor, file: File): Promise<Uplo
     await db.insert(mediaObjects).values({
       id,
       uploadedBy: actor.id,
-      scope: "listing",
+      scope,
       storageKey,
       thumbKey,
       mimeType: "image/webp",
