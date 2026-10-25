@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PASSWORD_MAX, PASSWORD_MIN } from "./password-rules";
 
 // Messages are i18n keys under `validation.*`.
 export const emailSchema = z
@@ -7,8 +8,8 @@ export const emailSchema = z
   .transform((v) => v.trim().toLowerCase());
 export const passwordSchema = z
   .string()
-  .min(10, { error: "password_too_short" })
-  .max(128, { error: "password_too_long" });
+  .min(PASSWORD_MIN, { error: "password_too_short" })
+  .max(PASSWORD_MAX, { error: "password_too_long" });
 
 export const displayNameSchema = z
   .string()

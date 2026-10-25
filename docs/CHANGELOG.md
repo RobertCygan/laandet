@@ -2,7 +2,7 @@
 
 All notable changes to Laandet. Dates are DD.MM.YYYY.
 
-## [Phase 03] — 25.10.2026 (waiting for the owner's approval; not deployed)
+## [Phase 03] — 25.10.2026 (approved by the owner: «Zatwierdzam Phase 03»; not deployed)
 
 ### Added
 - **Cases between the parties (P03-01, DISPUTE_POLICY):**

@@ -14,7 +14,7 @@ It is an independent project in the **G-PSI.ai** portfolio.
 | **Phase 00:** inventory, architecture, data model, threat model, legal drafts, roadmap | **Approved by the owner** on 25.10.2026 (D-001…D-029 accepted) |
 | **Phase 01:** accounts, listings, uploads, explore, legal pages, reporting (`app/`) | **Approved by the owner** on 25.10.2026. Tested locally and in CI. |
 | **Phase 02:** messages, rental requests and bookings, agreements, giveaway claims, condition reports, worker jobs and notices | **Approved by the owner** on 25.10.2026. Tested locally and in CI. Rentals stay closed (`rentals_open` off) until the owner opens them. See `docs/CHANGELOG.md`. |
-| **Phase 03:** cases between the parties with staff help, reviews, account measures and appeals, admin panel, data export, retention and erasure, transparency figures, security pass with OWASP ASVS L1 | **Tested** locally and in CI; **waiting for the owner's approval.** An independent security review found 1 high, 4 medium and 7 low issues; all are fixed with tests. Open owner decisions are listed in `docs/ASVS_L1.md`. See `docs/CHANGELOG.md`. |
+| **Phase 03:** cases between the parties with staff help, reviews, account measures and appeals, admin panel, data export, retention and erasure, transparency figures, security pass with OWASP ASVS L1 | **Approved by the owner** on 25.10.2026. Tested locally and in CI. An independent security review found 1 high, 4 medium and 7 low issues; all are fixed with tests. See `docs/CHANGELOG.md`. |
 | Deployment (staging/production) | **Not deployed.** Deploy files and runbooks exist (`deploy/`, `docs/runbooks/`) and were tested locally with Docker. A server and domain must first be bought by the owner. |
 | Database reference schema | Designed. **Validated:** applied to PostgreSQL 16 and 23/23 checks passed (`docs/DATA_MODEL.md` §9) |
 | Legal drafts (nb authoritative, en informational) | **Drafts. Not legally reviewed. Must not be used with real users before review.** |
@@ -31,7 +31,7 @@ laandet/
 ├─ docs/                        project documentation (English)
 │  ├─ MASTER_SPECIFICATION.md   owner's master prompt (verbatim) + amendments
 │  ├─ CURRENT_STATE_ASSESSMENT.md  what exists, what works, what to reuse
-│  ├─ DECISIONS.md              ADR log (D-001 … D-055); D-001…D-047 accepted, D-048…D-055 proposed
+│  ├─ DECISIONS.md              ADR log (D-001 … D-055); D-001…D-055 accepted
 │  ├─ ARCHITECTURE.md           smallest viable secure architecture
 │  ├─ DATA_MODEL.md             entities, state machines, privileges, validation record
 │  ├─ AUTH_MODEL.md             authentication + authorisation matrix

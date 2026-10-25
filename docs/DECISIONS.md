@@ -456,7 +456,7 @@ during Phase 01 start as *Proposed* (implementation-level) unless the owner says
   - The staff recommendation has three parts and is non-binding. It only resolves the case if both parties accept it.
   - Staff can reopen a case within 30 days of closing, and only if a party once asked Laandet for help.
   - When a case closes, a disputed booking returns to completed. The outcome stays on the case and is never shown on a profile (N12).
-- **Status:** Proposed (Phase 03).
+- **Status:** Accepted 25.10.2026 (owner approved Phase 03: «Zatwierdzam Phase 03»).
 
 ## D-049 — Double-blind reviews
 - **Decision:**
@@ -465,7 +465,7 @@ during Phase 01 start as *Proposed* (implementation-level) unless the owner says
   - Giveaways have no reviews.
   - A deleted author is shown as «Tidligere medlem».
   - Staff can remove a review only with a statement of reasons, and the author can appeal.
-- **Status:** Proposed (Phase 03).
+- **Status:** Accepted 25.10.2026 (owner approved Phase 03: «Zatwierdzam Phase 03»).
 
 ## D-050 — Account measures and appeals
 - **Decision:**
@@ -475,7 +475,7 @@ during Phase 01 start as *Proposed* (implementation-level) unless the owner says
   - An appeal is decided once, by someone other than the original decider when another staff member exists.
   - A restricted member can still document their own rentals (condition and case photos, `evidence.upload`).
   - An account waiting for erasure can still finish its bookings, claims and cases, since the erasure waits for exactly those.
-- **Status:** Proposed (Phase 03).
+- **Status:** Accepted 25.10.2026 (owner approved Phase 03: «Zatwierdzam Phase 03»).
 
 ## D-051 — Retention the application cannot pull forward
 - **Context:** The security review (M1) found that the purge periods were measured from dates the application writes itself.
@@ -485,14 +485,14 @@ during Phase 01 start as *Proposed* (implementation-level) unless the owner says
   - The audit log purge never goes below 24 months.
   - Inactivity is measured by `last_seen_at`, stored at most once a day by signed-in requests, not by sign-in records.
 - **Trade-off:** A record changed after it closed is kept for the full period from that change. That can be slightly longer than PRIVACY §5 states, never shorter.
-- **Status:** Proposed (Phase 03).
+- **Status:** Accepted 25.10.2026 (owner approved Phase 03: «Zatwierdzam Phase 03»).
 
 ## D-052 — «Last ned mine data» as a same-origin POST
 - **Decision:**
   - The export is a JSON file with the person's own data. It leaves out other people's email addresses, staff-only notes and sealed reviews about the person.
   - It is limited to five a day and audited.
   - It runs as a form POST checked for our own origin, so another site cannot trigger it.
-- **Status:** Proposed (Phase 03).
+- **Status:** Accepted 25.10.2026 (owner approved Phase 03: «Zatwierdzam Phase 03»).
 
 ## D-053 — Cookie names set in full
 - **Context:** Better Auth added `__Secure-` in front of our names, giving `__Secure-__Host-laandet.session`.
@@ -500,11 +500,11 @@ during Phase 01 start as *Proposed* (implementation-level) unless the owner says
   - `useSecureCookies: false`, with the full names given in the configuration: `__Host-laandet.session`, `__Host-laandet.session_data`, `__Host-laandet.dont_remember` and `__Secure-laandet.two_factor`.
   - `Secure` is set through the default cookie attributes.
   - The e2e test checks the attributes.
-- **Status:** Proposed (Phase 03).
+- **Status:** Accepted 25.10.2026 (owner approved Phase 03: «Zatwierdzam Phase 03»).
 
 ## D-054 — Booking money terms fixed in the database
 - **Decision:** A trigger refuses any change to the parties, listing, conversation, value, price, price unit or deposit of a booking after the request. This covers every role. A change of period or handover method (a new agreement revision) only touches period, units, total and methods. There is no endpoint that moves or deducts a deposit (N6).
-- **Status:** Proposed (Phase 03).
+- **Status:** Accepted 25.10.2026 (owner approved Phase 03: «Zatwierdzam Phase 03»).
 
 ## D-055 — Limits on case and booking steps
 - **Decision:**
@@ -512,4 +512,13 @@ during Phase 01 start as *Proposed* (implementation-level) unless the owner says
   - A case takes at most 400 party entries; staff entries are always accepted.
   - Each refusal is audited as `abuse.rate_limited`.
 - **Trade-off:** These limits are far above what a real case needs. If a case reaches its limit, the parties are asked to contact Laandet.
-- **Status:** Proposed (Phase 03).
+- **Status:** Accepted 25.10.2026 (owner approved Phase 03: «Zatwierdzam Phase 03»).
+
+## D-056 — Minimum password length 6
+- **Context:** The owner, 25.10.2026: «ludzie nie lubią długich haseł. Możesz zrobić min 6 znaków» (people do not like long passwords). Before, the minimum was 10. OWASP ASVS L1 asks for 12, and NIST SP 800-63B for at least 8.
+- **Decision:**
+  - Passwords need 6 to 128 characters, with no composition rules.
+  - Kept: the breached-password check, which refuses passwords such as «123456» or «qwerty»; sign-in limits (5 attempts per 15 minutes per address, 20 per IP); scrypt hashing; mandatory TOTP for staff.
+  - Added: «Vis passord», so a password can be checked while typing (P04-02).
+- **Trade-off:** A 6-character password is much easier to guess offline if the password hashes ever leak. Online guessing is slowed by the limits. Raising the minimum again is a one-line change (`PASSWORD_MIN`).
+- **Status:** Accepted 25.10.2026 (owner decision). Recorded in `ASVS_L1.md` 2.1.1 as an accepted exception.

@@ -312,7 +312,7 @@
     "nameHint": "Vises for andre, f.eks. «Ola N.».",
     "email": "E-post",
     "password": "Passord",
-    "passwordHint": "Minst 10 tegn. Bruk gjerne en setning du husker.",
+    "passwordHint": "Minst 6 tegn. Bruk gjerne flere ord du husker.",
     "localityOptional": "Område (valgfritt)",
     "chooseLocality": "Velg område",
     "age18": "Jeg er 18 år eller eldre.",
@@ -647,7 +647,7 @@
   "validation": {
     "required": "Må fylles ut.",
     "email": "Skriv en gyldig e-postadresse.",
-    "password_too_short": "Passordet må ha minst 10 tegn.",
+    "password_too_short": "Passordet må ha minst 6 tegn.",
     "password_too_long": "Passordet kan ha høyst 128 tegn.",
     "password_compromised": "Dette passordet finnes i kjente datalekkasjer. Velg et annet.",
     "name_length": "Visningsnavnet må ha 2–40 tegn.",

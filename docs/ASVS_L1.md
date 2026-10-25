@@ -10,7 +10,7 @@ Legend: ✅ met · 🟡 partly met or met differently · ❌ not met · ⏳ need
 
 | ID | Requirement (short) | Status | Note |
 |---|---|---|---|
-| 2.1.1 | Passwords at least 12 characters | ❌ | Laandet uses **10** (AUTH_MODEL §1). Raising it to 12 is a one-line change; **owner decision needed** (10 follows NIST's minimum of 8 with margin; ASVS asks 12). |
+| 2.1.1 | Passwords at least 12 characters | ❌ | **Accepted exception (owner decision D-056):** minimum **6**, because long passwords put people off. Below ASVS (12) and NIST SP 800-63B (8). Mitigations: breached-password check, sign-in limits (5 per 15 min per address, 20 per IP), mandatory TOTP for staff, «Vis passord». |
 | 2.1.2 | Allow at least 64 characters | ✅ | Up to 128. |
 | 2.1.3 | No truncation | ✅ | Better Auth hashes the whole password (scrypt). |
 | 2.1.4 | Any printable Unicode | ✅ | No character restrictions. |
@@ -33,7 +33,7 @@ Legend: ✅ met · 🟡 partly met or met differently · ❌ not met · ⏳ need
 | 3.1.1 | No session tokens in URLs | ✅ | Cookie only. |
 | 3.2.1–3.2.3 | New token on sign-in, enough entropy, stored safely | ✅ | Better Auth; `__Host-` cookie (fixed in P03-05). |
 | 3.3.1 | Sign-out invalidates the session | ✅ | Server-side session deleted; «Logg ut fra alle enheter». |
-| 3.3.2 | Periodic re-authentication (L1: 30 days) | 🟡 | Sessions last 30 days and are **rolling** (renewed daily while used). Staff sessions end after 8 h for admin use. An absolute 30-day limit for members is not enforced. |
+| 3.3.2 | Periodic re-authentication (L1: 30 days) | 🟡 | Sessions last 30 days and are **rolling** (renewed daily while used), so an active member stays signed in. Staff sessions end after 8 h for admin use. Explained to the owner 25.10.2026; the convenient behaviour is kept unless the owner asks for a fixed limit. |
 | 3.4.1–3.4.5 | Secure, HttpOnly, SameSite, `__Host-`, Path | ✅ | e2e `security.spec.ts`. |
 | 3.7.1 | Re-authentication for sensitive actions | ✅ | Email change, password change, account deletion, 2FA. |
 
@@ -133,9 +133,9 @@ Legend: ✅ met · 🟡 partly met or met differently · ❌ not met · ⏳ need
 
 ## Open items from this checklist
 
-1. **2.1.1** password length 10 vs 12 — owner decision.
+1. **2.1.1** minimum 6 characters — accepted by the owner as an exception (D-056).
 2. **2.1.8 / 2.1.12** strength meter and «Vis passord» — small UI tasks.
-3. **3.3.2** absolute session lifetime for members — decide whether rolling 30 days is acceptable.
+3. **3.3.2** rolling 30-day sessions for members — kept as the default (explained to the owner 25.10.2026).
 4. **12.4.2** no antivirus — accepted risk while only re-encoded images are allowed.
 5. **14.2.1** add OSV-Scanner to CI.
 6. **V9, 10.3.2, 14.4.5** — verify on the server in Phase 04.

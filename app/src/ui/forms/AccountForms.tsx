@@ -8,6 +8,7 @@ import {
   confirmTwoFactorAction,
   startTwoFactorAction,
 } from "@/modules/auth/actions";
+import { PASSWORD_MAX, PASSWORD_MIN } from "@/modules/auth/password-rules";
 import { idle } from "@/modules/server/action";
 import { updateProfileAction } from "@/modules/users/actions";
 import { Notice } from "@/ui/Notice";
@@ -200,8 +201,8 @@ export function ChangePasswordForm() {
           type="password"
           autoComplete="new-password"
           required
-          minLength={10}
-          maxLength={128}
+          minLength={PASSWORD_MIN}
+          maxLength={PASSWORD_MAX}
           aria-invalid={invalid(state, "newPassword")}
         />
         <FieldError state={state} name="newPassword" />

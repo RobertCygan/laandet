@@ -9,7 +9,7 @@
 | Library | Better Auth (self-hosted, same app and database). No custom cryptography. |
 | Sign-up | Email + password + display name + locality (optional). The user must tick three confirmations, each stored with a timestamp: **(1)** «Jeg er 18 år eller eldre», **(2)** «Jeg bruker Laandet som privatperson, ikke i næringsvirksomhet», **(3)** «Jeg godtar brukervilkårene» (links to the terms and the privacy notice). |
 | Email verification | A link valid for 24 hours. Until the email is verified, the user can only browse, edit their profile and resend the link. |
-| Password rules | Minimum 10 characters, maximum 128. Rejected if found in the breached-password corpus (k-anonymity check). No composition rules. Hashed with scrypt (Better Auth default). |
+| Password rules | Minimum 6 characters (owner decision D-056, 25.10.2026; was 10), maximum 128. Rejected if found in the breached-password corpus (k-anonymity check). No composition rules. Hashed with scrypt (Better Auth default). |
 | Sign-in | Email + password. Optional passkey (flag `passkeys`). Generic error message: «Feil e-post eller passord». The message is the same whether or not the account exists. |
 | Password reset | An emailed link, valid for 1 hour and single use. A successful reset revokes all other sessions. The response is identical whether or not the email exists. |
 | Sessions | Database sessions, stored in a cookie named `__Host-laandet.session`. Cookie attributes: `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`. Lifetime: 30 days, rolling. For staff: 8 hours, with no "remember me". |

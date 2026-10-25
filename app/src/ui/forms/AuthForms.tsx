@@ -12,6 +12,7 @@ import {
   signUpAction,
   totpAction,
 } from "@/modules/auth/actions";
+import { PASSWORD_MAX, PASSWORD_MIN } from "@/modules/auth/password-rules";
 import { idle } from "@/modules/server/action";
 import { Link } from "@/i18n/navigation";
 import { Notice } from "@/ui/Notice";
@@ -79,8 +80,8 @@ export function SignUpForm({
           type="password"
           autoComplete="new-password"
           required
-          minLength={10}
-          maxLength={128}
+          minLength={PASSWORD_MIN}
+          maxLength={PASSWORD_MAX}
           aria-invalid={invalid(state, "password")}
           aria-describedby="password-error"
         />
@@ -238,8 +239,8 @@ export function ResetPasswordForm({ token }: { token: string }) {
           type="password"
           autoComplete="new-password"
           required
-          minLength={10}
-          maxLength={128}
+          minLength={PASSWORD_MIN}
+          maxLength={PASSWORD_MAX}
           aria-invalid={invalid(state, "password")}
         />
         <FieldError state={state} name="password" />

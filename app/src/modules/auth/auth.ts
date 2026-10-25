@@ -9,6 +9,7 @@ import { accounts, rateLimits, sessions, twoFactors, userProfiles, users, verifi
 import { env, hibpEnabled } from "@/modules/config/env";
 import { queueEmail } from "@/modules/notifications/outbox";
 import { hashIp } from "@/modules/server/request-meta";
+import { PASSWORD_MAX, PASSWORD_MIN } from "./password-rules";
 
 const DAY = 24 * 60 * 60;
 
@@ -46,8 +47,8 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
-    minPasswordLength: 10,
-    maxPasswordLength: 128,
+    minPasswordLength: PASSWORD_MIN,
+    maxPasswordLength: PASSWORD_MAX,
     autoSignIn: false,
     revokeSessionsOnPasswordReset: true,
     resetPasswordTokenExpiresIn: 60 * 60,
