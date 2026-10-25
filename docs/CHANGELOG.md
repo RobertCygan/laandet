@@ -71,6 +71,7 @@ All notable changes to Laandet. Dates are DD.MM.YYYY.
   - rental: request → accept → both accept the agreement → handover with a photo → return → completed. A third user gets 404 for the photo and the booking;
   - giveaway: claim → choose → both confirm → «Gitt bort»;
   - messaging (on the Pixel 7 profile): N2 + N9, the payment warning and polling.
+- **CI (`laandet-ci`):** green on 25.10.2026 for all five jobs on commit `3cdee3b` (lint/format/types, unit, integration on PostgreSQL 17, build + Playwright, secrets/audit).
 
 ### Not done / known gaps
 - **Rentals are closed by default.** `rentals_open` is off until the owner decides to open them. Category B stays blocked (BankID, deposits and the extended agreement are later phases).
