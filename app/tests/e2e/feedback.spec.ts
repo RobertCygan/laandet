@@ -14,7 +14,7 @@ test.describe("closed beta (P04-01) at 390 px", () => {
     await registerAndVerify(member, uniqueEmail("p04-tilbakemelding"), "Tove T.");
     await member.goto("/utforsk");
     await member.getByRole("contentinfo").getByRole("link", { name: "Gi tilbakemelding" }).click();
-    await expect(member).toHaveURL(/\/tilbakemelding$/);
+    await expect(member).toHaveURL(/\/tilbakemelding\?fra=%2Futforsk$/);
     await expect(member.getByText("Siden du kom fra: /utforsk")).toBeVisible();
     await accessible(member);
     await noHorizontalScroll(member);
@@ -32,7 +32,7 @@ test.describe("closed beta (P04-01) at 390 px", () => {
     await accessible(mod);
     await mod.getByRole("button", { name: "Marker som behandlet" }).first().click();
     await expect(mod.getByText("Tilbakemeldingen er markert som behandlet.")).toBeVisible();
-    await expect(mod.getByRole("heading", { name: "Behandlet" })).toBeVisible();
+    await expect(mod.getByRole("heading", { name: "Behandlet", exact: true })).toBeVisible();
     expect(problems).toEqual([]);
   });
 });

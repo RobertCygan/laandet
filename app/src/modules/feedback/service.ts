@@ -8,22 +8,13 @@ import { assertCan } from "@/modules/authz/policy";
 import { AppError } from "@/modules/errors";
 import { enforceRateLimits, LIMITS } from "@/modules/ratelimit/ratelimit";
 import { getRequestMeta } from "@/modules/server/request-meta";
+import { cleanPagePath } from "./page-path";
 
-/**
- * «Gi tilbakemelding» (P04-01): what beta testers and members tell us, in one place for staff. The page it
- * came from is kept as a path only (no query string, which could hold a token).
- */
+/** «Gi tilbakemelding» (P04-01): what beta testers and members tell us, in one place for staff. */
 export const feedbackSchema = z.object({
   kind: z.enum(FEEDBACK_KINDS, { error: "required" }),
   body: z.string().trim().min(3, { error: "required" }).max(2000, { error: "too_long" }),
-  pagePath: z
-    .string()
-    .trim()
-    .optional()
-    .transform((v) => {
-      const path = v?.split(/[?#]/)[0];
-      return path && /^\/[\w\-/.]{0,299}$/.test(path) ? path : null;
-    }),
+  pagePath: z.string().optional().transform(cleanPagePath),
 });
 
 export async function sendFeedback(actor: Actor, input: z.infer<typeof feedbackSchema>): Promise<void> {

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { pageLocale, param } from "@/i18n/page";
 import { requirePageUser } from "@/modules/auth/guards";
+import { cleanPagePath } from "@/modules/feedback/page-path";
 import { FeedbackForm } from "@/ui/feedback/FeedbackForms";
 import { PageHeader } from "@/ui/layout/PageHeader";
 import { Notice } from "@/ui/Notice";
@@ -15,7 +16,9 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function FeedbackPage({ params, searchParams }: PageProps<"/[locale]/tilbakemelding">) {
   const locale = await pageLocale(params);
   await requirePageUser(locale, "/tilbakemelding");
-  const thanks = param((await searchParams).takk) === "1";
+  const sp = await searchParams;
+  const thanks = param(sp.takk) === "1";
+  const pagePath = cleanPagePath(param(sp.fra));
   const t = await getTranslations("feedback");
   return (
     <div className="wrap flex max-w-2xl flex-col gap-6 py-10">
@@ -26,7 +29,7 @@ export default async function FeedbackPage({ params, searchParams }: PageProps<"
         </Notice>
       )}
       <section className="card p-6">
-        <FeedbackForm locale={locale} />
+        <FeedbackForm locale={locale} pagePath={pagePath} />
       </section>
       <p className="fine-print">{t("privacy")}</p>
     </div>

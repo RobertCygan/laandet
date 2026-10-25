@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useSyncExternalStore } from "react";
+import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 import { markFeedbackHandledAction, sendFeedbackAction } from "@/modules/feedback/actions";
 import { idle } from "@/modules/server/action";
@@ -9,29 +9,15 @@ import { FieldError, FormError, invalid, prev } from "@/ui/forms/FormMessages";
 
 const KINDS = ["error", "suggestion", "other"] as const;
 
-const noSubscription = () => () => {};
-
-/** The page the person came from (same site only, path without query), so staff know where it happened. */
-function referrerPath(): string {
-  try {
-    const ref = document.referrer ? new URL(document.referrer) : null;
-    return ref && ref.origin === window.location.origin ? ref.pathname : "";
-  } catch {
-    return "";
-  }
-}
-
-export function FeedbackForm({ locale }: { locale: "nb" | "en" }) {
+export function FeedbackForm({ locale, pagePath }: { locale: "nb" | "en"; pagePath: string | null }) {
   const t = useTranslations("feedback");
   const tc = useTranslations("common");
   const [state, action] = useActionState(sendFeedbackAction, idle);
-  // Empty on the server; the browser fills it in after hydration.
-  const pagePath = useSyncExternalStore(noSubscription, referrerPath, () => "");
   return (
     <form action={action} className="flex flex-col gap-5">
       <FormError state={state} />
       <input type="hidden" name="locale" value={locale} />
-      <input type="hidden" name="pagePath" value={pagePath} />
+      {pagePath && <input type="hidden" name="pagePath" value={pagePath} />}
       <fieldset className="flex flex-col gap-2">
         <legend className="mb-1 text-sm font-semibold">{t("kindLabel")}</legend>
         {KINDS.map((k) => (

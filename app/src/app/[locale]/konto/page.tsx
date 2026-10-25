@@ -162,7 +162,7 @@ export default async function AccountPage({ params, searchParams }: PageProps<"/
             {t("feedbackHeading")}
           </h2>
           <p className="mb-4">{t("feedbackLead")}</p>
-          <Link href="/tilbakemelding" className="button button-outline">
+          <Link href="/tilbakemelding?fra=/konto" className="button button-outline">
             {t("feedbackLink")}
           </Link>
         </section>

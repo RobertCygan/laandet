@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { FeedbackLink } from "./feedback/FeedbackLink";
 import { Logo } from "./Logo";
 
 export async function SiteFooter() {
@@ -21,7 +22,7 @@ export async function SiteFooter() {
           <Link href="/stott-laandet">{t("support")}</Link>
           <Link href="/apenhet">{t("transparency")}</Link>
           <Link href="/kontakt">{t("contact")}</Link>
-          <Link href="/tilbakemelding">{t("feedback")}</Link>
+          <FeedbackLink label={t("feedback")} />
         </div>
         <div>
           <h3>{t("rulesHeading")}</h3>
