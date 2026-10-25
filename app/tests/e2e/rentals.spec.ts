@@ -1,48 +1,6 @@
-import path from "node:path";
-import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
-import { publishRental, query, registerAndVerify, uniqueEmail, watchForInjection } from "./support";
-
-const PHOTO = path.resolve("seed/demo-images/equipment-1.webp");
-const osloDate = (d: Date) => new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Oslo" }).format(d);
-const inDays = (n: number) => osloDate(new Date(Date.now() + n * 24 * 3600 * 1000));
-
-async function setRentalsOpen(on: boolean) {
-  await query(
-    `INSERT INTO feature_flags (key, enabled, description) VALUES ('rentals_open', $1, 'e2e')
-     ON CONFLICT (key) DO UPDATE SET enabled = $1`,
-    [on],
-  );
-}
-
-/** No serious or critical axe violations (WCAG 2.1 AA), as in the smoke tests. */
-async function accessible(page: Page) {
-  const results = await new AxeBuilder({
-    page: page as unknown as ConstructorParameters<typeof AxeBuilder>[0]["page"],
-  })
-    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
-    .analyze();
-  const serious = results.violations.filter((v) => v.impact === "serious" || v.impact === "critical");
-  expect(serious.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`)).toEqual([]);
-}
-
-async function noHorizontalScroll(page: Page) {
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-  expect(overflow).toBeLessThanOrEqual(0);
-}
-
-/** Records this party's condition entry on the open page (handover or return). */
-async function addEntry(page: Page, opts: { photo?: boolean; outcome?: string } = {}) {
-  await page.getByRole("combobox", { name: "Tilstand", exact: true }).selectOption("good");
-  await page.getByRole("combobox", { name: "Fungerer den?" }).selectOption("works");
-  if (opts.outcome) await page.getByLabel(opts.outcome).check();
-  if (opts.photo) {
-    await page.locator('input[type="file"][capture="environment"]').setInputFiles(PHOTO);
-    await expect(page.locator('input[name="photoId"]')).toHaveCount(1, { timeout: 20_000 });
-  }
-  await page.getByRole("button", { name: "Lagre registreringen" }).click();
-  await expect(page.getByText("Registreringen er lagret.")).toBeVisible();
-}
+import { accessible, addEntry, confirmEntry, inDays, noHorizontalScroll, setRentalsOpen } from "./flows";
+import { publishRental, registerAndVerify, uniqueEmail, watchForInjection } from "./support";
 
 /** Rates every criterion on the open review page and sends the review. */
 async function writeReview(page: Page, comment: string, renter: boolean) {
@@ -50,11 +8,6 @@ async function writeReview(page: Page, comment: string, renter: boolean) {
     await page.locator(`input[name="${name}"][value="5"]`).check();
   await page.getByRole("textbox", { name: /Kommentar/ }).fill(comment);
   await page.getByRole("button", { name: "Send vurdering" }).click();
-}
-
-async function confirmEntry(page: Page, checklist: boolean) {
-  if (checklist) for (const box of await page.locator('input[name="check"]').all()) await box.check();
-  await page.getByRole("button", { name: "Bekreft", exact: true }).click();
 }
 
 test.describe("Phase 02 journeys at 390 px", () => {

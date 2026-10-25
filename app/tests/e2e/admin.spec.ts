@@ -1,32 +1,8 @@
-import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
-import { grantRole, query, registerAndVerify, signIn, totp, uniqueEmail } from "./support";
+import { accessible, staffWithTotp } from "./flows";
+import { query } from "./support";
 
-/** No serious or critical axe violations (WCAG 2.1 AA), as in the smoke tests. */
-async function accessible(page: Page) {
-  const results = await new AxeBuilder({
-    page: page as unknown as ConstructorParameters<typeof AxeBuilder>[0]["page"],
-  })
-    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
-    .analyze();
-  const serious = results.violations.filter((v) => v.impact === "serious" || v.impact === "critical");
-  expect(serious.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`)).toEqual([]);
-}
-
-async function adminWithTotp(page: Page) {
-  const email = uniqueEmail("admin");
-  await registerAndVerify(page, email, "Admin A.");
-  grantRole(email, "admin");
-  await signIn(page, email);
-  await page.goto("/admin");
-  await expect(page).toHaveURL(/\/konto\/tofaktor/);
-  await page.getByLabel("Passord").fill("en lang og trygg setning");
-  await page.getByRole("button", { name: "Start oppsett" }).click();
-  const secret = (await page.locator("code").first().textContent())!.replace(/\s/g, "");
-  await page.getByLabel("Kode").fill(totp(secret));
-  await page.getByRole("button", { name: "Bekreft med kode" }).click();
-  await expect(page.getByText("Tofaktorinnlogging er slått på.")).toBeVisible();
-}
+const adminWithTotp = (page: Page) => staffWithTotp(page, "admin");
 
 const REASON = "Pilotdrift: endring avtalt med eieren.";
 
