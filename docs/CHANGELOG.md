@@ -2,7 +2,7 @@
 
 All notable changes to Laandet. Dates are DD.MM.YYYY.
 
-## [Phase 04] — 25.10.2026 (waiting for the owner's approval; not deployed)
+## [Phase 04] — 25.10.2026 (approved by the owner: «Zatwierdzam Phase 04»; not deployed)
 
 The code and documents for the beta, the go/no-go gates and the launch. The beta and the launch themselves need the
 owner's purchases (server, domain, email provider), a lawyer, beta testers and a moderator.
