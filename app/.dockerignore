@@ -1,0 +1,26 @@
+# Never send secrets, local data or build output into the image build (SEC-40).
+.env*
+!.env.example
+.data
+.next
+node_modules
+npm-debug.log*
+*.tsbuildinfo
+next-env.d.ts
+
+# Test output is never needed. (The tests themselves stay in the build context because `next build`
+# type-checks every file in tsconfig.json; the runtime stage does not copy them.)
+test-results
+playwright-report
+blob-report
+playwright
+coverage
+
+# Docker and editor files
+Dockerfile
+.dockerignore
+.git
+.vscode
+.idea
+*.swp
+.DS_Store

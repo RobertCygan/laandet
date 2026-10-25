@@ -1,0 +1,7 @@
+# Server path: /opt/laandet/edge/secrets/staging-basic-auth.caddy (root, mode 0644 inside a 0700 directory)
+# Create the hash with:
+#   docker run --rm caddy:2.11.7 caddy hash-password --plaintext 'a long random password'
+# Share the password with testers through the owner's password manager, never by email.
+basic_auth @protected {
+	tester $2a$14$REPLACE_WITH_THE_BCRYPT_HASH_FROM_CADDY_HASH_PASSWORD
+}

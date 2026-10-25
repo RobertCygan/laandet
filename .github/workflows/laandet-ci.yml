@@ -1,0 +1,170 @@
+# Laandet CI (docs/TEST_STRATEGY.md §6).
+name: laandet-ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: laandet-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: app
+
+env:
+  NEXT_TELEMETRY_DISABLED: "1"
+  # Local-only credentials for the throwaway CI database (created by scripts/db-setup-local.sh).
+  TEST_DATABASE_URL: postgres://laandet_app:laandet_app_dev@localhost:5432/laandet_test
+  TEST_DATABASE_MIGRATION_URL: postgres://laandet_owner:laandet_owner_dev@localhost:5432/laandet_test
+
+jobs:
+  lint:
+    name: Lint, format and types
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+      - run: npx eslint .
+      - run: npx prettier --check .
+      - run: npm run typecheck
+
+  unit:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+      - run: npm run test:unit
+
+  integration:
+    name: Database and integration tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGHOST: localhost
+      PGUSER: postgres
+      PGPASSWORD: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+      - name: Create roles and databases
+        run: sh scripts/db-setup-local.sh
+      # Migrations, reference data and legal texts are applied by the test global setup.
+      - run: npm run test:integration
+
+  e2e:
+    name: Build and end-to-end tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGHOST: localhost
+      PGUSER: postgres
+      PGPASSWORD: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+      - name: Create roles and databases
+        run: sh scripts/db-setup-local.sh
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - run: npm run test:e2e
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            app/playwright-report
+            app/test-results
+          retention-days: 7
+
+  security:
+    name: Secrets and dependency audit
+    runs-on: ubuntu-latest
+    # Building gitleaks and OSV-Scanner from source takes a few minutes.
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+          cache: false
+      # The whole history, every time. (gitleaks-action scans "from the parent of the PR's first commit",
+      # which does not exist when a PR brings in a history of its own, as the move from G-PSI_WWW did.)
+      - name: Scan for committed secrets
+        working-directory: ${{ github.workspace }}
+        run: |
+          go install github.com/zricethezav/gitleaks/v8@v8.24.3
+          "$(go env GOPATH)/bin/gitleaks" detect --source . --redact --verbose --no-banner
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+      # SEC-60: OSV-Scanner on the whole lockfile. High and critical findings fail (scripts/osv-gate.mjs).
+      - name: Install OSV-Scanner
+        run: go install github.com/google/osv-scanner/v2/cmd/osv-scanner@v2.7.0
+      - name: OSV-Scanner
+        run: |
+          set +e
+          "$(go env GOPATH)/bin/osv-scanner" --lockfile package-lock.json --format json --output-file osv.json
+          code=$?
+          set -e
+          # 0: nothing found; 1: findings, judged by severity below; anything else is a scanner error.
+          if [ "$code" -gt 1 ]; then exit "$code"; fi
+          node scripts/osv-gate.mjs osv.json
