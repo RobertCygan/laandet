@@ -61,4 +61,8 @@ export const LIMITS = {
   // Rental requests and giveaway claims share one limit.
   requestsNew: { max: 5, windowSeconds: 24 * 60 * 60 },
   requestsEstablished: { max: 15, windowSeconds: 24 * 60 * 60 },
+  // Phase 03: steps in a case (statements, proposals, answers) and in a booking (condition entries,
+  // changes of terms), per person and day.
+  caseSteps: { max: 60, windowSeconds: 24 * 60 * 60 },
+  bookingSteps: { max: 40, windowSeconds: 24 * 60 * 60 },
 } satisfies Record<string, RateRule>;

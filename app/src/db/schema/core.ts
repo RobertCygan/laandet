@@ -58,8 +58,12 @@ export const userProfiles = pgTable(
     emailNotifications: boolean("email_notifications").notNull().default(true),
     deletionRequestedAt: ts("deletion_requested_at"),
     deletedAt: ts("deleted_at"),
+    // Last request with a valid session, stored at most once a day (getActor). Drives the inactivity job.
+    lastSeenAt: ts("last_seen_at").notNull().defaultNow(),
     createdAt: ts("created_at").notNull().defaultNow(),
     updatedAt: ts("updated_at").notNull().defaultNow(),
+    // Set by the database on every change the app makes (0010); retention waits for it, not for app dates.
+    lastChangedAt: ts("last_changed_at").notNull().defaultNow(),
   },
   (t) => [
     check("user_profiles_bio_len", sql`char_length(${t.bio}) <= 500`),

@@ -45,6 +45,23 @@ test("SEC-11, SEC-12, N10: a __Host- HttpOnly Secure SameSite=Lax session that s
   await page.goto("/konto");
   await expect(page).toHaveURL(/\/konto$/);
 
+  // L4: the data export is a same-origin POST from the account page; GET and foreign posts do nothing.
+  const download = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Last ned mine data (JSON)" }).click();
+  expect((await download).suggestedFilename()).toMatch(/^laandet-mine-data-\d{4}-\d{2}-\d{2}\.json$/);
+  expect((await page.request.get("/konto/mine-data", { maxRedirects: 0, failOnStatusCode: false })).status()).toBe(405);
+  const foreign = await page.request.post("/konto/mine-data", {
+    headers: { Origin: "https://evil.example" },
+    maxRedirects: 0,
+    failOnStatusCode: false,
+  });
+  expect(foreign.status()).toBe(403);
+  const [exports] = await query<{ n: string }>(
+    "SELECT count(*) AS n FROM audit_events WHERE action = 'user.data_export' AND actor_id = (SELECT id FROM users WHERE email = $1)",
+    [email],
+  );
+  expect(Number(exports!.n)).toBe(1);
+
   // The status is read on every request: a deleted account is signed out at once, session row or not.
   await query("UPDATE user_profiles SET status = 'deleted' WHERE user_id = (SELECT id FROM users WHERE email = $1)", [
     email,

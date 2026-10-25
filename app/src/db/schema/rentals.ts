@@ -25,6 +25,11 @@ import { legalDocumentVersions } from "./legal";
 // the acceptance trigger and the append-only privileges are in drizzle/0004_rentals_rules.sql.
 
 const ts = (name: string) => timestamp(name, { withTimezone: true });
+/**
+ * Set by the database on every insert and update the app role makes (migration 0010). Retention purges
+ * wait for it as well as for the closure date, so the app cannot backdate a row into an early purge.
+ */
+const lastChangedAt = () => ts("last_changed_at").notNull().defaultNow();
 const ore = (name: string) => bigint(name, { mode: "number" });
 const tstzrange = customType<{ data: string }>({
   dataType() {
@@ -166,6 +171,7 @@ export const bookings = pgTable(
     remindersSent: jsonb("reminders_sent").$type<string[]>().notNull().default([]),
     createdAt: ts("created_at").notNull().defaultNow(),
     updatedAt: ts("updated_at").notNull().defaultNow(),
+    lastChangedAt: lastChangedAt(),
   },
   (t) => [
     index("bookings_owner_idx").on(t.ownerId, t.status),
@@ -250,6 +256,7 @@ export const giveawayClaims = pgTable(
     transferredAt: ts("transferred_at"),
     createdAt: ts("created_at").notNull().defaultNow(),
     updatedAt: ts("updated_at").notNull().defaultNow(),
+    lastChangedAt: lastChangedAt(),
   },
   (t) => [
     unique("giveaway_claims_listing_claimant_uq").on(t.listingId, t.claimantId),
@@ -539,6 +546,7 @@ export const disputes = pgTable(
     // Opened after the recommended Laandet deadline: still accepted, but marked (DISPUTE_POLICY §3).
     reportedLate: boolean("reported_late").notNull().default(false),
     reopenedAt: ts("reopened_at"),
+    lastChangedAt: lastChangedAt(),
   },
   (t) => [
     check("disputes_not_self", sql`${t.openedBy} <> ${t.respondentId}`),

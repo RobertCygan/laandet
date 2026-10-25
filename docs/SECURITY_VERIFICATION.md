@@ -16,11 +16,11 @@ Legend: ✅ verified by an automated test · 🔎 verified by code review or a l
 | SEC-10 Better Auth only | 🔎 ✅ | No custom crypto in the code; `auth.int.test.ts` (sign-up, enumeration, bot checks). Only the two email links of the auth HTTP API are public (e2e `smoke.spec.ts`, D-041). |
 | SEC-11 session cookie | ✅ | e2e `security.spec.ts`: `__Host-laandet.session`, HttpOnly, Secure, SameSite=Lax, Path=/, no Domain. **Fixed in P03-05:** the cookie was named `__Secure-__Host-…` before (Better Auth added a prefix). |
 | SEC-12 session revocation | ✅ | Suspension deletes every session (`moderation-measures.int.test.ts`); status checked on every request — a deleted account is signed out at the next page (e2e `security.spec.ts`); password change and reset revoke other sessions (Better Auth setting, `auth/service.ts`). |
-| SEC-13 rate limits | ✅ | Listings (3/day new accounts), messages (61st in an hour), reports (11th in a day) refused in integration tests. Every app-level hit writes `abuse.rate_limited` (**added in P03-05**, asserted in `listings.int.test.ts`); the operations page counts them. |
+| SEC-13 rate limits | ✅ | Listings (3/day new accounts), messages (61st in an hour), reports (11th in a day), case steps (61st in a day) refused in integration tests. Every app-level hit writes `abuse.rate_limited` (**added in P03-05**, asserted in `listings.int.test.ts` and `disputes.int.test.ts`); the operations page counts them. **Review fixes:** limits for case and booking steps (M4); the new-conversation limit is checked before the transaction, so its audit row is kept (L6); the per-email key is an HMAC (`security.int.test.ts`). |
 | SEC-14 staff 2FA, 8 h | ✅ | `moderation.int.test.ts` (no 2FA → refused, stale session → refused); policy unit tests; e2e journeys set up real TOTP. |
-| SEC-20 server-side authorisation, 404 | ✅ 🔎 | 70 policy unit tests (every Phase 01–03 action); negative integration tests per area (N1, N2, N13, N15, bookings, claims, cases, reviews, export); lint rule forbids `@/db/client` in `app/` and `ui/`. |
+| SEC-20 server-side authorisation, 404 | ✅ 🔎 | 79 policy unit tests (every Phase 01–03 action, including `evidence.upload` and accounts waiting for erasure, review L5); negative integration tests per area (N1, N2, N13, N15, bookings, claims, cases, reviews, export); lint rule forbids `@/db/client` in `app/` and `ui/`. |
 | SEC-21 no privileged fields from input | ✅ | `security.int.test.ts`: profile, request, change of terms, review, case and measure inputs drop `role`, `status`, money terms and similar. Note: the schemas strip unknown keys rather than reject them (`.strict()`); the effect for privileged fields is the same, and the database guards contracts, reviews, proposals and booking terms with column privileges and triggers. |
-| SEC-22 CSRF | ✅ | e2e `security.spec.ts`: a Server Action posted with a foreign `Origin` is refused, the same action works from the site. No state-changing GET routes (the data export is a read-only GET). |
+| SEC-22 CSRF | ✅ | e2e `security.spec.ts`: a Server Action posted with a foreign `Origin` is refused, the same action works from the site. No state-changing GET routes: the data export (counted and audited) is a same-origin POST, GET gives 405 and a foreign `Origin` 403 (review L4, same spec). |
 | SEC-23 SQL injection | 🔎 | Drizzle query builder and `sql` templates only; lint bans `sql.raw` (used only in a test helper). |
 | SEC-24 XSS | ✅ 🔎 | Lint bans `dangerouslySetInnerHTML`; legal Markdown renderer skips HTML (unit test with a malicious fixture); e2e N9 for names, listings and messages; cases, reviews and agreement texts are rendered as text or through the same safe Markdown renderer. |
 | SEC-25 validation | ✅ | Zod schemas plus database `CHECK`s (lengths, enums, øre as integers); unit and integration tests per area. |
@@ -33,11 +33,11 @@ Legend: ✅ verified by an automated test · 🔎 verified by code review or a l
 | SEC-41 separate environments | ⏳ | Deploy files separate staging and production; checked at release. |
 | SEC-42 generic error page | 🟡 | **Added in P03-05:** localized error page and a last-resort global page that show only the reference code (digest). Not covered by an automated test: the production build has no route that fails on purpose. |
 | SEC-43 nothing personal in logs | ✅ | **Added in P03-05:** `safeError` removes query parameters and email addresses from logged errors and from errors stored in `worker_heartbeats` (unit test); a failed message write never carries the text (`messaging.int.test.ts`); IPs only as HMAC hashes. |
-| SEC-50 audit log | ✅ | Integration tests assert audit rows for moderation, appeals, flags, category and transparency changes, case grants and staff views, rate-limit hits and data exports; append-only (`privileges.int.test.ts`). |
+| SEC-50 audit log | ✅ | Integration tests assert audit rows for moderation, appeals, flags, category and transparency changes, case grants and staff views, rate-limit hits and data exports; append-only (`privileges.int.test.ts`). The audit purge never goes below 24 months, whatever the caller passes (review M1, `privacy.int.test.ts`). |
 | SEC-51 admin interface | ✅ | Role + 2FA + fresh session for `/admin`; every admin change needs a reason (`admin.int.test.ts`); no bulk export of personal data. |
-| SEC-52 least privilege | ✅ | `privileges.int.test.ts`; append-only and column privileges for contracts, acceptances, condition evidence, case events, grants, reviews and proposals (integration tests per area). |
+| SEC-52 least privilege | ✅ | `privileges.int.test.ts`; append-only and column privileges for contracts, acceptances, condition evidence, case events, grants, reviews and proposals (integration tests per area). Functions with elevated rights use `search_path = public, pg_temp` (review L7, `0010`). |
 | SEC-53 backups and restore | ⏳ | restic backup and scripted restore tested locally with Docker (P01-13). The first real restore test is a Phase 04 gate. |
-| SEC-54 retention jobs | ✅ | `privacy.int.test.ts`: each job deletes what PRIVACY §5 says and nothing newer; account erasure waits for open bookings. |
+| SEC-54 retention jobs | ✅ | `privacy.int.test.ts`: each job deletes what PRIVACY §5 says and nothing newer; account erasure waits for open bookings. **Review fixes:** the app role cannot backdate a row into an early purge (database-stamped `last_changed_at`, M1 test); inactivity is measured by `last_seen_at`, so staff and members with rolling sessions are not warned or erased while active (H1 test). |
 | SEC-60 dependencies | 🟡 | Lockfile, Dependabot, `npm audit --omit=dev --audit-level=high` in CI. OSV-Scanner is not in CI yet. |
 | SEC-61 container | 🔎 | Pinned base image digest, non-root, read-only root filesystem (Dockerfile, checked with Docker in P01-13). |
 | SEC-62 server hardening | ⏳ | Release checklist; needs the server. |
@@ -66,4 +66,6 @@ Legend: ✅ verified by an automated test · 🔎 verified by code review or a l
 ## Independent review
 
 A separate read-only review of the Phase 02–03 code was done by an independent agent (not the implementer).
-Its findings and what was done about each are in the Phase 03 entry of [`CHANGELOG.md`](CHANGELOG.md).
+It found 1 high, 4 medium and 7 low issues, plus an unkeyed email hash. Each was checked against the code and
+fixed with a test. One race test (L2) was also run without the fix to confirm that it fails. The table with
+each finding, fix and test is in the Phase 03 entry of [`CHANGELOG.md`](CHANGELOG.md).

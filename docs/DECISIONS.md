@@ -447,3 +447,69 @@ during Phase 01 start as *Proposed* (implementation-level) unless the owner says
   - Message notices respect the user's email setting. Booking and handover notices are essential and always sent.
 - **Status:** Accepted 25.10.2026 (owner approved Phase 02: «Zatwierdzam Phase 02»).
 
+
+## D-048 — How Laandet handles a case
+- **Context:** DISPUTE_POLICY asks Laandet to help two neighbours agree, not to judge them or hold money.
+- **Decision:**
+  - The parties talk in the case first: statements, photos, a referenced message, proposals and answers.
+  - Staff see the case text and photos only after «Ta saken» with a written reason. That gives a 30-day grant, and every view is audited. Without a grant the queue shows metadata only.
+  - The staff recommendation has three parts and is non-binding. It only resolves the case if both parties accept it.
+  - Staff can reopen a case within 30 days of closing, and only if a party once asked Laandet for help.
+  - When a case closes, a disputed booking returns to completed. The outcome stays on the case and is never shown on a profile (N12).
+- **Status:** Proposed (Phase 03).
+
+## D-049 — Double-blind reviews
+- **Decision:**
+  - Reviews only for completed rentals, one per party, written within 14 days. The window restarts when a later case closes.
+  - A review stays sealed until both parties have written or the window ends, and is held while a case is open.
+  - Giveaways have no reviews.
+  - A deleted author is shown as «Tidligere medlem».
+  - Staff can remove a review only with a statement of reasons, and the author can appeal.
+- **Status:** Proposed (Phase 03).
+
+## D-050 — Account measures and appeals
+- **Decision:**
+  - Four measures: warn, restrict (optionally until a date), suspend (all sessions revoked) and reinstate. Each comes with a statement of reasons and an email, and can be appealed.
+  - Staff never act on themselves or in a case they are part of. Only admins act on staff accounts.
+  - A measure can only close a report about that member.
+  - An appeal is decided once, by someone other than the original decider when another staff member exists.
+  - A restricted member can still document their own rentals (condition and case photos, `evidence.upload`).
+  - An account waiting for erasure can still finish its bookings, claims and cases, since the erasure waits for exactly those.
+- **Status:** Proposed (Phase 03).
+
+## D-051 — Retention the application cannot pull forward
+- **Context:** The security review (M1) found that the purge periods were measured from dates the application writes itself.
+- **Decision:**
+  - Append-only records are purged only by database functions with fixed periods.
+  - Each purge also waits for `last_changed_at`, which the database stamps on every change the app role makes.
+  - The audit log purge never goes below 24 months.
+  - Inactivity is measured by `last_seen_at`, stored at most once a day by signed-in requests, not by sign-in records.
+- **Trade-off:** A record changed after it closed is kept for the full period from that change. That can be slightly longer than PRIVACY §5 states, never shorter.
+- **Status:** Proposed (Phase 03).
+
+## D-052 — «Last ned mine data» as a same-origin POST
+- **Decision:**
+  - The export is a JSON file with the person's own data. It leaves out other people's email addresses, staff-only notes and sealed reviews about the person.
+  - It is limited to five a day and audited.
+  - It runs as a form POST checked for our own origin, so another site cannot trigger it.
+- **Status:** Proposed (Phase 03).
+
+## D-053 — Cookie names set in full
+- **Context:** Better Auth added `__Secure-` in front of our names, giving `__Secure-__Host-laandet.session`.
+- **Decision:**
+  - `useSecureCookies: false`, with the full names given in the configuration: `__Host-laandet.session`, `__Host-laandet.session_data`, `__Host-laandet.dont_remember` and `__Secure-laandet.two_factor`.
+  - `Secure` is set through the default cookie attributes.
+  - The e2e test checks the attributes.
+- **Status:** Proposed (Phase 03).
+
+## D-054 — Booking money terms fixed in the database
+- **Decision:** A trigger refuses any change to the parties, listing, conversation, value, price, price unit or deposit of a booking after the request. This covers every role. A change of period or handover method (a new agreement revision) only touches period, units, total and methods. There is no endpoint that moves or deducts a deposit (N6).
+- **Status:** Proposed (Phase 03).
+
+## D-055 — Limits on case and booking steps
+- **Decision:**
+  - Each person can take up to 60 case steps a day (statements, proposals, answers) and up to 40 booking steps a day (condition entries, changes of terms).
+  - A case takes at most 400 party entries; staff entries are always accepted.
+  - Each refusal is audited as `abuse.rate_limited`.
+- **Trade-off:** These limits are far above what a real case needs. If a case reaches its limit, the parties are asked to contact Laandet.
+- **Status:** Proposed (Phase 03).

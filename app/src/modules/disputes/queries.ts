@@ -3,7 +3,7 @@ import { db } from "@/db/client";
 import { bookings, disputeEvents, disputeProposals, disputes, listings, messages, users } from "@/db/schema";
 import type { Actor } from "@/modules/authz/actor-types";
 import { can } from "@/modules/authz/policy";
-import { canEscalate, decodeRecommendation, isOpen, OPEN_DISPUTE_STATUSES } from "./rules";
+import { canEscalate, decodeRecommendation, isOpen, MAX_CASE_EVENTS, OPEN_DISPUTE_STATUSES } from "./rules";
 
 /**
  * Read models for the parties' case page (P03-01). Staff-only notes are returned without their text,
@@ -22,12 +22,18 @@ export async function getDisputeForParty(actor: Actor, disputeId: string, now = 
   if (!can(actor, "dispute.view", { type: "dispute", openerId: d.openedBy, respondentId: d.respondentId }).allow)
     return null;
   const [events, proposals, people, thread] = await Promise.all([
-    db.select().from(disputeEvents).where(eq(disputeEvents.disputeId, d.id)).orderBy(asc(disputeEvents.createdAt)),
+    db
+      .select()
+      .from(disputeEvents)
+      .where(eq(disputeEvents.disputeId, d.id))
+      .orderBy(asc(disputeEvents.createdAt))
+      .limit(MAX_CASE_EVENTS + 100),
     db
       .select()
       .from(disputeProposals)
       .where(eq(disputeProposals.disputeId, d.id))
-      .orderBy(asc(disputeProposals.createdAt)),
+      .orderBy(asc(disputeProposals.createdAt))
+      .limit(MAX_CASE_EVENTS),
     db
       .select({ id: users.id, name: users.name })
       .from(users)

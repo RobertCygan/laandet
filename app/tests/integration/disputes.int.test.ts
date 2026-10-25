@@ -2,7 +2,7 @@ import sharp from "sharp";
 import { and, eq, sql } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import * as schema from "@/db/schema";
-import { mayViewConditionMedia } from "@/modules/condition/service";
+import { addEntry, confirmReport, mayViewConditionMedia } from "@/modules/condition/service";
 import { activeGrant, mayViewDisputeMedia } from "@/modules/disputes/access";
 import { getDisputeForParty } from "@/modules/disputes/queries";
 import {
@@ -18,6 +18,7 @@ import {
 import {
   closeByStaff,
   getCaseForStaff,
+  listRecentlyClosed,
   listSupportQueue,
   recommend,
   reopenCase,
@@ -210,6 +211,90 @@ describe("disputes (P03-01)", () => {
     await expect(withdrawDispute(renter, caseId)).rejects.toMatchObject({ code: "forbidden" });
     await withdrawDispute(lender, caseId);
     expect((await disputeRow(caseId)).status).toBe("withdrawn");
+  });
+
+  it("M2: a case the parties closed themselves, never escalated, cannot be reopened by staff", async () => {
+    const { lender, id } = await completedBooking();
+    const mod = await staff();
+    const { id: caseId } = await openDispute(lender, open(id));
+    await withdrawDispute(lender, caseId);
+    expect((await listRecentlyClosed(mod)).map((c) => c.id)).not.toContain(caseId);
+    await expect(reopenCase(mod, { disputeId: caseId, reason: "Vil se på saken igjen." })).rejects.toMatchObject({
+      message: "reopen_not_available",
+    });
+  });
+
+  it("L2: both parties accepting a recommendation at the same moment still resolve the case", async () => {
+    const { lender, renter, id } = await completedBooking();
+    const mod = await staff();
+    const { id: caseId } = await openDispute(lender, open(id));
+    await escalate(lender, caseId, later(8));
+    await takeCase(mod, { disputeId: caseId, reason: "Saken er eskalert av utleier." });
+    await recommend(mod, {
+      disputeId: caseId,
+      documented: "Ripen er ikke nevnt i utleveringen.",
+      disagreed: "Om ripen kom under leien.",
+      recommendation: "Del en eventuell kostnad likt.",
+    });
+    const recId = (await getDisputeForParty(lender, caseId))!.latestRecommendation!.id;
+    await Promise.all(
+      [lender, renter].map((p) => answerRecommendation(p, { disputeId: caseId, eventId: recId, decision: "accept" })),
+    );
+    expect((await disputeRow(caseId)).status).toBe("resolved_by_agreement");
+    // A recommendation after closing is refused.
+    await expect(
+      recommend(mod, { disputeId: caseId, documented: "Ny.", disagreed: "Ny.", recommendation: "Ny anbefaling." }),
+    ).rejects.toMatchObject({ code: "conflict" });
+  });
+
+  it("L3: contesting the return while a «not returned» case is open adds to that case", async () => {
+    const { lender, renter, id, end } = await handedOverBooking();
+    const { id: caseId } = await openDispute(lender, open(id, "not_returned"));
+    await addEntry(renter, entry(id, "return", { proposedOutcome: "returned_ok" }), end);
+    await confirmReport(renter, { bookingId: id, phase: "return", decision: "confirm", checklist: {}, comment: "" });
+    expect(
+      await confirmReport(lender, {
+        bookingId: id,
+        phase: "return",
+        decision: "contest",
+        checklist: {},
+        comment: "Levert fire dager for sent, og bladet er sprukket.",
+      }),
+    ).toBe("contested");
+    expect(await owner.select().from(schema.disputes)).toHaveLength(1);
+    const statements = await owner
+      .select({ body: schema.disputeEvents.body })
+      .from(schema.disputeEvents)
+      .where(and(eq(schema.disputeEvents.disputeId, caseId), eq(schema.disputeEvents.kind, "statement")));
+    expect(statements.map((e) => e.body)).toContain("Levert fire dager for sent, og bladet er sprukket.");
+    expect((await bookingRow(id)).status).toBe("disputed");
+  });
+
+  it("M4: case steps are rate-limited (audited) and a full case takes no more party entries", async () => {
+    const { lender, renter, id } = await completedBooking();
+    const { id: caseId } = await openDispute(lender, open(id));
+    const say = (who: typeof renter) =>
+      addStatement(who, { disputeId: caseId, body: "Mer informasjon.", photoIds: [] });
+    await owner
+      .insert(schema.appRateLimits)
+      .values({ bucket: `case:user:${renter.id}`, count: 60, windowEnd: later(1) });
+    await expect(say(renter)).rejects.toMatchObject({ code: "rate_limited" });
+    const hits = await owner
+      .select()
+      .from(schema.auditEvents)
+      .where(and(eq(schema.auditEvents.action, "abuse.rate_limited"), eq(schema.auditEvents.actorId, renter.id)));
+    expect(hits).toHaveLength(1);
+
+    await owner.insert(schema.disputeEvents).values(
+      Array.from({ length: 400 }, () => ({
+        disputeId: caseId,
+        actorId: lender.id,
+        kind: "statement" as const,
+        body: "x",
+      })),
+    );
+    await expect(say(lender)).rejects.toMatchObject({ message: "case_full" });
+    expect((await getDisputeForParty(lender, caseId))!.events.length).toBeLessThanOrEqual(500);
   });
 
   it("a late case is accepted and marked; N12: a pending case leaves no trace on the public profile", async () => {

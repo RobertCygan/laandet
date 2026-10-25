@@ -148,10 +148,12 @@ export default async function AccountPage({ params, searchParams }: PageProps<"/
             </div>
           )}
           <p className="mb-4">{tp("lead")}</p>
-          {/* A plain link: the file is a download, not a page to prefetch. */}
-          <a href={localePath(locale, "/konto/mine-data")} className="button button-outline" download>
-            {tp("download")}
-          </a>
+          {/* A plain form post: the export is counted and audited, so no link another site could trigger. */}
+          <form method="post" action={localePath(locale, "/konto/mine-data")}>
+            <button type="submit" className="button button-outline">
+              {tp("download")}
+            </button>
+          </form>
           <p className="fine-print mt-3">{tp("note")}</p>
         </section>
 

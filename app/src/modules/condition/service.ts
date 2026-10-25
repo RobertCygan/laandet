@@ -8,6 +8,7 @@ import {
   conditionPhotos,
   conditionReports,
   CLEANLINESS,
+  disputeEvents,
   disputes,
   FUNCTIONAL_STATUSES,
   ITEM_CONDITION_VALUES,
@@ -19,8 +20,10 @@ import {
 } from "@/db/schema";
 import type { Actor, UserActor } from "@/modules/authz/actor-types";
 import { staffMediaGrant } from "@/modules/disputes/access";
+import { OPEN_DISPUTE_STATUSES } from "@/modules/disputes/rules";
 import { AppError } from "@/modules/errors";
 import { notify } from "@/modules/notifications/notify";
+import { enforceRateLimits, LIMITS } from "@/modules/ratelimit/ratelimit";
 import { announce, loadBookingFor, moveBooking, periodOf } from "@/modules/rentals/service";
 import { inviteReviews } from "@/modules/reviews/service";
 
@@ -142,6 +145,7 @@ export async function addEntry(
     throw new AppError("validation", "entry_invalid", { fieldErrors: { proposedOutcome: "required" } });
   }
   const [l] = await db.select({ title: listings.title }).from(listings).where(eq(listings.id, b.listingId));
+  await enforceRateLimits(db, [{ bucket: `booking:user:${me}`, rule: LIMITS.bookingSteps }]);
 
   return db.transaction(async (tx) => {
     const report = await reportFor(tx, b.id, input.phase);
@@ -284,15 +288,28 @@ export async function confirmReport(
         .set({ status: "contested", returnOutcome: "return_disputed", closedAt: now })
         .where(eq(conditionReports.id, report.id));
       await moveBooking(tx, b, "return_contested", role, me);
-      await tx.insert(disputes).values({
-        bookingId: b.id,
-        openedBy: me,
-        respondentId: role === "owner" ? b.renterId : b.ownerId,
-        category: "other",
-        summary:
-          input.comment.length >= 10 ? input.comment : `Tilbakelevering bestridt: ${input.comment}`.slice(0, 4000),
-        responseDueAt: new Date(now.getTime() + CONDITION_DEADLINES.disputeResponseDays * 24 * HOUR),
-      });
+      const summary =
+        input.comment.length >= 10 ? input.comment : `Tilbakelevering bestridt: ${input.comment}`.slice(0, 4000);
+      // A case already open about this booking (e.g. «not returned») takes the objection as a statement.
+      const [openCase] = await tx
+        .select({ id: disputes.id })
+        .from(disputes)
+        .where(and(eq(disputes.bookingId, b.id), inArray(disputes.status, [...OPEN_DISPUTE_STATUSES])))
+        .for("update");
+      if (openCase) {
+        await tx
+          .insert(disputeEvents)
+          .values({ disputeId: openCase.id, actorId: me, kind: "statement", body: summary });
+      } else {
+        await tx.insert(disputes).values({
+          bookingId: b.id,
+          openedBy: me,
+          respondentId: role === "owner" ? b.renterId : b.ownerId,
+          category: "other",
+          summary,
+          responseDueAt: new Date(now.getTime() + CONDITION_DEADLINES.disputeResponseDays * 24 * HOUR),
+        });
+      }
       await announce(tx, b, "booking.disputed", "booking_disputed", [other], title);
       return "contested";
     }

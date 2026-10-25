@@ -212,18 +212,17 @@ export async function eraseDueAccounts(): Promise<number> {
 }
 
 /**
- * Worker `inactive_accounts` (PRIVACY §5): a warning after 24 months without sign-in, erasure 60 days
- * later if the person still has not signed in. Sign-ins are read from the audit log.
+ * Worker `inactive_accounts` (PRIVACY §5): a warning after 24 months without use, erasure 60 days later if
+ * the person still has not been back. «Use» is `last_seen_at`, stored by every signed-in request at most once
+ * a day — not sign-in records, which an active member with a rolling session may never produce.
  */
 export async function handleInactiveAccounts(now = new Date()): Promise<{ warned: number; scheduled: number }> {
   const since = new Date(now.getTime() - INACTIVE_WARNING_DAYS * DAY);
-  const signIn = (userId: unknown, after: unknown) => sql`EXISTS (
-    SELECT 1 FROM ${auditEvents} a WHERE a.actor_id = ${userId} AND a.action = 'auth.sign_in' AND a.occurred_at >= ${after})`;
   const warnedSince = (userId: unknown, after: unknown) => sql`EXISTS (
     SELECT 1 FROM ${auditEvents} a WHERE a.target_id = ${userId} AND a.action = 'privacy.inactivity_warning'
        AND a.occurred_at >= ${after})`;
 
-  // 1. Warn: old enough, no sign-in for 24 months, not warned in that time.
+  // 1. Warn: not seen for 24 months, not warned in that time.
   const toWarn = await db
     .select({ id: users.id, email: users.email, name: users.name, locale: userProfiles.locale })
     .from(users)
@@ -231,8 +230,7 @@ export async function handleInactiveAccounts(now = new Date()): Promise<{ warned
     .where(
       and(
         inArray(userProfiles.status, ["active", "restricted"]),
-        lt(users.createdAt, since),
-        sql`NOT ${signIn(users.id, since.toISOString())}`,
+        lt(userProfiles.lastSeenAt, since),
         sql`NOT ${warnedSince(users.id, since.toISOString())}`,
       ),
     )
@@ -255,7 +253,7 @@ export async function handleInactiveAccounts(now = new Date()): Promise<{ warned
     });
   }
 
-  // 2. Schedule erasure: warned at least 60 days ago (within this inactivity period) and still no sign-in.
+  // 2. Schedule erasure: warned at least 60 days ago (within this inactivity period) and not seen since.
   const graceEnd = new Date(now.getTime() - INACTIVE_GRACE_DAYS * DAY).toISOString();
   const toDelete = await db
     .select({ id: users.id })
@@ -264,12 +262,10 @@ export async function handleInactiveAccounts(now = new Date()): Promise<{ warned
     .where(
       and(
         inArray(userProfiles.status, ["active", "restricted"]),
-        lt(users.createdAt, since),
+        lt(userProfiles.lastSeenAt, since),
         sql`EXISTS (SELECT 1 FROM ${auditEvents} w WHERE w.target_id = ${users.id}
               AND w.action = 'privacy.inactivity_warning' AND w.occurred_at < ${graceEnd}
-              AND w.occurred_at >= ${since.toISOString()}
-              AND NOT EXISTS (SELECT 1 FROM ${auditEvents} s WHERE s.actor_id = ${users.id}
-                    AND s.action = 'auth.sign_in' AND s.occurred_at >= w.occurred_at))`,
+              AND w.occurred_at >= ${since.toISOString()} AND w.occurred_at > ${userProfiles.lastSeenAt})`,
       ),
     )
     .limit(200);

@@ -44,7 +44,7 @@ Legend: ✅ met · 🟡 partly met or met differently · ❌ not met · ⏳ need
 | 4.1.1–4.1.3 | Enforced on the server; attributes not user-controllable; least privilege | ✅ | Central `can()`; ownership from the database; least-privilege database role. |
 | 4.1.5 | Fail securely | ✅ | Deny by default; strangers get 404. |
 | 4.2.1 | Protection against IDOR | ✅ | Negative tests in every area (N1, N2, N13, N15, bookings, claims, cases, reviews, export). |
-| 4.2.2 | CSRF protection | ✅ | Server Action origin check (e2e test). |
+| 4.2.2 | CSRF protection | ✅ | Server Action origin check, and the same check on the data export POST (e2e tests). |
 | 4.3.1 | MFA for administrative interfaces | ✅ | TOTP mandatory for staff. |
 | 4.3.2 | No directory browsing or metadata exposure | ✅ | No static listings; media served by id through an authorised route. |
 
@@ -98,8 +98,8 @@ Legend: ✅ met · 🟡 partly met or met differently · ❌ not met · ⏳ need
 
 | ID | Requirement (short) | Status | Note |
 |---|---|---|---|
-| 11.1.1 | Steps in order, no skipping | ✅ | Booking, claim and case state machines with status-conditional updates; database triggers for acceptances, proposals and reviews. |
-| 11.1.2–11.1.4 | Business limits and anti-automation | ✅ | Rate limits per action; one open case per booking; one review per party. |
+| 11.1.1 | Steps in order, no skipping | ✅ | Booking, claim and case state machines with status-conditional updates; steps in one case serialised by a row lock; appeals decided once; database triggers for acceptances, proposals, reviews and booking money terms. |
+| 11.1.2–11.1.4 | Business limits and anti-automation | ✅ | Rate limits per action, including case and booking steps; one open case per booking with at most 400 party entries; one review per party. |
 | 11.1.5 | Limits documented | ✅ | `SECURITY.md` §2, `DISPUTE_POLICY.md` §3. |
 
 ## V12 Files and resources
@@ -117,7 +117,7 @@ Legend: ✅ met · 🟡 partly met or met differently · ❌ not met · ⏳ need
 | ID | Requirement (short) | Status | Note |
 |---|---|---|---|
 | 13.1.1 / 13.1.3 | Same encoding; no keys in URLs | ✅ | The data export uses the session cookie. |
-| 13.2.1–13.2.3 | Allowed methods; schema validation; CSRF | ✅ | Server Actions (POST) with origin check; read-only GET routes. |
+| 13.2.1–13.2.3 | Allowed methods; schema validation; CSRF | ✅ | Server Actions (POST) with origin check; the data export is POST only (GET gives 405); the remaining GET routes are read-only. |
 
 ## V14 Configuration
 

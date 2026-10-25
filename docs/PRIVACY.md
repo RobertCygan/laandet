@@ -79,7 +79,7 @@ legal review (L-12).
 | Data | Retention | Basis for the period |
 |---|---|---|
 | Active account (email, profile) | while the account exists | contract |
-| Inactive account (no sign-in) | 24 months, then a warning email, then deleted after a further 60 days | minimisation |
+| Inactive account (not signed in or used while signed in; `last_seen_at`, stored at most once a day) | 24 months, then a warning email, then deleted after a further 60 days | minimisation |
 | Sessions incl. IP/user agent | until expiry (max 30 days), then purged | security |
 | Verification / reset tokens | until expiry + 7 days | security |
 | Deleted or archived listings and their images | 30 days after deletion (soft delete for undo and abuse investigation) | minimisation |
@@ -98,6 +98,8 @@ legal review (L-12).
 | Backups | rolling, max 6 months | durability. Deleted data disappears from backups within 6 months. |
 | Category suggestions | 12 months | minimisation |
 | Legal acceptances | while the account exists + 3 years | proof of acceptance |
+
+For append-only records (bookings, claims, cases, reports, legal acceptances) the period runs from the closing date **and** from the last change the application made to the record, whichever is later. The database stamps that time itself, so the application cannot pull a purge forward (security review M1, migration `0010`).
 
 ## 6. Account deletion procedure
 

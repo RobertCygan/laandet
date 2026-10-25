@@ -46,6 +46,7 @@ export type Action =
   | "dispute.view"
   | "dispute.participate"
   | "dispute.support"
+  | "evidence.upload"
   | "review.write"
   | "review.moderate"
   | "user.moderate"
@@ -87,7 +88,7 @@ function staffAccess(a: UserActor): Decision {
   return ALLOW;
 }
 
-/** Actions a suspended / deletion-pending account may still perform. */
+/** Actions a suspended account may still perform. */
 const ALLOWED_WHEN_SUSPENDED: ReadonlySet<Action> = new Set([
   "listing.view",
   "appeal.create",
@@ -95,6 +96,17 @@ const ALLOWED_WHEN_SUSPENDED: ReadonlySet<Action> = new Set([
   "claim.view",
   "dispute.view",
   "account.export",
+]);
+/**
+ * A person waiting for erasure can still finish what is under way — return an item, confirm a handover, answer
+ * a case — since erasure waits for exactly that (PRIVACY §6, security review L5).
+ */
+const ALLOWED_WHEN_DELETION_PENDING: ReadonlySet<Action> = new Set([
+  ...ALLOWED_WHEN_SUSPENDED,
+  "booking.participate",
+  "claim.participate",
+  "dispute.participate",
+  "evidence.upload",
 ]);
 /** Actions a restricted account may not perform (AUTH_MODEL §3). */
 const DENIED_WHEN_RESTRICTED: ReadonlySet<Action> = new Set([
@@ -124,6 +136,7 @@ const NEEDS_VERIFIED_EMAIL: ReadonlySet<Action> = new Set([
   "claim.participate",
   "dispute.open",
   "dispute.participate",
+  "evidence.upload",
   "review.write",
 ]);
 
@@ -134,7 +147,8 @@ export function can(actor: Actor, action: Action, resource: Resource = NONE): De
   }
   if (actor.kind === "anonymous") return deny("auth_required");
   if (actor.status === "deleted") return deny("auth_required");
-  if ((actor.status === "suspended" || actor.status === "deletion_pending") && !ALLOWED_WHEN_SUSPENDED.has(action)) {
+  if (actor.status === "suspended" && !ALLOWED_WHEN_SUSPENDED.has(action)) return deny("account_restricted");
+  if (actor.status === "deletion_pending" && !ALLOWED_WHEN_DELETION_PENDING.has(action)) {
     return deny("account_restricted");
   }
   if (actor.status === "restricted" && DENIED_WHEN_RESTRICTED.has(action)) {
@@ -222,6 +236,9 @@ export function can(actor: Actor, action: Action, resource: Resource = NONE): De
       return resource.giverId === actor.id ? ALLOW : deny("forbidden");
     // ---- Phase 03
     case "account.export":
+    // Condition and case photos: a restricted account still documents its own rentals (review L5). The
+    // photo stays private to the uploader until the booking or case service attaches it for a party.
+    case "evidence.upload":
       return ALLOW;
     case "dispute.open":
     case "review.write":

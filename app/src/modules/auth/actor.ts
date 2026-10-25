@@ -9,6 +9,7 @@ import { auth } from "./auth";
 
 const STAFF_SESSION_MS = 8 * 60 * 60 * 1000;
 const NEW_ACCOUNT_MS = 7 * 24 * 60 * 60 * 1000;
+const SEEN_REFRESH_MS = 24 * 60 * 60 * 1000;
 
 /**
  * Resolve the current actor from the session cookie, once per request.
@@ -29,11 +30,16 @@ export const getActor = cache(async (): Promise<Actor> => {
       role: userProfiles.role,
       status: userProfiles.status,
       locale: userProfiles.locale,
+      lastSeenAt: userProfiles.lastSeenAt,
     })
     .from(users)
     .innerJoin(userProfiles, eq(userProfiles.userId, users.id))
     .where(eq(users.id, session.user.id));
   if (!row || row.status === "deleted") return { kind: "anonymous" };
+  // Rolling sessions mean an active member may never sign in again; the inactivity job reads this instead.
+  if (Date.now() - row.lastSeenAt.getTime() > SEEN_REFRESH_MS) {
+    await db.update(userProfiles).set({ lastSeenAt: new Date() }).where(eq(userProfiles.userId, row.id));
+  }
   const sessionCreated = new Date(session.session.createdAt).getTime();
   const actor: UserActor = {
     kind: "user",

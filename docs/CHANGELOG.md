@@ -2,6 +2,76 @@
 
 All notable changes to Laandet. Dates are DD.MM.YYYY.
 
+## [Phase 03] — 25.10.2026 (waiting for the owner's approval; not deployed)
+
+### Added
+- **Cases between the parties (P03-01, DISPUTE_POLICY):**
+  - «Meld fra om et problem» on a booking, with the safety screen first. A contested return opens a case by itself;
+  - `/saker/[id]` for the two parties only: statements, up to 6 photos per entry, a message from the booking conversation attached as a reference, proposals and counter-proposals with «Godta»/«Avslå», withdrawal by the person who opened it;
+  - a case opened after the recommended deadline is accepted and marked as late;
+  - «Be Laandet om hjelp» once the other party has answered or the deadline has passed (at once for urgent categories);
+  - support queue at `/admin/saker` with metadata only. A staff member sees the case text and photos only after «Ta saken» with a reason: a 30-day grant, and every view is audited;
+  - staff can ask for documentation, give a three-part, non-binding recommendation («dokumentert», «uenige om», «anbefaling») that both parties accept or reject, close a case with neutral information about other options, and reopen an escalated case within 30 days;
+  - Laandet never decides who is right and never moves money. When a case closes, a disputed booking returns to completed and both parties are invited to review it;
+  - the case file, grants and proposal terms are append-only for the app role (column privileges and triggers).
+- **Reviews (P03-02):**
+  - two-sided and double-blind for completed rentals, one per party, within 14 days of completion. The window restarts when a later case closes;
+  - sealed until both have written or the window ends, and held while a case is open; published at once or by the `review_publish` job;
+  - the public profile shows published reviews, averages and a real count of completed rentals. A deleted author is shown as «Tidligere medlem»;
+  - reviews can be reported; staff remove and restore them with a statement of reasons.
+- **Moderation (P03-03):**
+  - account measures: warn, restrict (optionally until a date, ended by the `restriction_expiry` job), suspend (all sessions revoked) and reinstate, each with a statement of reasons, an email and an appeal;
+  - the report queue covers listings, profiles, messages and reviews, flags repeated reports and audits every reported message shown (N15);
+  - staff never act on themselves or in a case they are part of; only admins act on staff accounts;
+  - every moderation action can be appealed. A reversed appeal undoes the measure. Moderation notices appear on «Varsler».
+- **Admin panel (P03-04):** categories (moderators: policy only), localities, feature flags (switching needs a reason; `rentals_open` can now be opened here), legal versions (read-only; nothing can mark a text as reviewed), the security log (admin, read-only, IP hashes only) and operations figures for all staff. Every change takes a reason and is audited.
+- **Your data (P03-06):**
+  - «Last ned mine data (JSON)» on `/konto`: the person's own data without other people's email, staff-only notes or sealed reviews about them. Audited, five a day;
+  - retention jobs per PRIVACY §5 (listings, messages, notifications, outbox, category suggestions, orphaned photos, the audit log after 24 months), and append-only records through fixed-period database functions;
+  - account erasure per PRIVACY §6 once no booking, claim or case is under way; inactive accounts get a warning after 24 months and are erased 60 days later.
+- **Transparency (P03-07):** admins enter real monthly figures; `/apenhet` shows only those, plus a separately labelled estimate section from `OPERATING_COSTS.md`. **No real figures are entered yet**, so the page shows its empty state.
+- **Security pass (P03-05):** `docs/SECURITY_VERIFICATION.md` (every SEC requirement with its evidence) and `docs/ASVS_L1.md` (OWASP ASVS 4.0.3 Level 1 self-assessment). Fixed while checking:
+  - **SEC-11:** the session cookie was named `__Secure-__Host-laandet.session`, so browsers applied only the weaker `__Secure-` rules. It is now `__Host-laandet.session`;
+  - **SEC-30:** condition entries allowed 8 photos instead of 6;
+  - **SEC-13:** rate-limit hits were not audited (now `abuse.rate_limited` with the user and the kind of limit, never an IP);
+  - **SEC-43:** errors stored in worker heartbeats could contain email addresses or query strings (now redacted);
+  - **SEC-42:** localized error pages that show only a reference code;
+  - **N6:** a database trigger keeps the parties and money terms of a booking fixed after the request.
+
+### Independent security review (P03-05)
+A separate agent read the Phase 02–03 code without the implementer's notes. Every finding was checked against the code, then fixed with a test:
+
+| # | Finding | Fix | Test |
+|---|---|---|---|
+| H1 | The inactivity job read sign-ins from the audit log. Staff signing in with 2FA and members with rolling sessions wrote none, so active accounts (staff included) would have been warned and erased. | `user_profiles.last_seen_at`, stored by every signed-in request at most once a day; the job uses it. The 2FA step now also records the sign-in. | `privacy.int` |
+| M1 | The retention periods were fixed, but measured from dates the app writes itself; a compromised app role could backdate a row and purge its evidence. The audit purge took any period. | The database stamps `last_changed_at` on every change by the app role, and each purge also waits for it; the audit purge never goes below 24 months (`0009`, `0010`). | `privacy.int` (M1) |
+| M2 | Staff could reopen a case the parties had settled without asking Laandet. | Only cases that were escalated can be reopened. | unit + `disputes.int` |
+| M3 | A user measure could close an unrelated report, or one the moderator had made. | The report must be about that member; the conflict-of-interest check applies. | `moderation-measures.int` |
+| M4 | Case and booking steps had no limits. | 60 case steps and 40 booking steps a day per person; a case takes at most 400 party entries and pages load a bounded number. | `disputes.int` |
+| L1 | Two staff deciding the same appeal at once could undo a measure twice; the reporter could decide the appeal. | Decided once (status-guarded update); nobody involved in the case decides. | `moderation-measures.int` |
+| L2 | Both parties accepting a recommendation at the same moment left the case open; a recommendation could land in a closed case. | Steps in one case are serialised with a row lock and a fresh status check. | `disputes.int` (fails without the lock) |
+| L3 | Contesting a return while a «not returned» case was open failed. | The objection is added to the open case. | `disputes.int` |
+| L4 | The data export was a GET, so another site could use up the daily quota. | A same-origin POST from the account page. | e2e `security.spec` |
+| L5 | A restricted member could not add condition or case photos; an account waiting for erasure could not finish the booking that blocks the erasure. | New action `evidence.upload`; deletion-pending accounts may take part in bookings, claims and cases. | policy unit + `security.int` |
+| L6 | The new-conversation limit ran inside the transaction, so its audit row was rolled back. | Checked before the transaction. | `messaging.int` |
+| L7 | Database functions with elevated rights had `search_path = public` only. | `public, pg_temp` (`0010`). | migration |
+| — | The per-email rate-limit key was an unkeyed hash. | HMAC with the server's hash key. | `security.int` |
+
+### Tested (run locally on 25.10.2026, PostgreSQL 16, Chromium from Playwright 1.63)
+- **Unit (Vitest): 204 passed**: the policy for every Phase 01–03 action (79 cases), case rules (deadlines, escalation, reopening), review windows, redaction of logged errors.
+- **Integration (Vitest against `laandet_test`): 109 passed.** New for Phase 03: cases (flow, grants, audited views, privileges, triggers, N12, photo access, races), reviews, account measures and appeals, admin sections and transparency, data export, retention and erasure, inactivity, SEC-21 and N6.
+- **End-to-end (Playwright, production build): result recorded after the local run finishes.** New: two case journeys at 390 px with axe checks, admin and transparency, reviews at the end of the rental journey, and security (foreign `Origin` refused, session cookie attributes, a deleted account signed out at once, the export as POST).
+- **CI (`laandet-ci`):** result recorded after the push.
+
+### Not done / known gaps
+- **Owner decisions needed** (see `docs/ASVS_L1.md`): minimum password length 10 or 12; whether rolling 30-day sessions are acceptable for members; OSV-Scanner in CI.
+- **Transparency:** no figures entered. The owner enters them in `/admin/apenhet` when the first invoices exist.
+- **Legal texts and `DISPUTE_POLICY.md` are drafts, not legally reviewed.**
+- Rentals stay closed (`rentals_open` off) and category B stays blocked.
+- Needs the server (Phase 04): TLS/HSTS, DNS, backups with a real restore test, the worker on a schedule, real email delivery.
+- No antivirus for uploads (only re-encoded images are accepted; accepted risk). No password strength meter or «Vis passord».
+- Not tested here: Safari/WebKit.
+
 ## [Phase 02] — 25.10.2026 (approved by the owner: «Zatwierdzam Phase 02»; not deployed)
 
 ### Added

@@ -25,7 +25,7 @@ export async function uploadImage(
   file: File,
   scope: "listing" | "condition" | "dispute",
 ): Promise<UploadedMedia> {
-  assertCan(actor, "media.upload");
+  assertCan(actor, scope === "listing" ? "media.upload" : "evidence.upload");
   await enforceRateLimits(db, [
     {
       bucket: `upload:user:${actor.id}`,

@@ -17,6 +17,12 @@ export const DISPUTE_DEADLINES = {
   grantDays: 30,
 };
 
+/**
+ * Party entries (statements, photos, proposals, answers) one case can hold. Far above any real case; it
+ * bounds what one page loads. Staff entries are always accepted.
+ */
+export const MAX_CASE_EVENTS = 400;
+
 export type DisputeStatus =
   | "awaiting_response"
   | "in_negotiation"
@@ -91,9 +97,15 @@ export function canEscalate(
   return URGENT_CATEGORIES.includes(d.category) || now.getTime() > d.responseDueAt.getTime();
 }
 
-/** Staff may reopen a closed case within 30 days if new information appears (audited). */
-export function canReopen(d: { status: DisputeStatus; closedAt: Date | null }, now: Date): boolean {
-  if (isOpen(d.status) || !d.closedAt) return false;
+/**
+ * Staff may reopen a closed case within 30 days if new information appears (audited) — only a case a party
+ * once asked Laandet to look at. A case the parties settled between themselves stays theirs.
+ */
+export function canReopen(
+  d: { status: DisputeStatus; closedAt: Date | null; escalatedAt: Date | null },
+  now: Date,
+): boolean {
+  if (isOpen(d.status) || !d.closedAt || !d.escalatedAt) return false;
   return now.getTime() <= d.closedAt.getTime() + DISPUTE_DEADLINES.reopenDays * DAY;
 }
 

@@ -9,6 +9,7 @@ import { env } from "@/modules/config/env";
 import { AppError } from "@/modules/errors";
 import { queueEmail } from "@/modules/notifications/outbox";
 import { getRequestMeta } from "@/modules/server/request-meta";
+import { assertNotOwnCase, assertReportAbout } from "./service";
 
 /**
  * Account measures (P03-03, AUTH_MODEL §3): warn, restrict (optionally until a date), suspend, reinstate.
@@ -89,8 +90,9 @@ export async function applyUserMeasure(
     throw new AppError("validation", "measure_invalid", { fieldErrors: { until: "period_in_past" } });
   if (input.reportId) {
     const [r] = await db.select().from(reports).where(eq(reports.id, input.reportId));
-    if (!r) throw new AppError("not_found");
-    if (r.reporterId === actor.id) throw new AppError("forbidden");
+    if (!r || r.status === "actioned" || r.status === "dismissed") throw new AppError("not_found");
+    await assertNotOwnCase(actor as UserActor, r);
+    await assertReportAbout(r, input.userId);
   }
   const meta = await getRequestMeta();
   return db.transaction(async (tx) => {

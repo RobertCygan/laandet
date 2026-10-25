@@ -1,4 +1,4 @@
-import { createHash } from "node:crypto";
+import { createHmac } from "node:crypto";
 import { isAPIError } from "better-auth/api";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { headers } from "next/headers";
@@ -11,6 +11,7 @@ import { queueEmail } from "@/modules/notifications/outbox";
 import { enforceRateLimits, LIMITS } from "@/modules/ratelimit/ratelimit";
 import { getRequestMeta, hashIp } from "@/modules/server/request-meta";
 import { AppError } from "@/modules/errors";
+import { env } from "@/modules/config/env";
 import type { UserActor } from "@/modules/authz/actor-types";
 import { localePath } from "@/i18n/page";
 import { auth } from "./auth";
@@ -20,9 +21,12 @@ const MIN_FILL_MS = 3000;
 
 const lp = localePath;
 
-/** Pseudonymous key for per-email rate limits and audit metadata (no raw emails stored). */
-function emailKey(email: string): string {
-  return createHash("sha256").update(`laandet:${email.toLowerCase()}`).digest("hex").slice(0, 32);
+/**
+ * Pseudonymous key for per-email rate limits and audit metadata (no raw emails stored). Keyed like the IP
+ * hash, so a list of known addresses cannot be matched against the stored keys.
+ */
+export function emailKey(email: string): string {
+  return createHmac("sha256", env().IP_HASH_KEY).update(`email:${email.toLowerCase()}`).digest("hex").slice(0, 32);
 }
 
 /**
@@ -137,8 +141,10 @@ export async function signIn(email: string, password: string): Promise<SignInRes
 export async function verifyTotp(code: string): Promise<void> {
   const meta = await getRequestMeta();
   try {
-    await auth.api.verifyTOTP({ body: { code }, headers: await headers() });
-    await recordAudit(db, { action: "auth.two_factor_verified", meta });
+    const res = (await auth.api.verifyTOTP({ body: { code }, headers: await headers() })) as { user?: { id: string } };
+    await recordAudit(db, { actorId: res.user?.id ?? null, action: "auth.two_factor_verified", meta });
+    // The password step stops before its sign-in record when a second factor follows.
+    await recordAudit(db, { actorId: res.user?.id ?? null, action: "auth.sign_in", meta });
   } catch (err) {
     if (isAPIError(err)) {
       await recordAudit(db, { action: "auth.two_factor_failed", meta });

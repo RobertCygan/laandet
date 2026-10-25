@@ -45,7 +45,7 @@ notifications · email_outbox · feature_flags · audit_events · app_rate_limit
 | Suggested entity | Implemented as | Note |
 |---|---|---|
 | `User` | `users` (Better Auth) | `users.name` is the public display name. |
-| `UserProfile` | `user_profiles` | role, status, locality, locale, sign-up self-declarations |
+| `UserProfile` | `user_profiles` | role, status, locality, locale, sign-up self-declarations, `last_seen_at` (inactivity) |
 | `IdentityVerification` | `identity_verifications` | MVP: email only (`basic`). BankID = `strong`, Phase 05. |
 | `Listing` | `listings` | three types in one table, type-specific `CHECK`s |
 | `ListingCategory` | `categories` | names/icons in JSONB, policy, `allow_paid_rental` |

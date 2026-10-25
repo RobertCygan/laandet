@@ -11,6 +11,7 @@ const otherMember = testUser({ id: OTHER });
 const unverified = testUser({ id: OWNER, emailVerified: false });
 const restricted = testUser({ id: OWNER, status: "restricted" });
 const suspended = testUser({ id: OWNER, status: "suspended" });
+const leaving = testUser({ id: OWNER, status: "deletion_pending" });
 const moderator = testUser({ id: OTHER, role: "moderator", staff2fa: true });
 const moderatorNo2fa = testUser({ id: OTHER, role: "moderator", staff2fa: false });
 const moderatorStale = testUser({ id: OTHER, role: "moderator", staff2fa: true, staffSessionFresh: false });
@@ -164,6 +165,16 @@ const rows: Row[] = [
   ],
   ["a member cannot moderate users", member, "user.moderate", { type: "profile", userId: OTHER }, false, "forbidden"],
   ["a suspended user can still export their data", suspended, "account.export", undefined, true],
+  // L5: a restricted account still documents its rentals; an account waiting for erasure finishes them.
+  ["restricted may upload condition and case photos", restricted, "evidence.upload", undefined, true],
+  ["unverified cannot upload evidence", unverified, "evidence.upload", undefined, false, "email_unverified"],
+  ["suspended cannot upload evidence", suspended, "evidence.upload", undefined, false, "account_restricted"],
+  ["deletion pending finishes a booking", leaving, "booking.participate", booking(), true],
+  ["deletion pending answers a case", leaving, "dispute.participate", dispute(), true],
+  ["deletion pending uploads evidence", leaving, "evidence.upload", undefined, true],
+  ["deletion pending cannot request a booking", leaving, "booking.request", undefined, false, "account_restricted"],
+  ["deletion pending cannot upload listing photos", leaving, "media.upload", undefined, false, "account_restricted"],
+  ["suspended cannot take part in a booking", suspended, "booking.participate", booking(), false, "account_restricted"],
   ["a visitor cannot export data", anon, "account.export", undefined, false, "auth_required"],
   ["moderators see platform metrics", moderator, "metrics.view", undefined, true],
   ["moderators cannot manage localities", moderator, "locality.manage", undefined, false, "forbidden"],

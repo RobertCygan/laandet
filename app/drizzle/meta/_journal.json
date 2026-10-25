@@ -64,6 +64,20 @@
       "when": 1792942414640,
       "tag": "0008_booking_terms_guard",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792943411071,
+      "tag": "0009_change_stamps",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792943416453,
+      "tag": "0010_retention_guards",
+      "breakpoints": true
     }
   ]
 }

@@ -111,6 +111,86 @@ describe("moderation: account measures, appeals, reported content (P03-03)", () 
     await applyUserMeasure(admin, { userId: otherMod.id, measure: "warn", reasonCode: "other", statement });
   });
 
+  it("M3: a measure closes only a report about that member, never one the moderator is part of", async () => {
+    const mod = await createUser({ role: "moderator", staff2fa: true });
+    const reported = await createUser({ name: "Rapportert R." });
+    const bystander = await createUser({ name: "Uskyldig U." });
+    const reporter = await createUser();
+    const [r] = await owner
+      .insert(schema.reports)
+      .values({ reporterId: reporter.id, targetType: "user", targetId: reported.id, reason: "harassment" })
+      .returning();
+    const [own] = await owner
+      .insert(schema.reports)
+      .values({ reporterId: mod.id, targetType: "user", targetId: reported.id, reason: "harassment" })
+      .returning();
+    await expect(
+      applyUserMeasure(mod, { userId: bystander.id, measure: "warn", reasonCode: "other", statement, reportId: r!.id }),
+    ).rejects.toMatchObject({ message: "report_mismatch" });
+    await expect(
+      applyUserMeasure(mod, {
+        userId: reported.id,
+        measure: "warn",
+        reasonCode: "other",
+        statement,
+        reportId: own!.id,
+      }),
+    ).rejects.toMatchObject({ code: "forbidden" });
+    expect(await status(bystander.id)).toBe("active");
+    await applyUserMeasure(mod, {
+      userId: reported.id,
+      measure: "warn",
+      reasonCode: "other",
+      statement,
+      reportId: r!.id,
+    });
+    const [after] = await owner.select().from(schema.reports).where(eq(schema.reports.id, r!.id));
+    expect(after!.status).toBe("actioned");
+    // A closed report cannot be used again.
+    await expect(
+      applyUserMeasure(mod, { userId: reported.id, measure: "warn", reasonCode: "other", statement, reportId: r!.id }),
+    ).rejects.toMatchObject({ code: "not_found" });
+  });
+
+  it("L1: an appeal is decided once, never by the staff member who made the report", async () => {
+    const user = await createUser({ name: "Ola O." });
+    const mod = await createUser({ role: "moderator", staff2fa: true });
+    const reportingMod = await createUser({ role: "moderator", staff2fa: true });
+    const [adminA, adminB] = [
+      await createUser({ role: "admin", staff2fa: true }),
+      await createUser({ role: "admin", staff2fa: true }),
+    ];
+    const [r] = await owner
+      .insert(schema.reports)
+      .values({ reporterId: reportingMod.id, targetType: "user", targetId: user.id, reason: "harassment" })
+      .returning();
+    const { actionId } = await applyUserMeasure(mod, {
+      userId: user.id,
+      measure: "restrict",
+      reasonCode: "harassment",
+      statement,
+      reportId: r!.id,
+    });
+    await createAppeal(
+      { ...user, status: "restricted" },
+      { actionId, text: "Jeg har ikke sendt trusler, se samtalen." },
+    );
+    const [appeal] = await owner.select().from(schema.appeals);
+    const decide = (who: typeof mod) =>
+      decideAppeal(who, { appealId: appeal!.id, outcome: "reversed", decision: "Ny vurdering av saken." });
+    await expect(decide(reportingMod)).rejects.toMatchObject({ code: "forbidden" });
+    // Two admins at the same time: one decision, one reversal.
+    const results = await Promise.allSettled([decide(adminA), decide(adminB)]);
+    expect(results.filter((x) => x.status === "fulfilled")).toHaveLength(1);
+    const reinstated = await owner
+      .select()
+      .from(schema.moderationActions)
+      .where(
+        and(eq(schema.moderationActions.targetId, user.id), eq(schema.moderationActions.action, "user_reinstated")),
+      );
+    expect(reinstated).toHaveLength(1);
+  });
+
   it("N15: staff read only the reported message, never the conversation, and the view is audited", async () => {
     const lender = await createUser();
     const asker = await createUser();

@@ -1,12 +1,14 @@
+import sharp from "sharp";
 import { eq, sql } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import * as schema from "@/db/schema";
 import { openSchema } from "@/modules/disputes/service";
+import { uploadImage } from "@/modules/media/service";
 import { userMeasureSchema } from "@/modules/moderation/users";
 import { changeTermsSchema, requestSchema } from "@/modules/rentals/service";
 import { reviewSchema } from "@/modules/reviews/service";
 import { profileSchema } from "@/modules/users/service";
-import { owner, resetDb } from "./helpers";
+import { createUser, owner, resetDb } from "./helpers";
 import { confirmedBooking, setRentalsOpen } from "./rental-fixtures";
 
 /**
@@ -93,5 +95,31 @@ describe("N6: money terms of a booking never change after the request", () => {
     expect(b!.depositOre).toBe(50000);
     // Status changes still work.
     await db.execute(sql`UPDATE bookings SET meeting_place_private = 'Ved butikken' WHERE id = ${id}`);
+  });
+});
+
+describe("evidence uploads for restricted accounts (security review L5)", () => {
+  beforeEach(resetDb);
+
+  it("a restricted member can upload condition and case photos, but no listing photos", async () => {
+    const restricted = await createUser({ status: "restricted" });
+    const png = await sharp({ create: { width: 64, height: 48, channels: 3, background: "#406080" } })
+      .png()
+      .toBuffer();
+    const file = () => new File([new Uint8Array(png)], "foto.png", { type: "image/png" });
+    await expect(uploadImage(restricted, file(), "condition")).resolves.toMatchObject({ id: expect.any(String) });
+    await expect(uploadImage(restricted, file(), "dispute")).resolves.toMatchObject({ id: expect.any(String) });
+    await expect(uploadImage(restricted, file(), "listing")).rejects.toMatchObject({ code: "account_restricted" });
+  });
+});
+
+describe("pseudonymous email keys", () => {
+  it("are keyed with the server secret, so a known address cannot be matched by hashing it", async () => {
+    const { createHash } = await import("node:crypto");
+    const { emailKey } = await import("@/modules/auth/service");
+    expect(emailKey("Ola@Example.no")).toBe(emailKey("ola@example.no"));
+    expect(emailKey("ola@example.no")).toMatch(/^[0-9a-f]{32}$/);
+    const unkeyed = createHash("sha256").update("laandet:ola@example.no").digest("hex").slice(0, 32);
+    expect(emailKey("ola@example.no")).not.toBe(unkeyed);
   });
 });

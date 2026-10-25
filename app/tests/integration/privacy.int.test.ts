@@ -240,7 +240,8 @@ describe("retention jobs (P03-06), against back-dated rows", () => {
     );
     const back = (years: number) =>
       owner.execute(
-        sql`UPDATE bookings SET period = tstzrange(now() - make_interval(years => ${years}) - interval '2 days', now() - make_interval(years => ${years})) WHERE id = ${f.id}`,
+        sql`UPDATE bookings SET period = tstzrange(now() - make_interval(years => ${years}) - interval '2 days', now() - make_interval(years => ${years})),
+              last_changed_at = now() - make_interval(years => ${years}) WHERE id = ${f.id}`,
       );
     await back(2);
     expect((await purgeAppendOnly()).bookings).toBe(0);
@@ -264,7 +265,7 @@ describe("retention jobs (P03-06), against back-dated rows", () => {
 
     await owner
       .update(schema.disputes)
-      .set({ closedAt: new Date(Date.now() - 4 * 365 * DAY) })
+      .set({ closedAt: new Date(Date.now() - 4 * 365 * DAY), lastChangedAt: new Date(Date.now() - 4 * 365 * DAY) })
       .where(eq(schema.disputes.id, d!.id));
     expect(await purgeAppendOnly()).toMatchObject({ disputes: 1, bookings: 1 });
     for (const table of [
@@ -287,6 +288,54 @@ describe("retention jobs (P03-06), against back-dated rows", () => {
     await expect(db.execute(sql`DELETE FROM contracts`)).rejects.toThrow();
   });
 
+  it("M1: the app role cannot backdate a row into an early purge, nor shorten the audit retention", async () => {
+    const { db } = await import("@/db/client");
+    const f = await completed();
+    const [d] = await owner
+      .insert(schema.disputes)
+      .values({
+        bookingId: f.id,
+        openedBy: f.lender.id,
+        respondentId: f.renter.id,
+        category: "damaged",
+        summary: "Riper på sagbladet etter leie.",
+        responseDueAt: new Date(),
+      })
+      .returning();
+    await owner.insert(schema.disputeEvents).values({ disputeId: d!.id, kind: "statement", body: "Forklaring" });
+    // What a compromised runtime role would try: closure and period dates years back, then the purges.
+    await db.execute(
+      sql`UPDATE disputes SET status = 'withdrawn', closed_at = now() - interval '5 years', last_changed_at = now() - interval '5 years' WHERE id = ${d!.id}`,
+    );
+    expect(await purgeAppendOnly()).toMatchObject({ disputes: 0, bookings: 0 });
+    await db.execute(sql`DELETE FROM disputes WHERE id = ${d!.id}`).catch(() => undefined); // refused: events refer to it
+    await db.execute(
+      sql`UPDATE bookings SET period = tstzrange(now() - interval '5 years 2 days', now() - interval '5 years'), last_changed_at = now() - interval '5 years' WHERE id = ${f.id}`,
+    );
+    const [doc] = await owner
+      .select({ id: schema.legalDocumentVersions.id })
+      .from(schema.legalDocumentVersions)
+      .limit(1);
+    await owner.insert(schema.legalAcceptances).values({ userId: f.renter.id, documentVersionId: doc!.id });
+    await db.execute(
+      sql`UPDATE user_profiles SET status = 'deleted', deleted_at = now() - interval '5 years' WHERE user_id = ${f.renter.id}`,
+    );
+    expect(await purgeAppendOnly()).toMatchObject({ disputes: 0, bookings: 0, legalAcceptances: 0 });
+    expect(await owner.select().from(schema.disputeEvents)).toHaveLength(1);
+    expect(await owner.select().from(schema.contracts)).not.toHaveLength(0);
+    expect(await owner.select().from(schema.legalAcceptances)).toHaveLength(1);
+    const [stamp] = await owner
+      .select({ at: schema.bookings.lastChangedAt })
+      .from(schema.bookings)
+      .where(eq(schema.bookings.id, f.id));
+    expect(Date.now() - stamp!.at.getTime()).toBeLessThan(60_000);
+
+    const before = (await owner.select().from(schema.auditEvents)).length;
+    expect(before).toBeGreaterThan(0);
+    await db.execute(sql`SELECT purge_expired_audit_events(interval '1 second')`);
+    expect(await owner.select().from(schema.auditEvents)).toHaveLength(before);
+  });
+
   it("reports and moderation 2 years after closure; condition photos never attached are removed", async () => {
     const a = await createUser();
     await owner.insert(schema.reports).values([
@@ -297,6 +346,7 @@ describe("retention jobs (P03-06), against back-dated rows", () => {
         reason: "spam",
         status: "dismissed",
         handledAt: new Date(Date.now() - 3 * 365 * DAY),
+        lastChangedAt: new Date(Date.now() - 3 * 365 * DAY),
       },
       {
         reporterId: a.id,
@@ -376,14 +426,20 @@ describe("account erasure (P03-06, PRIVACY §6)", () => {
     expect(view!.contracts[0]!.renderedText).toContain("Leietaker L.");
   });
 
-  it("inactive accounts: a warning after 24 months, erasure scheduled 60 days later without a sign-in", async () => {
+  it("inactive accounts: a warning after 24 months unseen, erasure 60 days later unless the person came back", async () => {
     const quiet = await createUser({ name: "Stille S." });
     const back = await createUser({ name: "Tilbake T." });
+    // H1: an old staff account in daily use with a rolling session has no recent sign-in record, but is seen.
+    const busy = await createUser({ name: "Moderator M.", role: "moderator" });
     const old = new Date(Date.now() - 25 * 30 * DAY);
     await owner
       .update(schema.users)
       .set({ createdAt: old })
-      .where(sql`${schema.users.id} IN (${quiet.id}, ${back.id})`);
+      .where(sql`${schema.users.id} IN (${quiet.id}, ${back.id}, ${busy.id})`);
+    await owner
+      .update(schema.userProfiles)
+      .set({ lastSeenAt: old })
+      .where(sql`${schema.userProfiles.userId} IN (${quiet.id}, ${back.id})`);
 
     expect(await handleInactiveAccounts()).toEqual({ warned: 2, scheduled: 0 });
     expect(await handleInactiveAccounts()).toEqual({ warned: 0, scheduled: 0 });
@@ -391,21 +447,25 @@ describe("account erasure (P03-06, PRIVACY §6)", () => {
       .select()
       .from(schema.emailOutbox)
       .where(eq(schema.emailOutbox.template, "inactivity_warning"));
-    expect(warnings).toHaveLength(2);
+    expect(warnings.map((w) => w.toUserId).sort()).toEqual([quiet.id, back.id].sort());
 
-    // 61 days later: one of them signed in after the warning.
+    // 61 days later: one of them used Laandet after the warning (getActor stores last_seen_at).
     await owner.execute(
       sql`UPDATE audit_events SET occurred_at = now() - interval '61 days' WHERE action = 'privacy.inactivity_warning'`,
     );
-    await owner.insert(schema.auditEvents).values({ actorId: back.id, action: "auth.sign_in" });
+    await owner
+      .update(schema.userProfiles)
+      .set({ lastSeenAt: new Date(Date.now() - 10 * DAY) })
+      .where(eq(schema.userProfiles.userId, back.id));
     expect(await handleInactiveAccounts()).toEqual({ warned: 0, scheduled: 1 });
     const statuses = await owner
       .select({ id: schema.userProfiles.userId, status: schema.userProfiles.status })
       .from(schema.userProfiles)
-      .where(sql`${schema.userProfiles.userId} IN (${quiet.id}, ${back.id})`);
+      .where(sql`${schema.userProfiles.userId} IN (${quiet.id}, ${back.id}, ${busy.id})`);
     expect(Object.fromEntries(statuses.map((s) => [s.id, s.status]))).toEqual({
       [quiet.id]: "deletion_pending",
       [back.id]: "active",
+      [busy.id]: "active",
     });
   });
 });

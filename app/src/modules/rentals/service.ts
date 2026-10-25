@@ -348,6 +348,7 @@ export async function changeTerms(
   const perr = periodError(start, end, b.priceUnit, now);
   if (perr) fieldErrors.start = perr;
   if (Object.keys(fieldErrors).length) throw new AppError("validation", "request_invalid", { fieldErrors });
+  await enforceRateLimits(db, [{ bucket: `booking:user:${(actor as UserActor).id}`, rule: LIMITS.bookingSteps }]);
   const n = units(start, end, b.priceUnit);
   const title = l!.title;
   try {

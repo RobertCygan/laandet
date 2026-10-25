@@ -41,6 +41,8 @@ export const reports = pgTable(
     handledAt: ts("handled_at"),
     decisionNote: text("decision_note"),
     createdAt: ts("created_at").notNull().defaultNow(),
+    // Set by the database on every change the app makes (0010); retention waits for it.
+    lastChangedAt: ts("last_changed_at").notNull().defaultNow(),
   },
   (t) => [
     index("reports_open_idx").on(t.status, t.createdAt),

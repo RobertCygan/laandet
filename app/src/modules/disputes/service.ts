@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
+import { and, count, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { db, type DbOrTx, type Tx } from "@/db/client";
 import {
@@ -28,6 +28,7 @@ import {
   decodeRecommendation,
   DISPUTE_DEADLINES,
   isOpen,
+  MAX_CASE_EVENTS,
   OPEN_DISPUTE_STATUSES,
   REPORTABLE_BOOKING_STATUSES,
   reportedLate,
@@ -104,6 +105,21 @@ export async function closeCase(
     await inviteReviews(tx, b, await caseTitle(tx, b.id));
   }
 }
+
+/**
+ * Serialises the steps of one case (security review L2): the row lock waits for any other step in the same
+ * case, then the status is checked again. Party input is refused once the case is full (M4).
+ */
+export async function lockCase(tx: Tx, d: DisputeRow, partyInput = true) {
+  const [cur] = await tx.select({ status: disputes.status }).from(disputes).where(eq(disputes.id, d.id)).for("update");
+  if (cur?.status !== d.status) throw new AppError("conflict", "case_changed");
+  if (!partyInput) return;
+  const [n] = await tx.select({ n: count() }).from(disputeEvents).where(eq(disputeEvents.disputeId, d.id));
+  if ((n?.n ?? 0) >= MAX_CASE_EVENTS) throw new AppError("conflict", "case_full");
+}
+
+/** One step by a party in a case: a statement, proposal or answer (M4). Checked before the transaction. */
+const limitCaseStep = (me: string) => enforceRateLimits(db, [{ bucket: `case:user:${me}`, rule: LIMITS.caseSteps }]);
 
 /** Own, not yet attached photos uploaded for a case (scope `dispute`). */
 async function assertOwnPhotos(tx: Tx, me: string, ids: string[]) {
@@ -206,8 +222,10 @@ export async function addStatement(actor: Actor, input: z.infer<typeof statement
   const d = await loadDisputeFor(actor, input.disputeId, "dispute.participate");
   if (!isOpen(d.status)) throw new AppError("conflict", "case_closed");
   const me = (actor as UserActor).id;
+  await limitCaseStep(me);
   const title = await caseTitle(db, d.bookingId);
   await db.transaction(async (tx) => {
+    await lockCase(tx, d);
     await assertOwnPhotos(tx, me, input.photoIds);
     if (input.body)
       await tx.insert(disputeEvents).values({ disputeId: d.id, actorId: me, kind: "statement", body: input.body });
@@ -283,8 +301,10 @@ export async function makeProposal(actor: Actor, input: z.infer<typeof proposalS
   if (input.newReturnAt && new Date(input.newReturnAt) <= now)
     throw new AppError("validation", "proposal_invalid", { fieldErrors: { newReturnAt: "period_in_past" } });
   const me = (actor as UserActor).id;
+  await limitCaseStep(me);
   const title = await caseTitle(db, d.bookingId);
   await db.transaction(async (tx) => {
+    await lockCase(tx, d);
     await tx
       .update(disputeProposals)
       .set({ status: "superseded" })
@@ -318,8 +338,10 @@ export async function respondToProposal(actor: Actor, input: z.infer<typeof resp
   const d = await loadDisputeFor(actor, p.disputeId, "dispute.participate");
   if (p.proposerId === actor.id) throw new AppError("forbidden", "own_proposal");
   if (p.status !== "pending" || !isOpen(d.status)) throw new AppError("conflict", "proposal_not_open");
+  await limitCaseStep(actor.id);
   const title = await caseTitle(db, d.bookingId);
   await db.transaction(async (tx) => {
+    await lockCase(tx, d);
     const updated = await tx
       .update(disputeProposals)
       .set({ status: input.decision === "accept" ? "accepted" : "rejected", respondedBy: actor.id, respondedAt: now })
@@ -361,8 +383,11 @@ export async function answerRecommendation(actor: Actor, input: z.infer<typeof r
     .orderBy(desc(disputeEvents.createdAt))
     .limit(1);
   if (!latest || latest.id !== input.eventId) throw new AppError("conflict", "recommendation_changed");
+  await limitCaseStep(me);
   const title = await caseTitle(db, d.bookingId);
   await db.transaction(async (tx) => {
+    // Both parties answering at once: the second waits here and then sees the first answer.
+    await lockCase(tx, d);
     await tx.insert(disputeEvents).values({
       disputeId: d.id,
       actorId: me,

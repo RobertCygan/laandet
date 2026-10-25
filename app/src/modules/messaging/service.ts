@@ -189,21 +189,24 @@ export async function sendMessage(
   await enforceRateLimits(db, [
     { bucket: `message:user:${user.id}`, rule: user.isNewAccount ? LIMITS.messagesNew : LIMITS.messagesEstablished },
   ]);
+  if (!conversationId) {
+    // Outside the transaction, so the audit row of a refusal is not rolled back with it (review L6).
+    const [existing] = await db
+      .select({ id: conversations.id })
+      .from(conversations)
+      .where(and(eq(conversations.listingId, input.listingId!), eq(conversations.initiatorId, user.id)));
+    if (!existing) {
+      await enforceRateLimits(db, [
+        {
+          bucket: `conversation:user:${user.id}`,
+          rule: user.isNewAccount ? LIMITS.conversationsNew : LIMITS.conversationsEstablished,
+        },
+      ]);
+    }
+  }
 
   return db.transaction(async (tx) => {
     if (!conversationId) {
-      const [existing] = await tx
-        .select({ id: conversations.id })
-        .from(conversations)
-        .where(and(eq(conversations.listingId, input.listingId!), eq(conversations.initiatorId, user.id)));
-      if (!existing) {
-        await enforceRateLimits(tx, [
-          {
-            bucket: `conversation:user:${user.id}`,
-            rule: user.isNewAccount ? LIMITS.conversationsNew : LIMITS.conversationsEstablished,
-          },
-        ]);
-      }
       conversationId = await getOrCreateConversation(tx, {
         listingId: input.listingId!,
         ownerId: otherId,

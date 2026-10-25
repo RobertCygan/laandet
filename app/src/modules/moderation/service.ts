@@ -5,6 +5,7 @@ import { db, type Tx } from "@/db/client";
 import {
   appeals,
   conversations,
+  disputes,
   listings,
   messages,
   moderationActions,
@@ -251,25 +252,50 @@ export async function hideListing(actor: Actor, input: z.infer<typeof hideSchema
   });
 }
 
-/** Staff never handle reports they made or that concern their own listing or profile (AUTH_MODEL §4). */
-async function assertNotOwnCase(actor: UserActor, report: typeof reports.$inferSelect): Promise<void> {
-  if (report.reporterId === actor.id) throw new AppError("forbidden");
-  if (report.targetType === "user" && report.targetId === actor.id) throw new AppError("forbidden");
-  if (report.targetType === "message") {
-    const [m] = await db.select({ senderId: messages.senderId }).from(messages).where(eq(messages.id, report.targetId));
-    if (m?.senderId === actor.id) throw new AppError("forbidden");
+/** The members a report is about: the account, the sender, the listing owner, the review author or the case parties. */
+async function reportedMembers(report: typeof reports.$inferSelect): Promise<string[]> {
+  const id = report.targetId;
+  switch (report.targetType) {
+    case "user":
+      return [id];
+    case "message": {
+      const [m] = await db.select({ senderId: messages.senderId }).from(messages).where(eq(messages.id, id));
+      return m?.senderId ? [m.senderId] : [];
+    }
+    case "listing": {
+      const [l] = await db.select({ ownerId: listings.ownerId }).from(listings).where(eq(listings.id, id));
+      return l ? [l.ownerId] : [];
+    }
+    case "review": {
+      const [r] = await db.select({ authorId: reviews.authorId }).from(reviews).where(eq(reviews.id, id));
+      return r ? [r.authorId] : [];
+    }
+    case "dispute": {
+      const [d] = await db
+        .select({ openedBy: disputes.openedBy, respondentId: disputes.respondentId })
+        .from(disputes)
+        .where(eq(disputes.id, id));
+      return d ? [d.openedBy, d.respondentId] : [];
+    }
   }
-  if (report.targetType === "listing") {
-    const [l] = await db.select({ ownerId: listings.ownerId }).from(listings).where(eq(listings.id, report.targetId));
-    if (l?.ownerId === actor.id) throw new AppError("forbidden");
-  }
+}
+
+/**
+ * Staff never handle a report they made, one about themselves, or one about a review written about them
+ * (AUTH_MODEL §4).
+ */
+export async function assertNotOwnCase(actor: UserActor, report: typeof reports.$inferSelect): Promise<void> {
+  if (report.reporterId === actor.id || (await reportedMembers(report)).includes(actor.id))
+    throw new AppError("forbidden");
   if (report.targetType === "review") {
-    const [r] = await db
-      .select({ authorId: reviews.authorId, subjectId: reviews.subjectId })
-      .from(reviews)
-      .where(eq(reviews.id, report.targetId));
-    if (r && (r.authorId === actor.id || r.subjectId === actor.id)) throw new AppError("forbidden");
+    const [r] = await db.select({ subjectId: reviews.subjectId }).from(reviews).where(eq(reviews.id, report.targetId));
+    if (r?.subjectId === actor.id) throw new AppError("forbidden");
   }
+}
+
+/** A measure against a member may only close a report about that member (security review M3). */
+export async function assertReportAbout(report: typeof reports.$inferSelect, userId: string): Promise<void> {
+  if (!(await reportedMembers(report)).includes(userId)) throw new AppError("validation", "report_mismatch");
 }
 
 export async function dismissReport(actor: Actor, reportId: string, note: string): Promise<void> {
@@ -427,6 +453,19 @@ export async function decideAppeal(actor: Actor, input: z.infer<typeof decideApp
     originalActorId: row.action.actorId,
     otherStaffAvailable: others,
   });
+  // Nobody decides an appeal in a case they are part of: the report's maker, the reported member, or
+  // the author or subject of a removed review (security review L1).
+  if (row.action.reportId) {
+    const [report] = await db.select().from(reports).where(eq(reports.id, row.action.reportId));
+    if (report) await assertNotOwnCase(actor, report);
+  }
+  if (row.action.targetType === "review") {
+    const [r] = await db
+      .select({ authorId: reviews.authorId, subjectId: reviews.subjectId })
+      .from(reviews)
+      .where(eq(reviews.id, row.action.targetId));
+    if (r && (r.authorId === actor.id || r.subjectId === actor.id)) throw new AppError("forbidden");
+  }
   const sameStaff = row.action.actorId === actor.id;
   const [appellant] = await db
     .select({ email: users.email, name: users.name, locale: userProfiles.locale })
@@ -435,7 +474,8 @@ export async function decideAppeal(actor: Actor, input: z.infer<typeof decideApp
     .where(eq(users.id, row.appeal.appellantId));
   const meta = await getRequestMeta();
   await db.transaction(async (tx) => {
-    await tx
+    // Decided once: a second decision (two staff at the same time) would undo the action twice.
+    const decided = await tx
       .update(appeals)
       .set({
         status: input.outcome,
@@ -444,7 +484,9 @@ export async function decideAppeal(actor: Actor, input: z.infer<typeof decideApp
         decidedAt: new Date(),
         decidedBySameStaff: sameStaff,
       })
-      .where(eq(appeals.id, input.appealId));
+      .where(and(eq(appeals.id, input.appealId), eq(appeals.status, "open")))
+      .returning({ id: appeals.id });
+    if (!decided.length) throw new AppError("conflict", "appeal_decided");
     if (input.outcome === "reversed") await undoAction(tx, actor.id, row.action, input.decision);
     await tx.insert(notifications).values({
       userId: row.appeal.appellantId,

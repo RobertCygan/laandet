@@ -48,10 +48,13 @@ describe("dispute rules (DISPUTE_POLICY §2–§3)", () => {
     expect(canEscalate(d("resolved_by_agreement"), at(30 * DAY))).toBe(false);
   });
 
-  it("reopening only within 30 days of closure", () => {
-    expect(canReopen({ status: "closed_without_agreement", closedAt: t0 }, at(29 * DAY))).toBe(true);
-    expect(canReopen({ status: "closed_without_agreement", closedAt: t0 }, at(31 * DAY))).toBe(false);
-    expect(canReopen({ status: "support_review", closedAt: null }, at(DAY))).toBe(false);
+  it("reopening only within 30 days of closure, and only a case that was escalated", () => {
+    const closed = { status: "closed_without_agreement", closedAt: t0, escalatedAt: at(-DAY) } as const;
+    expect(canReopen(closed, at(29 * DAY))).toBe(true);
+    expect(canReopen(closed, at(31 * DAY))).toBe(false);
+    expect(canReopen({ status: "support_review", closedAt: null, escalatedAt: at(-DAY) }, at(DAY))).toBe(false);
+    // M2: settled between the parties without Laandet → staff cannot pull it back in.
+    expect(canReopen({ status: "resolved_by_agreement", closedAt: t0, escalatedAt: null }, at(DAY))).toBe(false);
   });
 
   it("recommendation round-trip, and garbage is ignored", () => {

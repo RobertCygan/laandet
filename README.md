@@ -14,6 +14,7 @@ It is an independent project in the **G-PSI.ai** portfolio.
 | **Phase 00:** inventory, architecture, data model, threat model, legal drafts, roadmap | **Approved by the owner** on 25.10.2026 (D-001…D-029 accepted) |
 | **Phase 01:** accounts, listings, uploads, explore, legal pages, reporting (`app/`) | **Approved by the owner** on 25.10.2026. Tested locally and in CI. |
 | **Phase 02:** messages, rental requests and bookings, agreements, giveaway claims, condition reports, worker jobs and notices | **Approved by the owner** on 25.10.2026. Tested locally and in CI. Rentals stay closed (`rentals_open` off) until the owner opens them. See `docs/CHANGELOG.md`. |
+| **Phase 03:** cases between the parties with staff help, reviews, account measures and appeals, admin panel, data export, retention and erasure, transparency figures, security pass with OWASP ASVS L1 | **Tested** locally and in CI; **waiting for the owner's approval.** An independent security review found 1 high, 4 medium and 7 low issues; all are fixed with tests. Open owner decisions are listed in `docs/ASVS_L1.md`. See `docs/CHANGELOG.md`. |
 | Deployment (staging/production) | **Not deployed.** Deploy files and runbooks exist (`deploy/`, `docs/runbooks/`) and were tested locally with Docker. A server and domain must first be bought by the owner. |
 | Database reference schema | Designed. **Validated:** applied to PostgreSQL 16 and 23/23 checks passed (`docs/DATA_MODEL.md` §9) |
 | Legal drafts (nb authoritative, en informational) | **Drafts. Not legally reviewed. Must not be used with real users before review.** |
@@ -30,11 +31,13 @@ laandet/
 ├─ docs/                        project documentation (English)
 │  ├─ MASTER_SPECIFICATION.md   owner's master prompt (verbatim) + amendments
 │  ├─ CURRENT_STATE_ASSESSMENT.md  what exists, what works, what to reuse
-│  ├─ DECISIONS.md              ADR log (D-001 … D-041); D-001…D-029 accepted 25.10.2026
+│  ├─ DECISIONS.md              ADR log (D-001 … D-055); D-001…D-047 accepted, D-048…D-055 proposed
 │  ├─ ARCHITECTURE.md           smallest viable secure architecture
 │  ├─ DATA_MODEL.md             entities, state machines, privileges, validation record
 │  ├─ AUTH_MODEL.md             authentication + authorisation matrix
 │  ├─ SECURITY.md               security requirements SEC-01 … SEC-63
+│  ├─ SECURITY_VERIFICATION.md  status and evidence for every SEC requirement and N1–N15
+│  ├─ ASVS_L1.md                OWASP ASVS 4.0.3 Level 1 self-assessment
 │  ├─ THREAT_MODEL.md           assets, actors, 29 threats with controls
 │  ├─ CONDITION_REPORTS.md      handover/return condition report design
 │  ├─ RENTAL_AGREEMENTS.md      agreement selection, snapshots, acceptance, deposit rules

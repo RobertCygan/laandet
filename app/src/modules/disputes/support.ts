@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, isNotNull, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { z } from "zod";
 import { db } from "@/db/client";
@@ -21,8 +21,8 @@ import { assertCan } from "@/modules/authz/policy";
 import { AppError } from "@/modules/errors";
 import { getRequestMeta } from "@/modules/server/request-meta";
 import { activeGrant } from "./access";
-import { canReopen, DISPUTE_DEADLINES, encodeRecommendation, isOpen, STAFF_CLOSURES } from "./rules";
-import { caseTitle, closeCase, tellParties } from "./service";
+import { canReopen, DISPUTE_DEADLINES, encodeRecommendation, isOpen, MAX_CASE_EVENTS, STAFF_CLOSURES } from "./rules";
+import { caseTitle, closeCase, lockCase, tellParties } from "./service";
 
 /**
  * Staff facilitation (P03-01, DISPUTE_POLICY §2 step 4–6). Staff read a case only with a time-boxed
@@ -147,12 +147,18 @@ export async function getCaseForStaff(actor: Actor, disputeId: string) {
       .select({ id: users.id, name: users.name })
       .from(users)
       .where(inArray(users.id, [d.openedBy, d.respondentId])),
-    db.select().from(disputeEvents).where(eq(disputeEvents.disputeId, d.id)).orderBy(asc(disputeEvents.createdAt)),
+    db
+      .select()
+      .from(disputeEvents)
+      .where(eq(disputeEvents.disputeId, d.id))
+      .orderBy(asc(disputeEvents.createdAt))
+      .limit(MAX_CASE_EVENTS + 100),
     db
       .select()
       .from(disputeProposals)
       .where(eq(disputeProposals.disputeId, d.id))
-      .orderBy(asc(disputeProposals.createdAt)),
+      .orderBy(asc(disputeProposals.createdAt))
+      .limit(MAX_CASE_EVENTS),
     db.select().from(conditionReports).where(eq(conditionReports.bookingId, d.bookingId)),
   ]);
   const entries = reports.length
@@ -275,6 +281,8 @@ export async function recommend(actor: Actor, input: z.infer<typeof recommendSch
   const me = (actor as UserActor).id;
   const title = await caseTitle(db, d.bookingId);
   await db.transaction(async (tx) => {
+    // The case may have closed since it was read (security review L2).
+    await lockCase(tx, d, false);
     await tx.insert(disputeEvents).values({
       disputeId: d.id,
       actorId: me,
@@ -368,7 +376,7 @@ export async function reopenCase(actor: Actor, input: z.infer<typeof reopenSchem
   }
 }
 
-/** Recently closed cases a staff member may reopen (metadata only). */
+/** Recently closed, once escalated cases a staff member may reopen (metadata only). */
 export async function listRecentlyClosed(actor: Actor, now = new Date()) {
   assertCan(actor, "dispute.support");
   const since = new Date(now.getTime() - DISPUTE_DEADLINES.reopenDays * DAY);
@@ -383,7 +391,7 @@ export async function listRecentlyClosed(actor: Actor, now = new Date()) {
       respondentId: disputes.respondentId,
     })
     .from(disputes)
-    .where(sql`${disputes.closedAt} >= ${since.toISOString()}::timestamptz`)
+    .where(and(sql`${disputes.closedAt} >= ${since.toISOString()}::timestamptz`, isNotNull(disputes.escalatedAt)))
     .orderBy(desc(disputes.closedAt))
     .limit(50);
   return rows.filter((r) => r.openedBy !== me && r.respondentId !== me);
