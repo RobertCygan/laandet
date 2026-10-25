@@ -37,15 +37,16 @@ two-factor sign-in at `/konto/tofaktor` before `/admin` opens.
 
 ## Commands
 
-| Command                                                       | What it does                                                                           |
-| ------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `npm run dev` / `npm run build` / `npm start`                 | Next.js dev server, production build, production server                                |
-| `npm run lint` / `npm run format:check` / `npm run typecheck` | ESLint (incl. security rules), Prettier, TypeScript                                    |
-| `npm run test:unit`                                           | Vitest unit tests (`src/**/*.test.ts`)                                                 |
-| `npm run test:integration`                                    | Vitest against the `laandet_test` database (migrations, seed and legal load run first) |
-| `npm run build && npm run test:e2e`                           | Playwright (mobile + desktop) against the production build on port 3100                |
-| `npm run db:generate`                                         | Generate a migration from `src/db/schema` (review the SQL before committing)           |
-| `npm run worker -- --once`                                    | Run every worker job once and exit                                                     |
+| Command                                                       | What it does                                                                                                                               |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `npm run dev` / `npm run build` / `npm start`                 | Next.js dev server, production build, production server                                                                                    |
+| `npm run lint` / `npm run format:check` / `npm run typecheck` | ESLint (incl. security rules), Prettier, TypeScript                                                                                        |
+| `npm run test:unit`                                           | Vitest unit tests (`src/**/*.test.ts`)                                                                                                     |
+| `npm run test:integration`                                    | Vitest against the `laandet_test` database (migrations, seed and legal load run first)                                                     |
+| `npm run build && npm run test:e2e`                           | Playwright (mobile + desktop) against the production build on port 3100                                                                    |
+| `npm run db:generate`                                         | Generate a migration from `src/db/schema` (review the SQL before committing)                                                               |
+| `npm run worker -- --once`                                    | Run every worker job once and exit                                                                                                         |
+| `npm run release:check`                                       | Release gates code can check (legal markers and drafts; in production demo listings and the sender address). Exits 1 while blockers remain |
 
 Tests only ever use databases whose name ends in `_test`. Override the URLs with `TEST_DATABASE_URL` and
 `TEST_DATABASE_MIGRATION_URL`.

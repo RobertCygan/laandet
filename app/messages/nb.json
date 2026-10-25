@@ -314,6 +314,8 @@
     "email": "E-post",
     "password": "Passord",
     "passwordHint": "Minst 6 tegn. Bruk gjerne flere ord du husker.",
+    "showPassword": "Vis passord",
+    "hidePassword": "Skjul passord",
     "localityOptional": "Område (valgfritt)",
     "chooseLocality": "Velg område",
     "age18": "Jeg er 18 år eller eldre.",

@@ -111,7 +111,9 @@ test.describe("Phase 02 journeys at 390 px", () => {
     expect(problems).toEqual([]);
   });
 
-  test("giveaway: claim → the giver chooses → both confirm → «Gitt bort»", async ({ browser }) => {
+  test("giveaway: two claims → the giver chooses one → both confirm → «Gitt bort»; the other is told, then expires", async ({
+    browser,
+  }) => {
     test.setTimeout(180_000);
     const giver = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
     await registerAndVerify(giver, uniqueEmail("p02-giver"), "Gunn G.");
@@ -142,11 +144,24 @@ test.describe("Phase 02 journeys at 390 px", () => {
     await accessible(taker);
     const claimPath = new URL(taker.url()).pathname;
 
+    // A second person wants it too (TEST_STRATEGY §5 journey 2).
+    const other = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
+    await registerAndVerify(other, uniqueEmail("p02-mottaker2"), "Siv S.");
+    await other.goto(listingPath);
+    await other
+      .locator("form", { hasText: "Giveren velger selv" })
+      .getByRole("button", { name: "Jeg vil gjerne ha den" })
+      .click();
+    await expect(other).toHaveURL(/\/overlevering\/[0-9a-f-]{36}\?ok=claimed/);
+
     await giver.goto(listingPath);
-    await expect(giver.getByText("Tor T.")).toBeVisible();
-    await giver.getByRole("button", { name: "Velg" }).click();
+    await expect(giver.getByText("Siv S.")).toBeVisible();
+    await giver.locator("li", { hasText: "Tor T." }).getByRole("button", { name: "Velg" }).click();
     await expect(giver).toHaveURL(new RegExp(`${claimPath}\\?ok=select`));
     await expect(giver.getByRole("heading", { name: /GB-\d{4}-\d{6}/ })).toBeVisible();
+    // The one not chosen is told, and the claim stays open until the transfer.
+    await other.goto("/varsler");
+    await expect(other.getByText("Giveren har valgt en annen mottaker av «Gammel bormaskin» foreløpig.")).toBeVisible();
 
     for (const p of [giver, taker]) {
       await p.goto(claimPath);
@@ -157,5 +172,10 @@ test.describe("Phase 02 journeys at 390 px", () => {
     await giver.goto(listingPath);
     await expect(giver.getByText(/Gitt bort/).first()).toBeVisible();
     await noHorizontalScroll(giver);
+    // After the transfer the other claim has expired.
+    await other.goto("/leieforhold");
+    await expect(
+      other.getByRole("link", { name: /Gammel bormaskin/ }).getByText("Utløpt", { exact: true }),
+    ).toBeVisible();
   });
 });

@@ -12,12 +12,12 @@ import {
   signUpAction,
   totpAction,
 } from "@/modules/auth/actions";
-import { PASSWORD_MAX, PASSWORD_MIN } from "@/modules/auth/password-rules";
 import { idle } from "@/modules/server/action";
 import { Link } from "@/i18n/navigation";
 import { Notice } from "@/ui/Notice";
 import { SubmitButton } from "@/ui/SubmitButton";
 import { FieldError, FormError, invalid, prev } from "./FormMessages";
+import { PasswordField } from "./PasswordField";
 
 type Loc = "nb" | "en";
 
@@ -72,21 +72,13 @@ export function SignUpForm({
         />
         <FieldError state={state} name="email" />
       </label>
-      <label className="field">
-        {t("password")}
-        <span className="field-hint">{t("passwordHint")}</span>
-        <input
-          name="password"
-          type="password"
-          autoComplete="new-password"
-          required
-          minLength={PASSWORD_MIN}
-          maxLength={PASSWORD_MAX}
-          aria-invalid={invalid(state, "password")}
-          aria-describedby="password-error"
-        />
-        <FieldError state={state} name="password" />
-      </label>
+      <PasswordField
+        label={t("password")}
+        hint={t("passwordHint")}
+        name="password"
+        autoComplete="new-password"
+        state={state}
+      />
       <label className="field">
         {t("localityOptional")}
         <select name="locality" defaultValue={prev(state, "locality") ?? ""} key={prev(state, "locality") ?? ""}>
@@ -146,10 +138,7 @@ export function SignInForm({ locale, next }: { locale: Loc; next?: string }) {
         {t("email")}
         <input name="email" type="email" autoComplete="email" required defaultValue={prev(state, "email")} />
       </label>
-      <label className="field">
-        {t("password")}
-        <input name="password" type="password" autoComplete="current-password" required />
-      </label>
+      <PasswordField label={t("password")} name="password" autoComplete="current-password" />
       <SubmitButton pendingLabel={tc("sending")}>{t("signInButton")}</SubmitButton>
       {state.status === "error" && state.code === "email_unverified" && <ResendInline />}
     </form>
@@ -231,20 +220,13 @@ export function ResetPasswordForm({ token }: { token: string }) {
     <form action={action} className="flex flex-col gap-5">
       <FormError state={state} />
       <input type="hidden" name="token" value={token} />
-      <label className="field">
-        {t("newPassword")}
-        <span className="field-hint">{t("passwordHint")}</span>
-        <input
-          name="password"
-          type="password"
-          autoComplete="new-password"
-          required
-          minLength={PASSWORD_MIN}
-          maxLength={PASSWORD_MAX}
-          aria-invalid={invalid(state, "password")}
-        />
-        <FieldError state={state} name="password" />
-      </label>
+      <PasswordField
+        label={t("newPassword")}
+        hint={t("passwordHint")}
+        name="password"
+        autoComplete="new-password"
+        state={state}
+      />
       <SubmitButton>{t("resetButton")}</SubmitButton>
     </form>
   );
@@ -291,11 +273,7 @@ export function DeleteAccountForm({ locale }: { locale: Loc }) {
     <form action={action} className="flex flex-col gap-5">
       <FormError state={state} />
       <input type="hidden" name="locale" value={locale} />
-      <label className="field">
-        {t("deletePassword")}
-        <input name="password" type="password" autoComplete="current-password" required />
-        <FieldError state={state} name="password" />
-      </label>
+      <PasswordField label={t("deletePassword")} name="password" autoComplete="current-password" state={state} />
       <label className="check">
         <input type="checkbox" name="confirm" required />
         <span>{t("deleteConfirm")}</span>

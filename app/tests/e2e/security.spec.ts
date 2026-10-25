@@ -30,6 +30,21 @@ test("SEC-22: a Server Action posted with a foreign Origin is refused", async ({
   await expect(page).toHaveURL(/\/logg-inn\?neste=/);
 });
 
+test("«Vis passord» shows and hides the password and is a named toggle (ASVS 2.1.12)", async ({ page }) => {
+  await page.goto("/logg-inn");
+  const field = page.getByLabel("Passord");
+  await field.fill("hemmelig");
+  await expect(field).toHaveAttribute("type", "password");
+  await page.getByRole("button", { name: "Vis passord" }).click();
+  await expect(field).toHaveAttribute("type", "text");
+  const hide = page.getByRole("button", { name: "Skjul passord" });
+  await expect(hide).toHaveAttribute("aria-pressed", "true");
+  await expect(hide).toHaveAttribute("aria-controls", (await field.getAttribute("id"))!);
+  await hide.click();
+  await expect(field).toHaveAttribute("type", "password");
+  await expect(field).toHaveValue("hemmelig");
+});
+
 test("SEC-11, SEC-12, N10: a __Host- HttpOnly Secure SameSite=Lax session that stops working when the account goes", async ({
   page,
   context,
