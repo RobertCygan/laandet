@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { pageLocale, param } from "@/i18n/page";
+import { redirect } from "next/navigation";
+import { localePath, pageLocale, param } from "@/i18n/page";
 import { requirePageUser } from "@/modules/auth/guards";
 import { can } from "@/modules/authz/policy";
 import { flagEnabled } from "@/modules/flags/flags";
+import { pendingAcceptances } from "@/modules/legal/acceptance";
 import { emptyInitial, wizardOptions } from "@/modules/listings/wizard";
 import { ResendVerificationForm } from "@/ui/forms/AuthForms";
 import { PageHeader } from "@/ui/layout/PageHeader";
@@ -20,6 +22,9 @@ const TYPES = ["rent_out", "wanted", "give_away"] as const;
 export default async function NewListingPage({ params, searchParams }: PageProps<"/[locale]/ny-annonse">) {
   const locale = await pageLocale(params);
   const actor = await requirePageUser(locale, "/ny-annonse");
+  if ((await pendingAcceptances(actor)).length) {
+    redirect(`${localePath(locale, "/godta-vilkar")}?neste=${encodeURIComponent(localePath(locale, "/ny-annonse"))}`);
+  }
   const t = await getTranslations("wizard");
   const ta = await getTranslations("auth");
   const te = await getTranslations("errors");

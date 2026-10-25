@@ -66,7 +66,7 @@ const FIELD_STEP: Record<string, number> = {
   deliveryFee: 4,
   deliveryRadiusKm: 4,
   meetingAreaNote: 4,
-  restrictedAck: 4,
+  restrictedAck: 5,
 };
 
 export function ListingWizard({
@@ -74,17 +74,19 @@ export function ListingWizard({
   categories,
   localities,
   initial,
+  initialStep,
 }: {
   locale: Loc;
   categories: WizardCategory[];
   localities: { id: string; name: string }[];
   initial: WizardInitial;
+  initialStep?: number;
 }) {
   const t = useTranslations("wizard");
   const tl = useTranslations("listing");
   const tc = useTranslations("common");
   const [state, dispatch, pending] = useActionState(saveListingAction, idle);
-  const [step, setStep] = useState(initial.type ? 2 : 1);
+  const [step, setStep] = useState(initialStep ?? (initial.type ? 2 : 1));
   const [type, setType] = useState<ListingType | undefined>(initial.type);
   const [categoryId, setCategoryId] = useState(initial.categoryId ?? "");
   const [freeLoan, setFreeLoan] = useState(initial.freeLoan);
@@ -149,6 +151,7 @@ export function ListingWizard({
 
       <input type="hidden" name="locale" value={locale} />
       {initial.listingId && <input type="hidden" name="listingId" value={initial.listingId} />}
+      <input type="hidden" name="step" value={step} />
 
       {/* Step 1: type and category */}
       <div hidden={step !== 1} className="flex flex-col gap-6">
@@ -331,7 +334,7 @@ export function ListingWizard({
             </label>
           </>
         )}
-        {type === "give_away" && <Notice>{tl("free")}</Notice>}
+        {type === "give_away" && <Notice>{t("giveFreeNote")}</Notice>}
         {!type && <Notice tone="warning">{t("stepType")}</Notice>}
       </div>
 
@@ -391,6 +394,11 @@ export function ListingWizard({
           )}
           <FieldError state={state} name="handover" />
         </fieldset>
+      </div>
+
+      {/* Step 5: preview */}
+      <div hidden={step !== 5} className="flex flex-col gap-5">
+        <Notice tone="warning">{t("previewNoAddress")}</Notice>
         {category?.policy === "restricted" && (
           <div className="flex flex-col gap-2">
             {category.safetyNotice && <Notice tone="warning">{category.safetyNotice[locale]}</Notice>}
@@ -401,11 +409,6 @@ export function ListingWizard({
             <FieldError state={state} name="restrictedAck" />
           </div>
         )}
-      </div>
-
-      {/* Step 5: preview */}
-      <div hidden={step !== 5} className="flex flex-col gap-5">
-        <Notice tone="warning">{t("previewNoAddress")}</Notice>
         <div className="card p-5">
           <p className="category-label">
             {type ? tl(`type.${type}`) : "–"} · {category?.labels[locale] ?? "–"}

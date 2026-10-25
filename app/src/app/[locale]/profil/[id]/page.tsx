@@ -8,6 +8,7 @@ import { pageLocale } from "@/i18n/page";
 import { getActor } from "@/modules/auth/actor";
 import { getPublicProfile } from "@/modules/users/service";
 import { ReportForm } from "@/ui/listings/ListingActions";
+import { ReportSignedOut } from "@/ui/listings/ReportSignedOut";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/profil/[id]">): Promise<Metadata> {
   const { id } = await params;
@@ -22,7 +23,6 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
   if (!p) notFound();
   const t = await getTranslations("profile");
   const tl = await getTranslations("listing");
-  const tr = await getTranslations("report");
   const isNew = Date.now() - p.createdAt.getTime() < 30 * 24 * 60 * 60 * 1000;
   const self = actor.kind === "user" && actor.id === p.id;
 
@@ -71,7 +71,7 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
       {!self && (
         <details className="card mt-10 p-6">
           <summary className="cursor-pointer font-bold">{t("report")}</summary>
-          <div className="mt-4">{actor.kind === "user" ? <ReportForm targetType="user" targetId={p.id} /> : <p>{tr("signInFirst")}</p>}</div>
+          <div className="mt-4">{actor.kind === "user" ? <ReportForm targetType="user" targetId={p.id} /> : <ReportSignedOut returnTo={`${locale === "en" ? "/en" : ""}/profil/${p.id}`} />}</div>
         </details>
       )}
     </div>

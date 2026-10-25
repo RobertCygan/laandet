@@ -259,3 +259,41 @@ export async function confirmTwoFactorSetup(actor: UserActor, code: string): Pro
   }
   await recordAudit(db, { actorId: actor.id, actorRole: actor.role, action: "auth.two_factor_enabled", targetType: "user", targetId: actor.id, meta });
 }
+
+/** «Endre passord»: current password required; other sessions are signed out (P01-07). */
+export async function changePassword(actor: UserActor, currentPassword: string, newPassword: string): Promise<void> {
+  const meta = await getRequestMeta();
+  await enforceRateLimits(db, [{ bucket: `password-change:user:${actor.id}`, rule: LIMITS.signInPerEmail }]);
+  try {
+    await auth.api.changePassword({ body: { currentPassword, newPassword, revokeOtherSessions: true }, headers: await headers() });
+  } catch (err) {
+    if (isAPIError(err)) {
+      const code = (err.body as { code?: string } | undefined)?.code;
+      if (code === "PASSWORD_COMPROMISED") throw new AppError("validation", "password_compromised", { fieldErrors: { newPassword: "password_compromised" } });
+      if (code === "INVALID_PASSWORD") throw new AppError("validation", "wrong_password", { fieldErrors: { currentPassword: "wrong_password" } });
+      throw new AppError("validation");
+    }
+    throw err;
+  }
+  await queueEmail(db, { toEmail: actor.email, toUserId: actor.id, template: "password_changed", locale: actor.locale, payload: { name: actor.name } });
+  await recordAudit(db, { actorId: actor.id, action: "auth.password_changed", targetType: "user", targetId: actor.id, meta });
+}
+
+/**
+ * «Endre e-post»: re-authenticate, then a verification link goes to the new address. The old
+ * address is told about the request. The response never reveals whether the address is taken.
+ */
+export async function changeEmail(actor: UserActor, password: string, newEmail: string, locale: "nb" | "en"): Promise<void> {
+  if (!(await verifyCurrentPassword(password))) throw new AppError("validation", "wrong_password", { fieldErrors: { password: "wrong_password" } });
+  const meta = await getRequestMeta();
+  await enforceRateLimits(db, [{ bucket: `email-change:user:${actor.id}`, rule: LIMITS.emailPerAddress }]);
+  if (newEmail === actor.email) return;
+  try {
+    await auth.api.changeEmail({ body: { newEmail, callbackURL: lp(locale, "/konto?epost=1") }, headers: await headers() });
+  } catch (err) {
+    if (!isAPIError(err)) throw err;
+    throw new AppError("validation");
+  }
+  await queueEmail(db, { toEmail: actor.email, toUserId: actor.id, template: "email_change_requested", locale: actor.locale, payload: { name: actor.name } });
+  await recordAudit(db, { actorId: actor.id, action: "auth.email_change_requested", targetType: "user", targetId: actor.id, meta });
+}

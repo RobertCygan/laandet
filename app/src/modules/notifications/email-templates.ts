@@ -6,6 +6,7 @@ export type EmailTemplate =
   | "verify_email"
   | "reset_password"
   | "password_changed"
+  | "email_change_requested"
   | "existing_account_signup"
   | "deletion_requested"
   | "listing_hidden"
@@ -49,6 +50,16 @@ const templates: Record<EmailTemplate, Record<"nb" | "en", (p: Payload) => Rende
     en: (p) => ({
       subject: "Your Laandet password has been changed",
       text: `Hi ${p.name}!\n\nThe password for your account was changed, and you have been signed out on other devices. Was it not you? Set a new password right away via "Forgot password" and contact us.`,
+    }),
+  },
+  email_change_requested: {
+    nb: (p) => ({
+      subject: "Endring av e-postadresse hos Laandet",
+      text: `Hei ${p.name}!\n\nDet er bedt om å endre e-postadressen for kontoen din hos Laandet. Endringen skjer først når lenken som er sendt til den nye adressen, blir åpnet. Var det ikke deg? Endre passordet ditt med en gang via «Glemt passord» og kontakt oss.`,
+    }),
+    en: (p) => ({
+      subject: "Change of email address at Laandet",
+      text: `Hi ${p.name}!\n\nA change of the email address for your Laandet account was requested. It only takes effect when the link sent to the new address is opened. Was it not you? Change your password right away via "Forgot password" and contact us.`,
     }),
   },
   existing_account_signup: {

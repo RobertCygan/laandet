@@ -102,6 +102,8 @@ export const auth = betterAuth({
       });
     },
   },
+  // The new address must be verified before the change takes effect (P01-07).
+  user: { changeEmail: { enabled: true } },
   session: {
     expiresIn: 30 * DAY,
     updateAge: DAY,

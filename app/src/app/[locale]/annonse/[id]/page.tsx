@@ -13,6 +13,8 @@ import { classifyValue } from "@/modules/listings/rules";
 import { latestDecisionForOwnListing } from "@/modules/moderation/service";
 import { CategoryIcon } from "@/ui/Icon";
 import { ReportForm } from "@/ui/listings/ListingActions";
+import { ReportSignedOut } from "@/ui/listings/ReportSignedOut";
+import { SaveWarnings } from "@/ui/listings/SaveWarnings";
 import { Notice } from "@/ui/Notice";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/annonse/[id]">): Promise<Metadata> {
@@ -39,7 +41,6 @@ export default async function ListingPage({ params, searchParams }: PageProps<"/
   const t = await getTranslations("detail");
   const tl = await getTranslations("listing");
   const tw = await getTranslations("wizard");
-  const tr = await getTranslations("report");
   const tc = await getTranslations("common");
   const lagret = param(sp.lagret);
   const unit = tl(`unit.${l.priceUnit ?? "day"}`);
@@ -59,7 +60,7 @@ export default async function ListingPage({ params, searchParams }: PageProps<"/
             {tw(lagret as "saved" | "published" | "updated")}
           </Notice>
         )}
-        {param(sp.advarsel) === "kontakt" && <Notice tone="warning">{tw("warnContact")}</Notice>}
+        <SaveWarnings value={param(sp.advarsel)} />
         {l.isDemo && <Notice tone="warning">{t("demoNotice")}</Notice>}
         {l.status === "removed" && isOwner && (
           <Notice tone="danger">
@@ -232,16 +233,25 @@ export default async function ListingPage({ params, searchParams }: PageProps<"/
             {l.type === "rent_out" && highValue && <Notice tone="warning">{t("highValueNotice")}</Notice>}
             {l.type === "rent_out" && !d.category.allowPaidRental && <Notice>{t("freeLoanNotice")}</Notice>}
             {!l.isDemo && !isOwner && l.status === "published" && (
-              <Notice>
-                {l.type === "rent_out" && !rentalsOpen ? (
-                  <>
-                    <p className="font-bold">{t("requestSoon")}</p>
-                    <p>{t("requestSoonText")}</p>
-                  </>
-                ) : (
-                  <p>{t("contactSoon")}</p>
+              <div className="flex flex-col gap-2">
+                {l.type === "rent_out" && !rentalsOpen && (
+                  <button type="button" className="button button-primary w-full" disabled aria-describedby="request-soon">
+                    {t("sendRequest")}
+                  </button>
                 )}
-              </Notice>
+                <Notice>
+                  <div id="request-soon">
+                    {l.type === "rent_out" && !rentalsOpen ? (
+                      <>
+                        <p className="font-bold">{t("requestSoon")}</p>
+                        <p>{t("requestSoonText")}</p>
+                      </>
+                    ) : (
+                      <p>{t("contactSoon")}</p>
+                    )}
+                  </div>
+                </Notice>
+              </div>
             )}
 
             {!isOwner && l.status === "published" && (
@@ -270,7 +280,7 @@ export default async function ListingPage({ params, searchParams }: PageProps<"/
           {!isOwner && (
             <details className="card p-6">
               <summary className="cursor-pointer font-bold">{t("report")}</summary>
-              <div className="mt-4">{actor.kind === "user" ? <ReportForm targetType="listing" targetId={l.id} /> : <p>{tr("signInFirst")}</p>}</div>
+              <div className="mt-4">{actor.kind === "user" ? <ReportForm targetType="listing" targetId={l.id} /> : <ReportSignedOut returnTo={`${locale === "en" ? "/en" : ""}/annonse/${l.id}`} />}</div>
             </details>
           )}
         </aside>

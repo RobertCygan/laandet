@@ -185,7 +185,8 @@
     "images": "Bilder",
     "openImage": "Åpne bilde {n} i full størrelse",
     "removedNotice": "Annonsen er skjult av Laandet.",
-    "seeDecision": "Se begrunnelsen og klag"
+    "seeDecision": "Se begrunnelsen og klag",
+    "sendRequest": "Send forespørsel"
   },
   "explore": {
     "title": "Utforsk nabolaget",
@@ -288,7 +289,9 @@
     "published": "Annonsen er publisert.",
     "updated": "Endringene er lagret.",
     "warnContact": "Beskrivelsen ser ut til å inneholde kontaktinformasjon. Del heller kontaktinfo i meldinger når dere har avtalt.",
-    "typeLocked": "Typen kan ikke endres etter at annonsen er laget."
+    "typeLocked": "Typen kan ikke endres etter at annonsen er laget.",
+    "giveFreeNote": "Gratis – Laandet tar ingen gebyr.",
+    "warnKeywords": "Annonsen kan handle om en forbudt eller begrenset gjenstand. Sjekk reglene. Hvis du publiserer, ser en moderator på annonsen."
   },
   "myListings": {
     "title": "Mine annonser",
@@ -371,7 +374,16 @@
     "deletedText": "Vi har sendt deg en bekreftelse på e-post. Takk for at du var med i Laandet.",
     "statusRestricted": "Kontoen din er begrenset. Du kan ikke legge ut nye annonser. Se begrunnelsen i e-posten fra oss.",
     "statusSuspended": "Kontoen din er suspendert. Du kan klage på avgjørelsen.",
-    "statusDeletion": "Kontoen din er under sletting."
+    "statusDeletion": "Kontoen din er under sletting.",
+    "passwordHeading": "Endre passord",
+    "currentPassword": "Nåværende passord",
+    "changePasswordButton": "Endre passord",
+    "passwordChanged": "Passordet er endret. Du er logget ut fra andre enheter.",
+    "newEmail": "Ny e-postadresse",
+    "changeEmailButton": "Endre e-post",
+    "emailChangeSent": "Hvis adressen kan brukes, har vi sendt en lenke til den nye adressen. E-postadressen endres når du åpner lenken.",
+    "emailChanged": "E-postadressen er endret og bekreftet.",
+    "changeEmailHint": "Vi sender en bekreftelseslenke til den nye adressen."
   },
   "profile": {
     "memberSince": "Medlem siden {date}",
@@ -454,7 +466,21 @@
     "setup2faUri": "Legg inn denne nøkkelen i appen (eller bruk lenken på mobilen):",
     "setup2faBackup": "Reservekoder (vises bare nå – lagre dem trygt):",
     "setup2faVerify": "Bekreft med kode",
-    "setup2faDone": "Tofaktorinnlogging er slått på."
+    "setup2faDone": "Tofaktorinnlogging er slått på.",
+    "recent": "Siste avgjørelser",
+    "noRecent": "Ingen avgjørelser ennå.",
+    "reportedProfile": "Rapportert profil",
+    "reportedAt": "Rapportert {date}",
+    "appealAbout": "Klage på «{title}»",
+    "originalStatement": "Opprinnelig begrunnelse",
+    "filterAll": "Alle åpne",
+    "filterAutomatic": "Bare automatiske",
+    "profileNote": "Tiltak mot profiler (begrensning eller suspensjon) gjøres foreløpig manuelt av en administrator. Avvis rapporten med et notat når saken er håndtert.",
+    "openProfile": "Åpne profilen",
+    "dashboardLead": "Bare tall, ingen personopplysninger.",
+    "reportDetails": "Detaljer fra den som rapporterte",
+    "listingHiddenLabel": "Annonse skjult",
+    "reasonsLabel": "Regel"
   },
   "errors": {
     "auth_required": "Du må logge inn først.",
@@ -480,7 +506,8 @@
     "appeal_exists": "Du har allerede klaget på denne avgjørelsen.",
     "notFoundTitle": "Siden finnes ikke",
     "notFoundText": "Lenken kan være feil, eller annonsen er fjernet.",
-    "toFront": "Til forsiden"
+    "toFront": "Til forsiden",
+    "terms_acceptance_required": "Du må godta de oppdaterte vilkårene før du kan publisere."
   },
   "validation": {
     "required": "Må fylles ut.",
@@ -519,7 +546,8 @@
     "image_too_large": "Bildet er større enn 10 MB.",
     "image_unsupported_type": "Bare JPEG, PNG, WebP og HEIC kan lastes opp.",
     "image_too_many_pixels": "Bildet har for høy oppløsning.",
-    "image_undecodable": "Bildet kunne ikke leses. Prøv å ta bildet på nytt, eller lagre det som JPEG."
+    "image_undecodable": "Bildet kunne ikke leses. Prøv å ta bildet på nytt, eller lagre det som JPEG.",
+    "wrong_password": "Feil passord."
   },
   "pages": {
     "howTitle": "Slik fungerer Laandet",
@@ -564,6 +592,13 @@
   "legalPage": {
     "version": "Versjon {version}",
     "updated": "Lastet inn {date}",
-    "missing": "Dokumentet er ikke publisert ennå."
+    "missing": "Dokumentet er ikke publisert ennå.",
+    "acceptTitle": "Oppdaterte vilkår",
+    "acceptLead": "Vi har gjort vesentlige endringer i dokumentene under. Les dem, og godta dem for å fortsette å legge ut annonser.",
+    "acceptCheckbox": "Jeg har lest og godtar de oppdaterte dokumentene.",
+    "acceptButton": "Godta",
+    "acceptBanner": "Vi har oppdatert vilkårene våre.",
+    "acceptLink": "Les og godta",
+    "norwegianVersion": "Les den norske versjonen"
   }
 }

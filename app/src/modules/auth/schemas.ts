@@ -56,3 +56,14 @@ export const deleteAccountSchema = z.object({
 export const twoFactorStartSchema = z.object({
   password: z.string().min(1, { error: "required" }).max(128),
 });
+
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, { error: "required" }).max(128),
+  newPassword: passwordSchema,
+});
+
+export const changeEmailSchema = z.object({
+  password: z.string().min(1, { error: "required" }).max(128),
+  newEmail: emailSchema,
+  locale: z.enum(["nb", "en"]),
+});

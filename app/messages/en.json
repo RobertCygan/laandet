@@ -185,7 +185,8 @@
     "images": "Photos",
     "openImage": "Open photo {n} in full size",
     "removedNotice": "This listing has been hidden by Laandet.",
-    "seeDecision": "See the reasons and appeal"
+    "seeDecision": "See the reasons and appeal",
+    "sendRequest": "Send request"
   },
   "explore": {
     "title": "Explore nearby",
@@ -288,7 +289,9 @@
     "published": "The listing has been published.",
     "updated": "Your changes have been saved.",
     "warnContact": "The description seems to contain contact details. It is better to share contact details in messages once you have agreed.",
-    "typeLocked": "The type cannot be changed after the listing has been created."
+    "typeLocked": "The type cannot be changed after the listing has been created.",
+    "giveFreeNote": "Free – Laandet charges no fee.",
+    "warnKeywords": "This listing may concern a prohibited or restricted item. Please check the rules. If you publish, a moderator will review it."
   },
   "myListings": {
     "title": "My listings",
@@ -371,7 +374,16 @@
     "deletedText": "We have sent you a confirmation by email. Thank you for being part of Laandet.",
     "statusRestricted": "Your account is restricted. You cannot post new listings. See the reasons in our email.",
     "statusSuspended": "Your account is suspended. You can appeal the decision.",
-    "statusDeletion": "Your account is being deleted."
+    "statusDeletion": "Your account is being deleted.",
+    "passwordHeading": "Change password",
+    "currentPassword": "Current password",
+    "changePasswordButton": "Change password",
+    "passwordChanged": "Your password has been changed. You have been signed out on other devices.",
+    "newEmail": "New email address",
+    "changeEmailButton": "Change email",
+    "emailChangeSent": "If the address can be used, we have sent a link to the new address. The email address changes when you open the link.",
+    "emailChanged": "Your email address has been changed and confirmed.",
+    "changeEmailHint": "We send a confirmation link to the new address."
   },
   "profile": {
     "memberSince": "Member since {date}",
@@ -454,7 +466,21 @@
     "setup2faUri": "Add this key to your app (or use the link on your phone):",
     "setup2faBackup": "Backup codes (shown only now – store them safely):",
     "setup2faVerify": "Confirm with code",
-    "setup2faDone": "Two-factor sign-in is on."
+    "setup2faDone": "Two-factor sign-in is on.",
+    "recent": "Recent decisions",
+    "noRecent": "No decisions yet.",
+    "reportedProfile": "Reported profile",
+    "reportedAt": "Reported {date}",
+    "appealAbout": "Appeal about \"{title}\"",
+    "originalStatement": "Original statement",
+    "filterAll": "All open",
+    "filterAutomatic": "Automatic only",
+    "profileNote": "Measures against profiles (restriction or suspension) are for now done manually by an administrator. Dismiss the report with a note once the case is handled.",
+    "openProfile": "Open the profile",
+    "dashboardLead": "Numbers only, no personal data.",
+    "reportDetails": "Details from the reporter",
+    "listingHiddenLabel": "Listing hidden",
+    "reasonsLabel": "Rule"
   },
   "errors": {
     "auth_required": "Please sign in first.",
@@ -480,7 +506,8 @@
     "appeal_exists": "You have already appealed this decision.",
     "notFoundTitle": "Page not found",
     "notFoundText": "The link may be wrong, or the listing has been removed.",
-    "toFront": "To the front page"
+    "toFront": "To the front page",
+    "terms_acceptance_required": "You need to accept the updated terms before you can publish."
   },
   "validation": {
     "required": "Required.",
@@ -519,7 +546,8 @@
     "image_too_large": "The photo is larger than 10 MB.",
     "image_unsupported_type": "Only JPEG, PNG, WebP and HEIC can be uploaded.",
     "image_too_many_pixels": "The photo's resolution is too high.",
-    "image_undecodable": "The photo could not be read. Try taking it again, or save it as JPEG."
+    "image_undecodable": "The photo could not be read. Try taking it again, or save it as JPEG.",
+    "wrong_password": "Wrong password."
   },
   "pages": {
     "howTitle": "How Laandet works",
@@ -564,6 +592,13 @@
   "legalPage": {
     "version": "Version {version}",
     "updated": "Loaded {date}",
-    "missing": "The document has not been published yet."
+    "missing": "The document has not been published yet.",
+    "acceptTitle": "Updated terms",
+    "acceptLead": "We have made material changes to the documents below. Please read and accept them to continue posting listings.",
+    "acceptCheckbox": "I have read and accept the updated documents.",
+    "acceptButton": "Accept",
+    "acceptBanner": "We have updated our terms.",
+    "acceptLink": "Read and accept",
+    "norwegianVersion": "Read the Norwegian version"
   }
 }

@@ -54,7 +54,7 @@ export async function createReport(actor: Actor, input: z.infer<typeof reportSch
   });
 }
 
-export async function listOpenReports(actor: Actor) {
+export async function listOpenReports(actor: Actor, opts: { automaticOnly?: boolean } = {}) {
   assertCan(actor, "report.handle");
   return db
     .select({
@@ -71,8 +71,8 @@ export async function listOpenReports(actor: Actor) {
     })
     .from(reports)
     .leftJoin(listings, and(eq(reports.targetType, "listing"), eq(listings.id, reports.targetId)))
-    .where(inArray(reports.status, ["open", "in_review"]))
-    .orderBy(asc(reports.createdAt))
+    .where(and(inArray(reports.status, ["open", "in_review"]), ...(opts.automaticOnly ? [eq(reports.isAutomatic, true)] : [])))
+    .orderBy(desc(reports.createdAt))
     .limit(200);
 }
 
@@ -147,6 +147,7 @@ export async function hideListing(actor: Actor, input: z.infer<typeof hideSchema
       targetType: "listing",
       targetId: l.id,
       reason: input.reasonCode,
+      metadata: { moderationActionId: action!.id, reportId: input.reportId ?? null },
       meta,
     });
   });

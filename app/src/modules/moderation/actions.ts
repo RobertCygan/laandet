@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import { getActor } from "@/modules/auth/actor";
 import { formToObject, runAction, type ActionState } from "@/modules/server/action";
@@ -28,10 +29,17 @@ export async function appealAction(_prev: ActionState, form: FormData): Promise<
   return result;
 }
 
+/** Staff actions return to the queue they came from with a confirmation (`?lagret=1`). */
+function backToQueue(raw: Record<string, string>): never {
+  revalidatePath("/[locale]", "layout");
+  const back = /^(\/en)?\/admin(\/rapporter|\/klager)?$/.test(raw.back ?? "") ? raw.back : "/admin";
+  redirect(`${back}?lagret=1`);
+}
+
 export async function hideListingAction(_prev: ActionState, form: FormData): Promise<ActionState> {
   const raw = formToObject(form);
   const result = await runAction(async () => hideListing(await getActor(), hideSchema.parse(raw)), raw);
-  if (result.status === "ok") revalidatePath("/[locale]", "layout");
+  if (result.status === "ok") backToQueue(raw);
   return result;
 }
 
@@ -43,13 +51,13 @@ export async function dismissReportAction(_prev: ActionState, form: FormData): P
     const { reportId, note } = dismissSchema.parse(raw);
     await dismissReport(await getActor(), reportId, note);
   }, raw);
-  if (result.status === "ok") revalidatePath("/[locale]", "layout");
+  if (result.status === "ok") backToQueue(raw);
   return result;
 }
 
 export async function decideAppealAction(_prev: ActionState, form: FormData): Promise<ActionState> {
   const raw = formToObject(form);
   const result = await runAction(async () => decideAppeal(await getActor(), decideAppealSchema.parse(raw)), raw);
-  if (result.status === "ok") revalidatePath("/[locale]", "layout");
+  if (result.status === "ok") backToQueue(raw);
   return result;
 }

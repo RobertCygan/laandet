@@ -3,6 +3,8 @@
 import { redirect } from "next/navigation";
 import { requireUser } from "./actor";
 import {
+  changeEmailSchema,
+  changePasswordSchema,
   deleteAccountSchema,
   emailOnlySchema,
   resetPasswordSchema,
@@ -119,4 +121,21 @@ export async function confirmTwoFactorAction(_prev: ActionState, form: FormData)
     const { code } = totpSchema.parse(formToObject(form));
     await service.confirmTwoFactorSetup(actor, code);
   });
+}
+
+export async function changePasswordAction(_prev: ActionState, form: FormData): Promise<ActionState> {
+  return runAction(async () => {
+    const actor = await requireUser();
+    const { currentPassword, newPassword } = changePasswordSchema.parse(formToObject(form));
+    await service.changePassword(actor, currentPassword, newPassword);
+  });
+}
+
+export async function changeEmailAction(_prev: ActionState, form: FormData): Promise<ActionState> {
+  const raw = formToObject(form);
+  return runAction(async () => {
+    const actor = await requireUser();
+    const { password, newEmail, locale } = changeEmailSchema.parse(raw);
+    await service.changeEmail(actor, password, newEmail, locale);
+  }, raw);
 }

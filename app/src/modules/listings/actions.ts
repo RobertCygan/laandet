@@ -29,8 +29,13 @@ export async function saveListingAction(_prev: ActionState, form: FormData): Pro
   if (result.status !== "ok" || !result.data) return result as ActionState;
   const { id, status, warnings } = result.data;
   revalidatePath("/[locale]", "layout");
-  const outcome = raw.listingId ? "updated" : status === "published" ? "published" : "saved";
-  const warn = warnings.includes("description_contact_info") ? "&advarsel=kontakt" : "";
+  const warn = warnings.length ? `&advarsel=${warnings.join(",")}` : "";
+  // A draft stays in the wizard (same step); a published listing opens its page.
+  if (status === "draft") {
+    const step = /^[1-5]$/.test(raw.step ?? "") ? raw.step : "1";
+    redirect(`${localePath(locale, `/annonse/${id}/rediger`)}?lagret=saved&steg=${step}${warn}`);
+  }
+  const outcome = raw.listingId ? "updated" : "published";
   redirect(`${localePath(locale, `/annonse/${id}`)}?lagret=${outcome}${warn}`);
 }
 

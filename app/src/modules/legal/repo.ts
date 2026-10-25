@@ -18,3 +18,9 @@ export async function currentLegalDoc(
     .limit(1);
   return row ?? null;
 }
+
+/** For pages (they never import the database client directly). */
+export async function getLegalDoc(docKey: LegalDocKey, locale: "nb" | "en"): Promise<LegalDoc | null> {
+  const { db } = await import("@/db/client");
+  return currentLegalDoc(db, docKey, locale);
+}

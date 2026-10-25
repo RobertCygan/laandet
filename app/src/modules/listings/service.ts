@@ -16,6 +16,7 @@ import type { Actor, UserActor } from "@/modules/authz/actor-types";
 import { assertCan } from "@/modules/authz/policy";
 import { AppError } from "@/modules/errors";
 import { isFlagEnabled } from "@/modules/flags/flags";
+import { assertNoPendingAcceptance } from "@/modules/legal/acceptance";
 import { enforceRateLimits, LIMITS } from "@/modules/ratelimit/ratelimit";
 import { getRequestMeta } from "@/modules/server/request-meta";
 import { containsContactInfo, matchScreeningKeywords, MAX_IMAGES, publishViolations, storageViolations, type ListingDraft } from "./rules";
@@ -102,6 +103,7 @@ export async function saveListing(
     });
     if (v.length) throw violationsError(v);
   }
+  if (opts.intent === "publish" && !live) await assertNoPendingAcceptance(user);
   const firstPublish = opts.intent === "publish" && !existing?.publishedAt;
   if (firstPublish) {
     await enforceRateLimits(db, [
@@ -143,7 +145,7 @@ export async function saveListing(
   };
   const meta = await getRequestMeta();
 
-  const id = await db.transaction(async (tx) => {
+  const saved = await db.transaction(async (tx) => {
     let listingId: string;
     if (existing) {
       await tx.update(listings).set(values).where(eq(listings.id, existing.id));
@@ -161,20 +163,24 @@ export async function saveListing(
       targetId: listingId,
       meta,
     });
-    if (status === "published") await screenListing(tx, listingId, `${draft.title} ${draft.description}`);
-    return listingId;
+    const hits = await screeningHits(tx, `${draft.title} ${draft.description}`);
+    if (hits.length && status === "published") await reportScreeningHit(tx, listingId, hits);
+    return { listingId, hits };
   });
 
   const warnings: string[] = [];
-  if (containsContactInfo(draft.description)) warnings.push("description_contact_info");
-  return { id, status, warnings };
+  if (containsContactInfo(draft.description)) warnings.push("contact");
+  if (saved.hits.length) warnings.push("keywords");
+  return { id: saved.listingId, status, warnings };
+}
+
+async function screeningHits(tx: Tx, text: string): Promise<string[]> {
+  const keywords = (await tx.select({ k: screeningKeywords.keyword }).from(screeningKeywords)).map((r) => r.k);
+  return matchScreeningKeywords(text, keywords);
 }
 
 /** Keyword hints create an automatic report for moderators; nothing is removed automatically. */
-async function screenListing(tx: Tx, listingId: string, text: string) {
-  const keywords = (await tx.select({ k: screeningKeywords.keyword }).from(screeningKeywords)).map((r) => r.k);
-  const hits = matchScreeningKeywords(text, keywords);
-  if (!hits.length) return;
+async function reportScreeningHit(tx: Tx, listingId: string, hits: string[]) {
   const [open] = await tx
     .select({ id: reports.id })
     .from(reports)

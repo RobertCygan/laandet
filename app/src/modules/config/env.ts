@@ -53,6 +53,9 @@ export const envSchema = z
       }
     }
     if (e.SUPPORT_CAMPAIGN_URL) {
+      if (!e.SUPPORT_CAMPAIGN_URL.startsWith("https://")) {
+        ctx.addIssue({ code: "custom", path: ["SUPPORT_CAMPAIGN_URL"], message: "SUPPORT_CAMPAIGN_URL must use https" });
+      }
       for (const key of [
         "SUPPORT_PROVIDER_NAME",
         "SUPPORT_FEE_TEXT",

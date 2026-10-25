@@ -3,7 +3,9 @@ import { notFound } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { isLocale, routing } from "@/i18n/routing";
+import { Link } from "@/i18n/navigation";
 import { getActor } from "@/modules/auth/actor";
+import { pendingAcceptances } from "@/modules/legal/acceptance";
 import { SiteFooter } from "@/ui/SiteFooter";
 import { SiteHeader } from "@/ui/SiteHeader";
 import "../globals.css";
@@ -31,7 +33,9 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   if (!isLocale(locale)) notFound();
   setRequestLocale(locale);
   const t = await getTranslations("common");
+  const tl = await getTranslations("legalPage");
   const actor = await getActor();
+  const mustAccept = (await pendingAcceptances(actor)).length > 0;
 
   return (
     <html lang={locale === "nb" ? "nb-NO" : "en"}>
@@ -41,6 +45,16 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
         </a>
         <NextIntlClientProvider>
           <SiteHeader actor={actor} locale={locale} />
+          {mustAccept && (
+            <div className="bg-cream py-2 text-sm" role="status">
+              <div className="wrap">
+                {tl("acceptBanner")}{" "}
+                <Link href="/godta-vilkar" className="text-link">
+                  {tl("acceptLink")}
+                </Link>
+              </div>
+            </div>
+          )}
           <main id="main" tabIndex={-1} className="flex-1 outline-none">
             {children}
           </main>

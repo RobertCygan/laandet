@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { useTranslations } from "next-intl";
-import { confirmTwoFactorAction, startTwoFactorAction } from "@/modules/auth/actions";
+import { changeEmailAction, changePasswordAction, confirmTwoFactorAction, startTwoFactorAction } from "@/modules/auth/actions";
 import { idle } from "@/modules/server/action";
 import { updateProfileAction } from "@/modules/users/actions";
 import { Notice } from "@/ui/Notice";
@@ -119,5 +119,69 @@ export function TwoFactorSetup() {
         <SubmitButton>{t("setup2faVerify")}</SubmitButton>
       </form>
     </div>
+  );
+}
+
+export function ChangePasswordForm() {
+  const t = useTranslations("account");
+  const ta = useTranslations("auth");
+  const tc = useTranslations("common");
+  const [state, action] = useActionState(changePasswordAction, idle);
+  return (
+    <form action={action} className="flex flex-col gap-5">
+      <FormError state={state} />
+      {state.status === "ok" && (
+        <Notice tone="success" role="status">
+          {t("passwordChanged")}
+        </Notice>
+      )}
+      <label className="field">
+        {t("currentPassword")}
+        <input name="currentPassword" type="password" autoComplete="current-password" required aria-invalid={invalid(state, "currentPassword")} />
+        <FieldError state={state} name="currentPassword" />
+      </label>
+      <label className="field">
+        {ta("newPassword")}
+        <span className="field-hint">{ta("passwordHint")}</span>
+        <input name="newPassword" type="password" autoComplete="new-password" required minLength={10} maxLength={128} aria-invalid={invalid(state, "newPassword")} />
+        <FieldError state={state} name="newPassword" />
+      </label>
+      <SubmitButton className="button button-outline" pendingLabel={tc("saving")}>
+        {t("changePasswordButton")}
+      </SubmitButton>
+    </form>
+  );
+}
+
+export function ChangeEmailForm({ locale }: { locale: "nb" | "en" }) {
+  const t = useTranslations("account");
+  const tc = useTranslations("common");
+  const [state, action] = useActionState(changeEmailAction, idle);
+  if (state.status === "ok") {
+    return (
+      <Notice tone="success" role="status">
+        {t("emailChangeSent")}
+      </Notice>
+    );
+  }
+  return (
+    <form action={action} className="flex flex-col gap-5">
+      <FormError state={state} />
+      <input type="hidden" name="locale" value={locale} />
+      <label className="field">
+        {t("newEmail")}
+        <span className="field-hint">{t("changeEmailHint")}</span>
+        <input name="newEmail" type="email" autoComplete="email" required defaultValue={prev(state, "newEmail")} aria-invalid={invalid(state, "newEmail")} />
+        <FieldError state={state} name="newEmail" />
+      </label>
+      <label className="field">
+        {t("currentPassword")}
+        <input name="password" type="password" autoComplete="current-password" required aria-invalid={invalid(state, "password")} />
+        <FieldError state={state} name="password" />
+      </label>
+      <SubmitButton className="button button-outline" pendingLabel={tc("sending")}>
+        {t("changeEmailButton")}
+      </SubmitButton>
+    </form>
   );
 }
