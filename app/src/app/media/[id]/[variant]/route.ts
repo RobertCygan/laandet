@@ -1,6 +1,6 @@
 import { and, eq, isNull } from "drizzle-orm";
 import { db } from "@/db/client";
-import { listingImages, listings, mediaObjects } from "@/db/schema";
+import { listingImages, listings, mediaObjects, userProfiles } from "@/db/schema";
 import { getActor } from "@/modules/auth/actor";
 import { can } from "@/modules/authz/policy";
 import { mediaStore } from "@/modules/media/store";
@@ -23,15 +23,18 @@ export async function GET(_req: Request, ctx: RouteContext<"/media/[id]/[variant
       listingStatus: listings.status,
       ownerId: listings.ownerId,
       isDemo: listings.isDemo,
+      ownerStatus: userProfiles.status,
     })
     .from(mediaObjects)
     .leftJoin(listingImages, eq(listingImages.mediaId, mediaObjects.id))
     .leftJoin(listings, eq(listings.id, listingImages.listingId))
+    .leftJoin(userProfiles, eq(userProfiles.userId, listings.ownerId))
     .where(and(eq(mediaObjects.id, id), isNull(mediaObjects.deletedAt)));
   if (!m || m.scope !== "listing") return notFound();
 
   let isPublic = false;
-  if (m.listingStatus === "published") {
+  // Same visibility as the listing page: published, and the owner's account in good standing.
+  if (m.listingStatus === "published" && (m.ownerStatus === "active" || m.ownerStatus === "restricted")) {
     isPublic = true;
   } else {
     const actor = await getActor();
@@ -52,7 +55,8 @@ export async function GET(_req: Request, ctx: RouteContext<"/media/[id]/[variant
       "Content-Type": "image/webp",
       "Content-Disposition": "inline",
       "X-Content-Type-Options": "nosniff",
-      "Cache-Control": isPublic ? "public, max-age=86400" : "private, no-store",
+      // Short cache so a hidden listing's images stop being served within minutes.
+      "Cache-Control": isPublic ? "public, max-age=300" : "private, no-store",
     },
   });
 }

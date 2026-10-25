@@ -8,6 +8,7 @@ import { db } from "@/db/client";
 import { accounts, rateLimits, sessions, twoFactors, userProfiles, users, verifications } from "@/db/schema";
 import { env, hibpEnabled } from "@/modules/config/env";
 import { queueEmail } from "@/modules/notifications/outbox";
+import { hashIp } from "@/modules/server/request-meta";
 
 const DAY = 24 * 60 * 60;
 
@@ -123,6 +124,14 @@ export const auth = betterAuth({
             .from(userProfiles)
             .where(eq(userProfiles.userId, session.userId));
           if (p?.status === "deleted") return false;
+          // Store a keyed hash of the IP, never the raw address (SEC-43), and a shortened user agent.
+          return {
+            data: {
+              ...session,
+              ipAddress: hashIp(session.ipAddress ?? null),
+              userAgent: session.userAgent ? session.userAgent.slice(0, 200) : null,
+            },
+          };
         },
       },
     },

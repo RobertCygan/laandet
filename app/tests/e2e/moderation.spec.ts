@@ -10,17 +10,20 @@ test("report, hide with a statement of reasons, appeal and reversal", async ({ b
   await registerAndVerify(owner, ownerEmail);
   const id = await publishRental(owner, "Høytrykksspyler med terrassevasker");
 
+  // A third person reports (staff never handle reports they made themselves).
+  const reporter = await (await browser.newContext()).newPage();
+  await registerAndVerify(reporter, uniqueEmail("melder"), "Melder R.");
+  await reporter.goto(`/annonse/${id}`);
+  await reporter.getByText("Rapporter annonse").click();
+  await reporter.getByLabel("Hva gjelder det?").selectOption("misleading");
+  await reporter.getByLabel("Beskriv kort").fill("Bildet viser noe annet enn teksten.");
+  await reporter.getByLabel("Jeg rapporterer i god tro.").check();
+  await reporter.getByRole("button", { name: "Send rapport" }).click();
+  await expect(reporter.getByText("Takk! Rapporten er sendt")).toBeVisible();
+
   const mod = await (await browser.newContext()).newPage();
   const modEmail = uniqueEmail("moderator");
   await registerAndVerify(mod, modEmail, "Moderator M.");
-  await mod.goto(`/annonse/${id}`);
-  await mod.getByText("Rapporter annonse").click();
-  await mod.getByLabel("Hva gjelder det?").selectOption("misleading");
-  await mod.getByLabel("Beskriv kort").fill("Bildet viser noe annet enn teksten.");
-  await mod.getByLabel("Jeg rapporterer i god tro.").check();
-  await mod.getByRole("button", { name: "Send rapport" }).click();
-  await expect(mod.getByText("Takk! Rapporten er sendt")).toBeVisible();
-
   grantRole(modEmail, "moderator");
   await signIn(mod, modEmail);
   // N14: without 2FA the admin area is not available.

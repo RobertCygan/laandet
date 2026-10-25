@@ -36,7 +36,16 @@ export async function signUp(input: SignUpInput, now = Date.now()): Promise<void
   if (!(await isFlagEnabled(db, "registrations_open"))) throw new AppError("feature_disabled");
   await enforceRateLimits(db, [{ bucket: `signup:ip:${hashIp(meta.ip) ?? "none"}`, rule: LIMITS.signUpPerIp }]);
 
-  const existing = await db.select({ id: users.id }).from(users).where(eq(users.email, input.email));
+  const [existing] = await db
+    .select({ id: users.id, verified: users.emailVerified, profile: userProfiles.userId })
+    .from(users)
+    .leftJoin(userProfiles, eq(userProfiles.userId, users.id))
+    .where(eq(users.email, input.email));
+  if (existing && !existing.profile && !existing.verified) {
+    // Left behind by an interrupted sign-up (no profile, never verified, so nothing refers to it): start again.
+    await db.delete(users).where(eq(users.id, existing.id));
+  }
+  const accountExists = Boolean(existing && (existing.profile || existing.verified));
   try {
     await auth.api.signUpEmail({
       body: { name: input.name, email: input.email, password: input.password },
@@ -51,7 +60,7 @@ export async function signUp(input: SignUpInput, now = Date.now()): Promise<void
     }
     throw err;
   }
-  if (existing.length > 0) return; // existing account: Better Auth sent an informational email
+  if (accountExists) return; // existing account: Better Auth sent an informational email
 
   const [created] = await db.select({ id: users.id }).from(users).where(eq(users.email, input.email));
   if (!created) throw new AppError("validation", "sign_up_failed");

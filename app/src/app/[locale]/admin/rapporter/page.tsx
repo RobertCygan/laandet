@@ -59,7 +59,11 @@ export default async function ReportsPage({ params, searchParams }: PageProps<"/
       ) : (
         <ul className="flex flex-col gap-4">
           {reports.map((r) => {
-            const ownListing = r.listingOwnerId === actor.id;
+            // Staff never handle their own cases (reported by them, or about their listing or profile).
+            const ownCase =
+              r.listingOwnerId === actor.id ||
+              r.reporterId === actor.id ||
+              (r.targetType === "user" && r.targetId === actor.id);
             return (
               <li key={r.id} className="card flex flex-col gap-3 p-5">
                 <div className="flex flex-wrap items-center gap-2">
@@ -90,26 +94,29 @@ export default async function ReportsPage({ params, searchParams }: PageProps<"/
                     <p className="whitespace-pre-line">{r.details}</p>
                   </div>
                 )}
-                <div className="grid gap-4 md:grid-cols-2">
-                  {r.targetType === "listing" &&
-                    r.listingStatus &&
-                    !["removed", "deleted"].includes(r.listingStatus) &&
-                    !ownListing && (
-                      <details className="rounded-md border border-border p-3">
-                        <summary className="cursor-pointer font-bold">{t("hide")}</summary>
-                        <div className="mt-3">
-                          <HideListingForm listingId={r.targetId} reportId={r.id} back={back} />
-                        </div>
-                      </details>
-                    )}
-                  {r.targetType === "user" && <Notice>{t("profileNote")}</Notice>}
-                  <details className="rounded-md border border-border p-3">
-                    <summary className="cursor-pointer font-bold">{t("dismiss")}</summary>
-                    <div className="mt-3">
-                      <DismissReportForm reportId={r.id} back={back} />
-                    </div>
-                  </details>
-                </div>
+                {ownCase ? (
+                  <Notice>{t("ownCase")}</Notice>
+                ) : (
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {r.targetType === "listing" &&
+                      r.listingStatus &&
+                      !["removed", "deleted"].includes(r.listingStatus) && (
+                        <details className="rounded-md border border-border p-3">
+                          <summary className="cursor-pointer font-bold">{t("hide")}</summary>
+                          <div className="mt-3">
+                            <HideListingForm listingId={r.targetId} reportId={r.id} back={back} />
+                          </div>
+                        </details>
+                      )}
+                    {r.targetType === "user" && <Notice>{t("profileNote")}</Notice>}
+                    <details className="rounded-md border border-border p-3">
+                      <summary className="cursor-pointer font-bold">{t("dismiss")}</summary>
+                      <div className="mt-3">
+                        <DismissReportForm reportId={r.id} back={back} />
+                      </div>
+                    </details>
+                  </div>
+                )}
               </li>
             );
           })}

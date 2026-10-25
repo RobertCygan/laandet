@@ -62,8 +62,15 @@ The application lives in `app/` (Next.js 16, PostgreSQL, Drizzle, Better Auth). 
   - ESLint rules banning `dangerouslySetInnerHTML`, `sql.raw` and direct database imports in pages;
   - same-site-only redirect targets after sign-in.
 - **CI** (`.github/workflows/laandet-ci.yml`): lint/format/types, unit, integration (PostgreSQL 17), build + Playwright, gitleaks and `npm audit`. Dependabot is configured.
-- **Deployment files and runbooks (P01-13):** see `deploy/` and `docs/runbooks/`. **Nothing has been deployed, bought or registered.**
-- Decisions D-030…D-038 (implementation level) in `DECISIONS.md`.
+- **Deployment files and runbooks (P01-13):**
+  - Dockerfile, Compose for production/staging/edge, Caddy, a deploy script with rollback, a deploy workflow (off until enabled), restic backups with a systemd timer, a restore script, and runbooks.
+  - Verified locally with Docker only (D-040). **Nothing has been deployed, bought or registered.**
+- **Independent security review** (separate read-only review of the code). All 7 findings were fixed, and the fixes are covered by tests:
+  - **Medium:** the Better Auth HTTP endpoints let callers skip app checks, which allowed an email change without a password and a sign-up that locked an address. Now only the email links are served (D-041), and an interrupted sign-up is recovered.
+  - **Low/medium:** a race let an owner's save undo a moderator's removal. Status writes are now conditional.
+  - **Low:** staff could handle reports they made or that concerned themselves; restricted accounts could publish drafts or resume listings; images of hidden listings were cached for 24 hours (now 5 minutes, with an owner-status check); raw IPs were stored in sessions (now hashed).
+- Also found during deployment testing and fixed: requests pass through `proxy.ts`, which cut uploads near 10 MB. Fixed with `proxyClientMaxBodySize`.
+- Decisions D-030…D-041 (implementation level) in `DECISIONS.md`.
 
 ### Tested (run locally on 25.10.2026, PostgreSQL 16, Chromium from Playwright 1.63)
 - **Unit (Vitest): 87 passed**
@@ -82,7 +89,7 @@ The application lives in `app/` (Next.js 16, PostgreSQL, Drizzle, Better Auth). 
   - report rate limit, staff 2FA and session freshness (N14), hide → audit + notification + email + gone from explore, appeals by a different staff member;
   - legal loader idempotency and production refusal, re-acceptance;
   - EXIF/GPS removal and fake-image rejection (N8).
-- **End-to-end (Playwright, production build): 29 passed** (mobile; journey and smoke also on desktop)
+- **End-to-end (Playwright, production build): 31 passed** (mobile; journey and smoke also on desktop)
   - register → verify → publish with a photo → found in explore, never visiting the support page (N11);
   - N1 (another user gets 404 on the edit page);
   - N9 (HTML/script in display name, title and description shown as text; no dialogs, no CSP violations);
@@ -90,13 +97,15 @@ The application lives in `app/` (Next.js 16, PostgreSQL, Drizzle, Better Auth). 
   - every footer/content page 200 in nb and en; draft and translation banners;
   - language switch with Norwegian number formats;
   - security headers;
-  - axe (WCAG 2.1 AA): no serious or critical violations on 7 pages.
+  - axe (WCAG 2.1 AA): no serious or critical violations on 7 pages;
+  - a photo 200 bytes under the 10 MB limit uploads whole. This was confirmed to fail without the proxy body-size setting.
+  - the auth API answers only the two email links.
 - **Manual checks in the browser:** layouts on 390 px and 1 280 px for the main pages, the worker sending a queued email to the log, and the `grant-role` CLI.
 
 ### Not done / known gaps
 - **No deployment.** Staging and production need a server and a domain bought by the owner (`docs/runbooks/BILLING.md`).
 - **Legal texts are drafts.** They are not legally reviewed. Fields marked «MÅ FYLLES UT FØR LANSERING» block loading in production.
-- **CI has not run yet**: this branch had not been pushed when this entry was written.
+- **CI** runs on the pull request. See the PR for the current state.
 - Differences from the task files:
   - offset instead of keyset pagination, and no `EXPLAIN` fixture (D-032);
   - the keyword warning appears after saving, not while typing;

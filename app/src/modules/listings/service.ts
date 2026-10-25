@@ -113,6 +113,11 @@ export async function saveListing(
   if (stored.length) throw violationsError(stored);
   const live = existing && (existing.status === "published" || existing.status === "paused");
   const publishing = opts.intent === "publish" || Boolean(live);
+  if (existing && opts.intent === "publish" && existing.status === "draft") {
+    // A restricted account may keep editing drafts but not publish them (AUTH_MODEL §3).
+    assertCan(actor, "listing.publish", { type: "listing", ownerId: existing.ownerId, status: existing.status });
+    if (!(await isFlagEnabled(db, "listings_open"))) throw new AppError("feature_disabled");
+  }
   if (publishing) {
     const v = publishViolations({ ...draft, imageCount: images.length }, category, {
       highValuePreview: await isFlagEnabled(db, "high_value_preview"),
@@ -171,7 +176,13 @@ export async function saveListing(
   const saved = await db.transaction(async (tx) => {
     let listingId: string;
     if (existing) {
-      await tx.update(listings).set(values).where(eq(listings.id, existing.id));
+      // Only if nobody (e.g. a moderator) changed the status since we read it.
+      const updated = await tx
+        .update(listings)
+        .set(values)
+        .where(and(eq(listings.id, existing.id), eq(listings.status, existing.status)))
+        .returning({ id: listings.id });
+      if (!updated.length) throw new AppError("conflict");
       listingId = existing.id;
     } else {
       const [row] = await tx
@@ -245,15 +256,21 @@ const TRANSITIONS: Record<StatusAction, { from: ListingStatus[]; to: ListingStat
 };
 
 export async function changeListingStatus(actor: Actor, listingId: string, action: StatusAction): Promise<void> {
-  const row = await loadOwned(actor, listingId, action === "delete" ? "listing.delete" : "listing.update");
+  const row = await loadOwned(
+    actor,
+    listingId,
+    action === "delete" ? "listing.delete" : action === "resume" ? "listing.publish" : "listing.update",
+  );
   const t = TRANSITIONS[action];
   if (!t.from.includes(row.status)) throw new AppError("conflict", "status_transition");
   // Phase 02: refuse while a booking or giveaway claim is active.
   await db.transaction(async (tx) => {
-    await tx
+    const updated = await tx
       .update(listings)
       .set({ status: t.to, updatedAt: new Date(), ...(action === "delete" ? { deletedAt: new Date() } : {}) })
-      .where(eq(listings.id, row.id));
+      .where(and(eq(listings.id, row.id), eq(listings.status, row.status)))
+      .returning({ id: listings.id });
+    if (!updated.length) throw new AppError("conflict", "status_transition");
     await recordAudit(tx, {
       actorId: (actor as UserActor).id,
       action: `listing.${action}`,

@@ -3,7 +3,14 @@ import { beforeEach, describe, expect, it } from "vitest";
 import * as schema from "@/db/schema";
 import { searchListings } from "@/modules/listings/queries";
 import { saveListing } from "@/modules/listings/service";
-import { createAppeal, createReport, decideAppeal, hideListing, listOpenReports } from "@/modules/moderation/service";
+import {
+  createAppeal,
+  createReport,
+  decideAppeal,
+  dismissReport,
+  hideListing,
+  listOpenReports,
+} from "@/modules/moderation/service";
 import { createUser, owner, rentalDraft, resetDb } from "./helpers";
 
 const statement = "Regel: villedende annonse. Bildet viser en annen gjenstand. Bytt bildet og klag hvis du er uenig.";
@@ -137,5 +144,46 @@ describe("reporting and moderation (P01-12)", () => {
     });
     const [after] = await owner.select().from(schema.appeals);
     expect(after).toMatchObject({ status: "upheld", decidedBySameStaff: true });
+  });
+
+  it("staff cannot handle their own cases, and a report must belong to the listing it is used for", async () => {
+    const mod = await createUser({ role: "moderator", staff2fa: true });
+    const other = await createUser({ role: "admin", staff2fa: true });
+    const { id: modListing } = await saveListing(mod, await rentalDraft({ title: "Moderatorens drill" }), [], {
+      intent: "publish",
+    });
+    const { id: otherListing } = await publishedListing();
+    const reporter = await createUser();
+    await createReport(reporter, {
+      targetType: "listing",
+      targetId: modListing,
+      reason: "misleading",
+      details: "",
+      goodFaith: "on",
+    });
+    await createReport(mod, {
+      targetType: "listing",
+      targetId: otherListing,
+      reason: "misleading",
+      details: "",
+      goodFaith: "on",
+    });
+    const open = await listOpenReports(other);
+    const aboutMod = open.find((r) => r.targetId === modListing)!;
+    const byMod = open.find((r) => r.targetId === otherListing)!;
+
+    await expect(dismissReport(mod, aboutMod.id, "")).rejects.toMatchObject({ code: "forbidden" });
+    await expect(dismissReport(mod, byMod.id, "")).rejects.toMatchObject({ code: "forbidden" });
+    await expect(
+      hideListing(mod, { listingId: otherListing, reportId: byMod.id, reasonCode: "misleading", statement }),
+    ).rejects.toMatchObject({
+      code: "forbidden",
+    });
+    await expect(
+      hideListing(other, { listingId: otherListing, reportId: aboutMod.id, reasonCode: "misleading", statement }),
+    ).rejects.toMatchObject({
+      code: "not_found",
+    });
+    await dismissReport(other, aboutMod.id, "Ikke brudd på reglene.");
   });
 });

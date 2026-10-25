@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { isLocale, routing } from "@/i18n/routing";
+import { isLocale } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import { getActor } from "@/modules/auth/actor";
 import { pendingAcceptances } from "@/modules/legal/acceptance";
@@ -22,10 +22,6 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
     // Staging must never be indexed (P01-13); production decides via robots.txt.
     robots: process.env.APP_ENV === "production" ? undefined : { index: false, follow: false },
   };
-}
-
-export function generateStaticParams() {
-  return routing.locales.map((locale) => ({ locale }));
 }
 
 export default async function LocaleLayout({ children, params }: LayoutProps<"/[locale]">) {

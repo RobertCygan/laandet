@@ -125,4 +125,29 @@ describe("listings (P01-08, P01-10)", () => {
     expect(reports).toHaveLength(1);
     expect(reports[0]?.reporterId).toBeNull();
   });
+
+  it("a restricted account can keep a draft but cannot publish it or resume a paused listing", async () => {
+    const u = await createUser();
+    const draft = await saveListing(u, await rentalDraft({ title: "Kladd fra før" }), [], { intent: "draft" });
+    const live = await saveListing(u, await rentalDraft({ title: "Live fra før" }), [], { intent: "publish" });
+    await changeListingStatus(u, live.id, "pause");
+    await owner.update(schema.userProfiles).set({ status: "restricted" }).where(eq(schema.userProfiles.userId, u.id));
+    const restricted = { ...u, status: "restricted" as const };
+    await expect(
+      saveListing(restricted, await rentalDraft(), [], { listingId: draft.id, intent: "publish" }),
+    ).rejects.toMatchObject({
+      code: "account_restricted",
+    });
+    expect(
+      (
+        await saveListing(restricted, await rentalDraft({ title: "Endret kladd" }), [], {
+          listingId: draft.id,
+          intent: "draft",
+        })
+      ).status,
+    ).toBe("draft");
+    await expect(changeListingStatus(restricted, live.id, "resume")).rejects.toMatchObject({
+      code: "account_restricted",
+    });
+  });
 });

@@ -480,7 +480,8 @@
     "dashboardLead": "Bare tall, ingen personopplysninger.",
     "reportDetails": "Detaljer fra den som rapporterte",
     "listingHiddenLabel": "Annonse skjult",
-    "reasonsLabel": "Regel"
+    "reasonsLabel": "Regel",
+    "ownCase": "Dette er din egen sak (du rapporterte, eller den gjelder din annonse eller profil). En annen moderator må behandle den."
   },
   "errors": {
     "auth_required": "Du må logge inn først.",

@@ -376,3 +376,32 @@ during Phase 01 start as *Proposed* (implementation-level) unless the owner says
   - A HEIC file picked on a computer is rejected with a clear message. Content sniffing still recognises it.
 - **Revisit:** if pilot users report problems, decode HEIC in a separately licensed step (for example a libheif build on the server). This needs an owner decision on codec licensing.
 - **Status:** Proposed (implementation-level).
+
+## D-040 — Deployment layout (P01-13 implementation)
+- **Decision:**
+  - **One Caddy for both environments.** It runs as its own Compose project (`deploy/compose.edge.yaml`), because only one process can own ports 80/443. Each environment has its own edge network, and only its `app` container joins it. Staging and production cannot reach each other, and Caddy cannot reach any database.
+  - **One image, two kinds of process.**
+    - `node server.js` runs the Next.js standalone server.
+    - The worker and the scripts (migrate, load-legal, seed, grant-role) are bundled with esbuild into `tools/*.mjs`, so the image needs no second `node_modules` tree (about 440 MB instead of about 1.3 GB). `sharp` is resolved from the standalone `node_modules`.
+  - **Trigger.** Tags `laandet-v*` (a `-staging` suffix means staging) or a manual run, both gated by the repository variable `LAANDET_DEPLOY_ENABLED`. Merging is safe: nothing deploys until the owner turns it on. Production uses a GitHub environment with required reviewers. The SSH deploy key is limited to a forced command.
+  - **Each deploy:** pre-deploy database dump → migrations (owner role) → legal texts (production refuses placeholders) → idempotent seed (staging adds `--demo`) → app and worker → health check. A failure rolls back to the previous image.
+  - **`/healthz` is public** for an uptime monitor and exempt from the staging password. Caddy writes no access log (SEC-43), and its admin API is off.
+  - **Pinned images and actions.** Base images are pinned by digest (`node:22.23.4-bookworm-slim`, `postgres:17.11-bookworm`, `caddy:2.11.7`). GitHub Actions in the deploy workflow are pinned to commit SHAs (checked against their release tags on 25.10.2026).
+  - **Containers:** read-only root filesystem, non-root user, all capabilities dropped. The only writable paths are `/data/media` and `/tmp`, and the database has no published port.
+  - **Backups:** nightly restic backup (database dump + media) to EU storage, with a scripted restore into a throwaway environment for the restore test. Staging is not backed up.
+- **Verified locally with Docker (not on a real server):**
+  - the image builds;
+  - a staging deploy with Caddy's internal CA, plus an automatic rollback after a deliberately broken image;
+  - the production guard stops on placeholder legal texts;
+  - backup → restore into a throwaway environment with matching row counts;
+  - `shellcheck`, `actionlint`, `docker compose config` and `caddy validate` all pass.
+- **Not verified:** Let's Encrypt, GHCR pushes, the workflow on GitHub, the SSH forced command, off-site storage, the systemd timer on a real server, and the first real restore test. These need the server and domain.
+- **Status:** Proposed (implementation-level). Running it needs the owner's purchases (`docs/runbooks/BILLING.md`).
+
+## D-041 — Better Auth endpoints are not public
+- **Context:** An independent security review found that the catch-all `/api/auth/*` route exposed every Better Auth endpoint. Calling them directly skipped the app's own checks: consent records, bot checks, per-account rate limits, re-authentication for email changes and audit logging. An email change without a password could lead to account takeover with a stolen session.
+- **Decision:**
+  - Only the two links sent by email are served over HTTP: `GET /api/auth/verify-email` and `GET /api/auth/reset-password/:token`. Everything else returns 404.
+  - All other auth operations go through our Server Actions, which call `auth.api.*` on the server.
+  - Session rows store a keyed hash of the IP (SEC-43) and a shortened user agent.
+- **Status:** Proposed (implementation-level).

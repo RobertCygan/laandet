@@ -1,3 +1,4 @@
+import { mkdirSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
@@ -19,6 +20,9 @@ for (const url of [TEST_DB_URL, TEST_DB_OWNER_URL]) {
 }
 
 export function applyTestEnv(): void {
+  const mediaDir = path.join(os.tmpdir(), "laandet-test-media");
+  // /healthz reports the media volume; on a fresh CI machine it must exist before the server starts.
+  mkdirSync(mediaDir, { recursive: true });
   Object.assign(process.env, {
     APP_ENV: "test",
     APP_URL: "http://localhost:3000",
@@ -26,7 +30,7 @@ export function applyTestEnv(): void {
     DATABASE_MIGRATION_URL: TEST_DB_OWNER_URL,
     BETTER_AUTH_SECRET: "integration-test-secret-integration-test-secret",
     IP_HASH_KEY: "integration-test-ip-hash-key-integration-test",
-    MEDIA_DIR: path.join(os.tmpdir(), "laandet-test-media"),
+    MEDIA_DIR: mediaDir,
     SMTP_URL: "",
     HIBP_ENABLED: "false",
     MAIL_FROM: "Laandet <noreply@example.invalid>",

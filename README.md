@@ -12,8 +12,8 @@ It is an independent project in the **G-PSI.ai** portfolio.
 |---|---|
 | Visual prototype (`../Laanndet.html`) | Exists. Static demo with fictional data (see `docs/CURRENT_STATE_ASSESSMENT.md`) |
 | **Phase 00:** inventory, architecture, data model, threat model, legal drafts, roadmap | **Approved by the owner** on 25.10.2026 (D-001…D-029 accepted) |
-| **Phase 01:** accounts, listings, uploads, explore, legal pages, reporting (`app/`) | **Implemented and tested locally** (unit, integration, Playwright). CI has not run yet. See `docs/CHANGELOG.md`. |
-| Deployment (staging/production) | **Not deployed.** Deploy files and runbooks exist (`deploy/`, `docs/runbooks/`). A server and domain must first be bought by the owner. |
+| **Phase 01:** accounts, listings, uploads, explore, legal pages, reporting (`app/`) | **Implemented and tested** locally and in CI (unit, integration, Playwright). See `docs/CHANGELOG.md`. |
+| Deployment (staging/production) | **Not deployed.** Deploy files and runbooks exist (`deploy/`, `docs/runbooks/`) and were tested locally with Docker. A server and domain must first be bought by the owner. |
 | Database reference schema | Designed. **Validated:** applied to PostgreSQL 16 and 23/23 checks passed (`docs/DATA_MODEL.md` §9) |
 | Legal drafts (nb authoritative, en informational) | **Drafts. Not legally reviewed. Must not be used with real users before review.** |
 | Target | Public pilot 14.12.2026, subject to the gates in `docs/DEVELOPMENT_ROADMAP.md` |
@@ -29,7 +29,7 @@ laandet/
 ├─ docs/                        project documentation (English)
 │  ├─ MASTER_SPECIFICATION.md   owner's master prompt (verbatim) + amendments
 │  ├─ CURRENT_STATE_ASSESSMENT.md  what exists, what works, what to reuse
-│  ├─ DECISIONS.md              ADR log (D-001 … D-038); D-001…D-029 accepted 25.10.2026
+│  ├─ DECISIONS.md              ADR log (D-001 … D-041); D-001…D-029 accepted 25.10.2026
 │  ├─ ARCHITECTURE.md           smallest viable secure architecture
 │  ├─ DATA_MODEL.md             entities, state machines, privileges, validation record
 │  ├─ AUTH_MODEL.md             authentication + authorisation matrix

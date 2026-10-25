@@ -64,6 +64,7 @@ export async function listOpenReports(actor: Actor, opts: { automaticOnly?: bool
       id: reports.id,
       targetType: reports.targetType,
       targetId: reports.targetId,
+      reporterId: reports.reporterId,
       reason: reports.reason,
       details: reports.details,
       isAutomatic: reports.isAutomatic,
@@ -108,6 +109,11 @@ export async function hideListing(actor: Actor, input: z.infer<typeof hideSchema
   if (!l) throw new AppError("not_found");
   assertCan(actor, "listing.moderate", { type: "listing", ownerId: l.ownerId, status: l.status });
   if (l.status === "removed" || l.status === "deleted") throw new AppError("conflict");
+  if (input.reportId) {
+    const [r] = await db.select().from(reports).where(eq(reports.id, input.reportId));
+    if (!r || r.targetType !== "listing" || r.targetId !== l.id) throw new AppError("not_found");
+    if (r.reporterId === actor.id) throw new AppError("forbidden");
+  }
   const [owner] = await db
     .select({ email: users.email, name: users.name, locale: userProfiles.locale })
     .from(users)
@@ -178,8 +184,21 @@ export async function hideListing(actor: Actor, input: z.infer<typeof hideSchema
   });
 }
 
+/** Staff never handle reports they made or that concern their own listing or profile (AUTH_MODEL §4). */
+async function assertNotOwnCase(actor: UserActor, report: typeof reports.$inferSelect): Promise<void> {
+  if (report.reporterId === actor.id) throw new AppError("forbidden");
+  if (report.targetType === "user" && report.targetId === actor.id) throw new AppError("forbidden");
+  if (report.targetType === "listing") {
+    const [l] = await db.select({ ownerId: listings.ownerId }).from(listings).where(eq(listings.id, report.targetId));
+    if (l?.ownerId === actor.id) throw new AppError("forbidden");
+  }
+}
+
 export async function dismissReport(actor: Actor, reportId: string, note: string): Promise<void> {
   assertCan(actor, "report.handle");
+  const [report] = await db.select().from(reports).where(eq(reports.id, reportId));
+  if (!report) throw new AppError("not_found");
+  await assertNotOwnCase(actor, report);
   const meta = await getRequestMeta();
   await db.transaction(async (tx) => {
     const updated = await tx

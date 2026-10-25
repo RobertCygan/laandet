@@ -59,4 +59,13 @@ describe("sign-up (P01-05)", () => {
     });
     expect(await owner.select().from(schema.users)).toHaveLength(0);
   });
+
+  it("recovers an interrupted sign-up (account row without a profile) instead of locking the address", async () => {
+    await owner.insert(schema.users).values({ name: "Halvferdig", email: base.email, emailVerified: false });
+    await signUp({ ...base, startedAt: Date.now() - 10_000 });
+    const [u] = await owner.select().from(schema.users).where(eq(schema.users.email, base.email));
+    const profiles = await owner.select().from(schema.userProfiles).where(eq(schema.userProfiles.userId, u!.id));
+    expect(u?.name).toBe(base.name);
+    expect(profiles).toHaveLength(1);
+  });
 });

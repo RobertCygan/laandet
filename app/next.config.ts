@@ -29,6 +29,8 @@ const nextConfig: NextConfig = {
       // One image per action call (10 MB) + multipart overhead.
       bodySizeLimit: "11mb",
     },
+    // Requests pass through src/proxy.ts, which otherwise cuts bodies at 10 MB.
+    proxyClientMaxBodySize: "11mb",
   },
   turbopack: {
     rules: {

@@ -480,7 +480,8 @@
     "dashboardLead": "Numbers only, no personal data.",
     "reportDetails": "Details from the reporter",
     "listingHiddenLabel": "Listing hidden",
-    "reasonsLabel": "Rule"
+    "reasonsLabel": "Rule",
+    "ownCase": "This is your own case (you reported it, or it concerns your listing or profile). Another moderator must handle it."
   },
   "errors": {
     "auth_required": "Please sign in first.",
