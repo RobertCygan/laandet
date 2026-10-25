@@ -60,8 +60,8 @@ A separate agent read the Phase 02–03 code without the implementer's notes. Ev
 ### Tested (run locally on 25.10.2026, PostgreSQL 16, Chromium from Playwright 1.63)
 - **Unit (Vitest): 204 passed**: the policy for every Phase 01–03 action (79 cases), case rules (deadlines, escalation, reopening), review windows, redaction of logged errors.
 - **Integration (Vitest against `laandet_test`): 109 passed.** New for Phase 03: cases (flow, grants, audited views, privileges, triggers, N12, photo access, races), reviews, account measures and appeals, admin sections and transparency, data export, retention and erasure, inactivity, SEC-21 and N6.
-- **End-to-end (Playwright, production build): result recorded after the local run finishes.** New: two case journeys at 390 px with axe checks, admin and transparency, reviews at the end of the rental journey, and security (foreign `Origin` refused, session cookie attributes, a deleted account signed out at once, the export as POST).
-- **CI (`laandet-ci`):** result recorded after the push.
+- **End-to-end (Playwright, production build): 40 passed** (34 from Phases 01–02 plus 6 new). New: two case journeys at 390 px with axe checks, admin and transparency, reviews at the end of the rental journey, and security (foreign `Origin` refused, session cookie attributes, a deleted account signed out at once, the export as POST).
+- **CI (`laandet-ci`):** green on 25.10.2026 for all five jobs on commit `ecf610e` (lint/format/types, unit, integration on PostgreSQL 17, build + Playwright with 40 passed, secrets/audit).
 
 ### Not done / known gaps
 - **Owner decisions needed** (see `docs/ASVS_L1.md`): minimum password length 10 or 12; whether rolling 30-day sessions are acceptable for members; OSV-Scanner in CI.
