@@ -1,0 +1,561 @@
+{
+  "_note": "Demo content extracted from the Laanndet prototype (Oct 2026). All items are fictional examples with AI-generated images and MUST be labelled as examples (isDemo=true) wherever shown. Prices are in øre (1 kr = 100 øre). The prototype has no declared item values; seeds must add them before use.",
+  "categories": [
+    {
+      "id": "verktoy",
+      "name": "Verktøy",
+      "icon": "drill"
+    },
+    {
+      "id": "bygg",
+      "name": "Bygg og oppussing",
+      "icon": "hammer"
+    },
+    {
+      "id": "hage",
+      "name": "Hage og skog",
+      "icon": "trees"
+    },
+    {
+      "id": "transport",
+      "name": "Bil og transport",
+      "icon": "car"
+    },
+    {
+      "id": "tilhengere",
+      "name": "Tilhengere",
+      "icon": "trailer"
+    },
+    {
+      "id": "bat",
+      "name": "Båt og sjø",
+      "icon": "sailboat"
+    },
+    {
+      "id": "friluft",
+      "name": "Friluftsliv",
+      "icon": "mountain"
+    },
+    {
+      "id": "camping",
+      "name": "Camping",
+      "icon": "tent"
+    },
+    {
+      "id": "vinter",
+      "name": "Vinterutstyr",
+      "icon": "snowflake"
+    },
+    {
+      "id": "sport",
+      "name": "Sport",
+      "icon": "bike"
+    },
+    {
+      "id": "fest",
+      "name": "Fest og arrangement",
+      "icon": "party"
+    },
+    {
+      "id": "elektronikk",
+      "name": "Elektronikk",
+      "icon": "monitor"
+    },
+    {
+      "id": "foto",
+      "name": "Foto og video",
+      "icon": "camera"
+    },
+    {
+      "id": "rengjoring",
+      "name": "Rengjøring",
+      "icon": "sparkles"
+    },
+    {
+      "id": "barn",
+      "name": "Barn og familie",
+      "icon": "baby"
+    },
+    {
+      "id": "hjem",
+      "name": "Hjem og kjøkken",
+      "icon": "home"
+    },
+    {
+      "id": "grill",
+      "name": "Grill og matlaging",
+      "icon": "flame"
+    },
+    {
+      "id": "stiger",
+      "name": "Stiger og stillas",
+      "icon": "ladder"
+    },
+    {
+      "id": "annet",
+      "name": "Annet",
+      "icon": "box"
+    }
+  ],
+  "localities": [
+    "Leinesfjord",
+    "Leines",
+    "Nordfold",
+    "Engeløya",
+    "Nordskot",
+    "Bogøy",
+    "Helnessund",
+    "Bogen"
+  ],
+  "rental": [
+    {
+      "id": "hoytrykksspyler",
+      "type": "rent_out",
+      "title": "Høytrykksspyler med terrassevasker",
+      "category": "rengjoring",
+      "locality": "Leinesfjord",
+      "priceOre": {
+        "hour": 5000,
+        "day": 15000,
+        "weekend": null,
+        "week": 50000
+      },
+      "ownerDelivery": true,
+      "deliveryFeeOre": 10000,
+      "description": "Kraftig høytrykksspyler som passer godt til terrasse, bil, båt og husvegg. Terrassevasker følger med. Enkel å bruke, også om du ikke har prøvd før.",
+      "included": [
+        "Terrassevasker",
+        "8 meter slange",
+        "Justerbar dyse"
+      ],
+      "image": "images/equipment-1.webp"
+    },
+    {
+      "id": "tepperenser",
+      "type": "rent_out",
+      "title": "Teppe- og møbelrenser",
+      "category": "rengjoring",
+      "locality": "Nordfold",
+      "priceOre": {
+        "hour": null,
+        "day": 23500,
+        "weekend": null,
+        "week": 80000
+      },
+      "ownerDelivery": true,
+      "deliveryFeeOre": 15000,
+      "description": "Gi sofaen eller teppet en ny start. Praktisk tekstilrenser med eget møbelmunnstykke. Rensemiddel til én vanlig sofa følger med.",
+      "included": [
+        "Møbelmunnstykke",
+        "Teppeadapter",
+        "Én dose rensemiddel"
+      ],
+      "image": "images/equipment-2.webp"
+    },
+    {
+      "id": "motorsag",
+      "type": "rent_out",
+      "title": "Kraftig motorsag",
+      "category": "hage",
+      "locality": "Engeløya",
+      "priceOre": {
+        "hour": null,
+        "day": 20000,
+        "weekend": null,
+        "week": 90000
+      },
+      "ownerDelivery": false,
+      "deliveryFeeOre": null,
+      "description": "God sag til ved og enklere skogsarbeid. For deg som har erfaring med motorsag. Leveres med skarpt kjede og full tank.",
+      "included": [
+        "Sverd og kjede",
+        "Kjedebeskyttelse",
+        "Kombinøkkel"
+      ],
+      "image": "images/equipment-3.webp"
+    },
+    {
+      "id": "vedkloyver",
+      "type": "rent_out",
+      "title": "Elektrisk vedkløyver · 7 tonn",
+      "category": "hage",
+      "locality": "Leines",
+      "priceOre": {
+        "hour": null,
+        "day": 17500,
+        "weekend": null,
+        "week": 60000
+      },
+      "ownerDelivery": true,
+      "deliveryFeeOre": 20000,
+      "description": "Få vinterveden unna med en stødig elektrisk vedkløyver. Kobles til vanlig stikkontakt. Hjelp til lasting kan avtales.",
+      "included": [
+        "Stativ",
+        "Bruksanvisning"
+      ],
+      "image": "images/equipment-4.webp"
+    },
+    {
+      "id": "borhammer",
+      "type": "rent_out",
+      "title": "Slagdrill og borhammer",
+      "category": "verktoy",
+      "locality": "Bogøy",
+      "priceOre": {
+        "hour": 4000,
+        "day": 10000,
+        "weekend": null,
+        "week": 45000
+      },
+      "ownerDelivery": false,
+      "deliveryFeeOre": null,
+      "description": "Til hull i betong, stein og mur. En solid borhammer for oppussingshelgen. Vanlige bor følger med i kofferten.",
+      "included": [
+        "Bor 6–12 mm",
+        "Sidehåndtak",
+        "Transportkoffert"
+      ],
+      "image": "images/equipment-5.webp"
+    },
+    {
+      "id": "takboks",
+      "type": "rent_out",
+      "title": "Romslig takboks · 480 liter",
+      "category": "transport",
+      "locality": "Nordskot",
+      "priceOre": {
+        "hour": null,
+        "day": 12000,
+        "weekend": 35000,
+        "week": 50000
+      },
+      "ownerDelivery": false,
+      "deliveryFeeOre": null,
+      "description": "Ekstra plass til familieferien. Lett å åpne fra begge sider. Sjekk at takstativet ditt passer før du avtaler henting.",
+      "included": [
+        "Festebøyler",
+        "To nøkler"
+      ],
+      "image": "images/equipment-6.webp"
+    },
+    {
+      "id": "biltilhenger",
+      "type": "rent_out",
+      "title": "Biltilhenger med tipp",
+      "category": "tilhengere",
+      "locality": "Leinesfjord",
+      "priceOre": {
+        "hour": null,
+        "day": 30000,
+        "weekend": 90000,
+        "week": 150000
+      },
+      "ownerDelivery": true,
+      "deliveryFeeOre": 15000,
+      "description": "Praktisk tilhenger til materialer, hageavfall og flytting. Totalvekt 750 kg. Husk å sjekke førerkort og bilens hengervekt.",
+      "included": [
+        "Presenning",
+        "Lastestropper",
+        "Støttehjul"
+      ],
+      "image": "images/equipment-7.webp"
+    },
+    {
+      "id": "varetilhenger",
+      "type": "rent_out",
+      "title": "Liten varetilhenger",
+      "category": "tilhengere",
+      "locality": "Nordfold",
+      "priceOre": {
+        "hour": null,
+        "day": 20000,
+        "weekend": 65000,
+        "week": 100000
+      },
+      "ownerDelivery": false,
+      "deliveryFeeOre": null,
+      "description": "En lett og hendig henger til små og store gjøremål. Enkel å rygge og lett å laste. Totalvekt 750 kg.",
+      "included": [
+        "Lastenett",
+        "To stropper"
+      ],
+      "image": "images/equipment-8.webp"
+    },
+    {
+      "id": "rullestillas",
+      "type": "rent_out",
+      "title": "Aluminium rullestillas",
+      "category": "stiger",
+      "locality": "Engeløya",
+      "priceOre": {
+        "hour": null,
+        "day": 25000,
+        "weekend": 60000,
+        "week": 90000
+      },
+      "ownerDelivery": true,
+      "deliveryFeeOre": 25000,
+      "description": "Stødig rullestillas til maling og vedlikehold. Arbeidshøyde opptil 4 meter. Monteres på fast, plant underlag.",
+      "included": [
+        "Rekkverk",
+        "Støtteben",
+        "Monteringsveiledning"
+      ],
+      "image": "images/equipment-9.webp"
+    },
+    {
+      "id": "kajakk",
+      "type": "rent_out",
+      "title": "Kajakk med åre og vest",
+      "category": "friluft",
+      "locality": "Nordskot",
+      "priceOre": {
+        "hour": 8500,
+        "day": 25000,
+        "weekend": 70000,
+        "week": 110000
+      },
+      "ownerDelivery": false,
+      "deliveryFeeOre": null,
+      "description": "En fin turkajakk til rolige dager på fjorden. Åre, spruttrekk og vest følger med. Tilpass turen etter vær og egen erfaring.",
+      "included": [
+        "Åre",
+        "Flytevest",
+        "Spruttrekk"
+      ],
+      "image": "images/equipment-10.webp"
+    },
+    {
+      "id": "sup",
+      "type": "rent_out",
+      "title": "SUP-brett for rolige dager",
+      "category": "bat",
+      "locality": "Helnessund",
+      "priceOre": {
+        "hour": 7000,
+        "day": 20000,
+        "weekend": 55000,
+        "week": 85000
+      },
+      "ownerDelivery": true,
+      "deliveryFeeOre": 10000,
+      "description": "Stabilt oppblåsbart SUP-brett. Passer fint for nybegynnere på skjermet sjø. Brettet pakkes i en sekk for enkel transport.",
+      "included": [
+        "Åre",
+        "Pumpe",
+        "Flytevest",
+        "Transportsekk"
+      ],
+      "image": "images/equipment-11.webp"
+    },
+    {
+      "id": "slalam",
+      "type": "rent_out",
+      "title": "Komplett slalåmpakke",
+      "category": "vinter",
+      "locality": "Leinesfjord",
+      "priceOre": {
+        "hour": null,
+        "day": 17500,
+        "weekend": 40000,
+        "week": 50000
+      },
+      "ownerDelivery": false,
+      "deliveryFeeOre": null,
+      "description": "Ski på 170 cm med støvler i størrelse 42 og staver. Bindinger må sjekkes og tilpasses av fagperson før bruk.",
+      "included": [
+        "Ski",
+        "Støvler str. 42",
+        "Staver"
+      ],
+      "image": "images/equipment-12.webp"
+    },
+    {
+      "id": "snofreser",
+      "type": "rent_out",
+      "title": "Snøfreser til innkjørselen",
+      "category": "vinter",
+      "locality": "Nordfold",
+      "priceOre": {
+        "hour": null,
+        "day": 35000,
+        "weekend": 90000,
+        "week": null
+      },
+      "ownerDelivery": true,
+      "deliveryFeeOre": 25000,
+      "description": "Kraftig snøfreser for en skikkelig nordnorsk vinter. Elektrisk start og god arbeidsbredde. Du får en gjennomgang ved henting.",
+      "included": [
+        "Bruksanvisning",
+        "Renseverktøy"
+      ],
+      "image": "images/equipment-13.webp"
+    },
+    {
+      "id": "hekksaks",
+      "type": "rent_out",
+      "title": "Batteridrevet hekksaks",
+      "category": "hage",
+      "locality": "Leines",
+      "priceOre": {
+        "hour": null,
+        "day": 12000,
+        "weekend": 30000,
+        "week": 45000
+      },
+      "ownerDelivery": false,
+      "deliveryFeeOre": null,
+      "description": "Klipp hekken uten ledning. Lett hekksaks med to batterier, så du kan jobbe mens det ene lader.",
+      "included": [
+        "To batterier",
+        "Lader",
+        "Bladbeskytter"
+      ],
+      "image": "images/equipment-14.webp"
+    },
+    {
+      "id": "gressklipper",
+      "type": "rent_out",
+      "title": "Gressklipper med oppsamler",
+      "category": "hage",
+      "locality": "Bogøy",
+      "priceOre": {
+        "hour": null,
+        "day": 15000,
+        "weekend": 38000,
+        "week": 55000
+      },
+      "ownerDelivery": true,
+      "deliveryFeeOre": 10000,
+      "description": "En god klipper til en vanlig hage. Justerbar klippehøyde og romslig oppsamler. Leveres klar til bruk.",
+      "included": [
+        "Oppsamler",
+        "Bruksanvisning"
+      ],
+      "image": "images/equipment-15.webp"
+    },
+    {
+      "id": "partytelt",
+      "type": "rent_out",
+      "title": "Partytelt · 3 × 6 meter",
+      "category": "fest",
+      "locality": "Engeløya",
+      "priceOre": {
+        "hour": null,
+        "day": null,
+        "weekend": 70000,
+        "week": 140000
+      },
+      "ownerDelivery": true,
+      "deliveryFeeOre": 20000,
+      "description": "Plass til familie og venner, også om det kommer en skur. Vegger kan tas av. Beregn to personer til oppsetting.",
+      "included": [
+        "Sidevegger",
+        "Plugger og stropper",
+        "Monteringsveiledning"
+      ],
+      "image": "images/equipment-16.webp"
+    },
+    {
+      "id": "projektor",
+      "type": "rent_out",
+      "title": "Projektor og lerret",
+      "category": "elektronikk",
+      "locality": "Leinesfjord",
+      "priceOre": {
+        "hour": null,
+        "day": 30000,
+        "weekend": 75000,
+        "week": 120000
+      },
+      "ownerDelivery": true,
+      "deliveryFeeOre": 10000,
+      "description": "Gjør stua til kinosal eller vis bilder i selskapet. Full HD-projektor med lett lerret og HDMI-kabel.",
+      "included": [
+        "Lerret",
+        "HDMI-kabel",
+        "Fjernkontroll"
+      ],
+      "image": "images/equipment-17.webp"
+    },
+    {
+      "id": "gassgrill",
+      "type": "rent_out",
+      "title": "Gassgrill til sommerfesten",
+      "category": "grill",
+      "locality": "Nordskot",
+      "priceOre": {
+        "hour": null,
+        "day": 25000,
+        "weekend": 60000,
+        "week": 100000
+      },
+      "ownerDelivery": true,
+      "deliveryFeeOre": 15000,
+      "description": "Romslig gassgrill med tre brennere og sidebord. Passer til en hyggelig kveld med venner. Gass avtales separat.",
+      "included": [
+        "Grilltrekk",
+        "Grilltang",
+        "Rengjøringsbørste"
+      ],
+      "image": "images/equipment-18.webp"
+    }
+  ],
+  "wanted": [
+    {
+      "id": "minigraver",
+      "type": "wanted",
+      "title": "Ønsker å leie minigraver en helg",
+      "category": "bygg",
+      "locality": "Leinesfjord",
+      "description": "Skal ordne litt i hagen og trenger en liten graver. Helst med mulighet for levering.",
+      "budgetText": "Opptil 1 500 kr",
+      "budgetMaxOre": 150000,
+      "period": "En helg · fleksibel dato"
+    },
+    {
+      "id": "takboks-vinter",
+      "type": "wanted",
+      "title": "Trenger takboks til vinterferien",
+      "category": "transport",
+      "locality": "Nordfold",
+      "description": "Familien skal på tur. Ser etter en romslig takboks som passer et vanlig takstativ.",
+      "budgetText": "500–700 kr / uke",
+      "budgetMaxOre": 70000,
+      "period": "Én uke i vinterferien"
+    },
+    {
+      "id": "tepperenser-lordag",
+      "type": "wanted",
+      "title": "Trenger tepperenser lørdag",
+      "category": "rengjoring",
+      "locality": "Engeløya",
+      "description": "Sofaen trenger en runde før vi får besøk. Kan hente og levere samme dag.",
+      "budgetText": "Ca. 250 kr",
+      "budgetMaxOre": 25000,
+      "period": "En lørdag · én dag"
+    },
+    {
+      "id": "stillas-3",
+      "type": "wanted",
+      "title": "Ønsker å leie stillas i tre dager",
+      "category": "stiger",
+      "locality": "Leines",
+      "description": "Skal male en husvegg og trenger et enkelt stillas. Hjelp med transport hadde vært fint.",
+      "budgetText": "Etter avtale",
+      "budgetMaxOre": null,
+      "period": "Tre dager"
+    },
+    {
+      "id": "kajakker-besok",
+      "type": "wanted",
+      "title": "To kajakker til besøkende",
+      "category": "friluft",
+      "locality": "Nordskot",
+      "description": "Får besøk av venner som vil oppleve fjorden. Vi har erfaring og ønsker vester og årer.",
+      "budgetText": "Opptil 1 400 kr / helg",
+      "budgetMaxOre": 140000,
+      "period": "En helg · to kajakker"
+    }
+  ]
+}

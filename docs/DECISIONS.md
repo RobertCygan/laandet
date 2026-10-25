@@ -1,0 +1,298 @@
+# Architecture and Product Decisions (ADR log)
+
+Each decision records context, the choice, the trade-off and its status.
+
+**Status values:**
+- **Proposed** — recommended in Phase 00, waiting for the project owner.
+- **Accepted** — approved by the owner (write the date and how it was approved).
+- **Superseded** — replaced by a later decision.
+
+Nothing in this log is *Accepted* yet. The owner approves or changes decisions by commenting
+on the Phase 00 pull request or by editing this file.
+
+---
+
+## D-001 — Two interface languages: Norwegian Bokmål (default) and English
+- **Context:** The master prompt asks for a Norwegian Bokmål interface and centralised strings. The owner added "Norwegian lang. and english lang" at the top of the prompt. Many Steigen residents, seasonal workers and visitors read English better than Norwegian.
+- **Decision:**
+  - The UI ships in `nb-NO` (default; it owns the URL root `/`) and `en` (under `/en`).
+  - All strings live in message catalogs (`messages/nb.json`, `messages/en.json`), handled by `next-intl`.
+  - Legal documents are written in Norwegian. English versions are informational translations, and each one says the Norwegian text prevails.
+  - User-generated content (listings, messages) is shown as written and is never machine-translated.
+- **Trade-off:** About 15–20% more UI copy work and a second set of legal texts to keep in sync. It is far cheaper to do from day one than to retrofit.
+- **Status:** Proposed. **Owner must confirm** whether English legal translations are wanted at launch or only the English UI.
+
+## D-002 — Repository location
+- **Context:** This session can only reach `RobertCygan/G-PSI_WWW`, which hosts the G-PSI website (`www/`) and the prototype.
+- **Decision:**
+  - Laandet lives in the self-contained folder `laandet/`: docs, legal texts, design assets, and from Phase 01 the app in `laandet/app/`.
+  - The G-PSI website build (`www/`) is not touched.
+  - When the owner creates a dedicated repository (recommended: `laandet`), move the folder with `git subtree split` to keep history.
+- **Trade-off:** Shared CI configuration and issue tracker for a while. Workflows must use `paths:` filters so one product's changes don't run the other's checks.
+- **Status:** Proposed.
+
+## D-003 — Product name
+- **Decision:**
+  - Use "Laandet" in all new code, text, domains and assets.
+  - The prototype file `Laanndet.html` keeps its historical name and is not modified.
+  - The wordmark in the new UI reads "Laandet." (the prototype's dotted wordmark style).
+- **Status:** Required by the master specification.
+
+## D-004 — Application stack
+- **Context:** The master specification prefers Next.js, TypeScript, Tailwind, PostgreSQL and Prisma/Drizzle. The G-PSI site uses TanStack Start with an external auth broker (see `CURRENT_STATE_ASSESSMENT.md` §4). The prototype's React source is not available.
+- **Decision:**
+
+  | Layer | Choice (versions checked 25.10.2026) |
+  |---|---|
+  | Web framework | **Next.js 16** (App Router, React Server Components, Server Actions), TypeScript `strict` |
+  | Styling | **Tailwind CSS 4** with the prototype's design tokens as theme variables |
+  | Database | **PostgreSQL 17** |
+  | Data access | **Drizzle ORM** (0.45.x) with SQL migrations committed to the repo |
+  | Authentication | **Better Auth** (1.7.x), self-hosted in the same app and database |
+  | Validation | **Zod**, with schemas shared by forms and server |
+  | i18n | **next-intl** |
+  | Image processing | **sharp** |
+  | Tests | **Vitest** (unit and integration), **Playwright** (end-to-end) |
+  | CI | **GitHub Actions** |
+
+- **Why Drizzle over Prisma:**
+  - Plain SQL migrations that can be reviewed.
+  - No separate query engine binary.
+  - Easy use of PostgreSQL features the design depends on: range types, exclusion constraints, full-text search.
+- **Why Better Auth:**
+  - Maintained and open source (MIT), and it runs inside our own app and database, so there is no external identity broker or per-user fee.
+  - Covers what we need: email verification, password reset, rate limiting, session revocation, TOTP two-factor and passkey plugins.
+  - The project behind Auth.js joined Better Auth in 2025, so it is the mainstream choice in this ecosystem.
+- **Trade-off:**
+  - Next.js is heavier than a minimal server, but well documented and familiar to any developer or AI assistant who picks up the project.
+  - Self-hosted auth means we own patching. Mitigated by pinning versions, Dependabot and CI audits.
+- **Status:** Proposed.
+
+## D-005 — Hosting: one EU virtual server with Docker Compose
+- **Context:** Low cost and EU/EEA data residency are priorities. Managed platforms cost about 40–70 USD per month at minimum and are mostly US companies; Vercel Hobby forbids commercial use. Hetzner raised prices in April and June 2026, and its cheapest plans may not be orderable for new customers (see `OPERATING_COSTS.md`).
+- **Decision:**
+  - One Linux VPS with at least 2 vCPU and 4 GB RAM in an EU/EEA data centre. Hetzner (Helsinki or Germany) is preferred if available; otherwise any comparable EU provider.
+  - It runs Docker Compose with: `app` (Next.js standalone build), `worker` (same image, scheduled jobs), `db` (PostgreSQL 17) and `caddy` (TLS certificates, reverse proxy, security headers).
+  - Staging runs on the same server as a separate Compose project, with its own database, secrets and subdomain, protected by basic auth and `noindex`.
+- **Trade-off:**
+  - Cheapest and simplest, and all data stays in one EU place.
+  - It is a single point of failure and the owner must keep the OS updated. Mitigations: unattended security upgrades, nightly encrypted off-site backups, a tested restore runbook, and an uptime monitor.
+  - Moving later to managed Postgres or a second server needs no code change, only configuration.
+- **Status:** Proposed. **No server will be ordered without owner approval.**
+
+## D-006 — Media storage behind the application
+- **Decision:**
+  - Uploaded images are stored on the server's disk (a Docker volume), outside the web root, under random UUID keys, behind a small `MediaStore` interface (`put`, `get`, `delete`).
+  - Public listing images are served by an app route that checks the listing is published.
+  - Private images (condition photos, dispute evidence) are served by the same route only to authorised users, with `Cache-Control: private, no-store`.
+  - An S3-compatible adapter (Hetzner Object Storage, Scaleway, Cloudflare R2 with EU jurisdiction) can be added when disk or bandwidth demands it.
+- **Trade-off:** No CDN and no extra service. Disk is included in the server price. Images are included in the off-site backup. Fine for a pilot of a few thousand users.
+- **Status:** Proposed.
+
+## D-007 — Authentication policy
+- **Decision:**
+  - Email and password sign-up. Email must be verified before a user can publish, message or book.
+  - Password reset by email link.
+  - Passwords:
+    - At least 10 characters.
+    - Checked against known breached passwords (Better Auth "Have I Been Pwned" plugin, k-anonymity, no password leaves the server).
+    - Hashed with scrypt (Better Auth default).
+  - Sessions:
+    - HTTP-only, `Secure`, `SameSite=Lax`, `__Host-` prefixed cookies.
+    - Expire after 30 days, or 8 hours for staff.
+    - Revoked on password change, suspension and deletion.
+  - Passkeys: optional for users, added in Phase 01 if time allows.
+  - TOTP two-factor: **mandatory** for moderators and administrators before they can use `/admin`.
+  - Bot protection at launch: rate limits, a hidden honeypot field, a minimum form-fill time and email verification. Cloudflare Turnstile is prepared behind a feature flag and switched on only if abuse appears, because it adds a third-party (US) processor.
+- **Status:** Proposed.
+
+## D-008 — Transactional email
+- **Decision:**
+  - Send through SMTP to an EU provider. Recommended: Scaleway Transactional Email (pay per use) or Brevo (free tier, 300 per day).
+  - Every email goes through an `email_outbox` table with retries, so a provider outage does not break sign-up or bookings.
+  - Mailpit catches all email in development and CI.
+- **Status:** Proposed. **Owner chooses the provider and creates the account.**
+
+## D-009 — Money representation
+- **Decision:**
+  - All amounts are integers in **øre** (1 kr = 100 øre), stored as `bigint` columns named `*_ore`. NOK is the only currency.
+  - Formatting is `Intl.NumberFormat('nb-NO')`, for example `1 500 kr`.
+  - No floating-point arithmetic on money.
+- **Status:** Required by the master specification.
+
+## D-010 — Pilot participants: private persons aged 18+
+- **Context:**
+  - Business sellers ("næringsdrivende") bring extra duties: consumer information, trader traceability, possibly platform reporting. The pilot does not need them.
+  - Under Norwegian guardianship law, minors cannot freely enter binding agreements.
+- **Decision:**
+  - At sign-up the user confirms (1) they are at least 18, (2) they use Laandet as a private person, not in business, and (3) they accept the terms. Each confirmation is stored with a timestamp.
+  - No date of birth and no fødselsnummer is collected.
+  - The interface never presents age as verified.
+- **Status:** Proposed.
+
+## D-011 — Value threshold and the high-value block
+- **Decision:**
+  - Every "Leies ut" listing must have a declared approximate replacement value.
+    - **Value ≤ 5 000 kr (≤ 500 000 øre):** category A, simplified agreement.
+    - **Value > 5 000 kr:** category B, extended agreement.
+  - **In the MVP the server refuses rental requests and bookings for category B.**
+  - A category B listing can be saved as a draft. It is published as a non-bookable "Kommer senere" preview only if the owner switches on the feature flag `high_value_preview` (default **off**).
+  - Category B bookings unlock only when all three are true:
+    1. Identity verification (`IdentityVerification.level = 'strong'`) is live for both parties.
+    2. A reviewed deposit procedure is approved.
+    3. The flag `extended_agreements` is on.
+- **Trade-off:**
+  - Some valuable items (e-bikes, large tools) cannot be rented in the pilot.
+  - Accepted for safety. Owners can still give such items away or lend them outside the platform.
+  - Owners might under-declare value to avoid the block. The terms forbid it, the agreement records the declared value (which weakens the owner's own claim if under-declared), and moderators can review suspicious listings.
+- **Status:** Proposed.
+
+## D-012 — No money flows through Laandet in the MVP
+- **Decision:**
+  - Laandet records the agreed price and any agreed deposit as **terms of the agreement only**.
+  - The parties settle directly (cash, Vipps, bank transfer). Laandet never receives, holds, refunds or deducts money.
+  - The UI warns before every agreement: off-platform payments have no platform protection, and Laandet never sends payment links.
+  - A future `PaymentProvider` interface is documented in `ARCHITECTURE.md` but not implemented.
+- **Status:** Required by the master specification.
+
+## D-013 — One `bookings` table also represents rental requests
+- **Context:** The master specification lists `RentalRequest` and `Booking` as separate entities.
+- **Decision:**
+  - A rental request is a `bookings` row with status `requested`. Accepting it moves the same row forward.
+  - Overlap protection (a PostgreSQL exclusion constraint) applies only from `accepted` onward, so several people can request the same dates.
+- **Trade-off:** One state machine, one history, no copying of data between tables. Requests and bookings are separated by status in queries.
+- **Status:** Proposed.
+
+## D-014 — Reviews only after completed rentals, published double-blind
+- **Decision:**
+  - Each party can review the other once per completed rental, within 14 days of completion.
+  - A review stays hidden until both have reviewed or the 14 days pass, so neither side can retaliate.
+  - Giveaways have no reviews in the MVP. Profiles show the verified count of completed giveaways instead.
+- **Status:** Proposed.
+
+## D-015 — Messaging rules
+- **Decision:**
+  - A conversation always belongs to a listing (a question about it) or to a booking or giveaway claim. There are no free direct messages.
+  - Messages are plain text, rendered as text. Links are not made clickable, and the UI warns about payment links.
+  - Users can block and report.
+  - Moderators cannot browse conversations. They see only:
+    - the messages a participant attaches to a report, and
+    - for an escalated dispute, the booking conversation, after both parties have been told it will be reviewed.
+  - Every staff view is written to the audit log with a reason.
+- **Status:** Proposed.
+
+## D-016 — Giveaways use a simple separate flow
+- **Decision:**
+  - Interested users send a `giveaway_claim` with a message. The giver picks one claim, which reserves the item.
+  - Both parties confirm the transfer: a *Gis bort — overleveringsbekreftelse* snapshot with condition and known defects. The listing then becomes "Gitt bort".
+  - No rental agreement, no deposit, no condition report.
+- **Status:** Proposed.
+
+## D-017 — No maps and no distances in the MVP
+- **Decision:**
+  - Location is a locality from an admin-managed list (Leinesfjord, Nordfold, Engeløya and so on) plus optional free text such as "nær skolen".
+  - Search filters by locality, with no distance, travel time or map tiles.
+- **Trade-off:** Less visual than the prototype's planned map toggle, but honest, cheaper and better for privacy. Maps (for example Kartverket open tiles) can come later.
+- **Status:** Proposed.
+
+## D-018 — Background work without a queue service
+- **Decision:** A `worker` process (same codebase) runs every minute and handles:
+  - the email outbox
+  - expiring stale requests
+  - reminders before handover and return
+  - opening review windows
+  - retention clean-up
+
+  State lives in PostgreSQL tables, and each job is safe to run twice.
+- **Status:** Proposed.
+
+## D-019 — Search with PostgreSQL only
+- **Decision:**
+  - PostgreSQL full-text search (`norwegian` and `simple` configurations combined) plus `pg_trgm` for typo tolerance.
+  - Filters run as SQL `WHERE` clauses. Availability uses a range-overlap check against bookings and blocked periods.
+- **Trade-off:** More than enough for tens of thousands of listings. No external search server.
+- **Status:** Proposed.
+
+## D-020 — "Ønskes leid" responses
+- **Decision:**
+  - A reply to a wanted listing is a message in a conversation tied to that listing. The replier can attach a link to one of their own "Leies ut" listings.
+  - The actual rental always happens as a request on a "Leies ut" listing, so every rental uses the same agreement, condition and dispute machinery.
+- **Status:** Proposed.
+
+## D-021 — Agreements are immutable snapshots
+- **Decision:** When the owner accepts a request:
+  1. The server renders the correct template version (A or B) with the booking terms.
+  2. It stores the full text and its SHA-256 hash.
+  3. Each party accepts that exact hash.
+  4. Changing any material term (dates, price, deposit, handover method, accessories) supersedes the agreement and requires both acceptances again.
+- **Status:** Required by the master specification.
+
+## D-022 — Append-only evidence enforced by database privileges
+- **Decision:** The application connects with a runtime database role that has **no `UPDATE` or `DELETE`** on these tables:
+  - `audit_events`
+  - `contract_acceptances`
+  - `condition_entries`
+  - `condition_confirmations`
+  - `dispute_events`
+  - `giveaway_transfer_confirmations`
+
+  Migrations run with a separate owner role. Corrections are new rows that point to the row they supersede.
+  Personal-data deletion is the one exception: a narrowly scoped `SECURITY DEFINER` function, used only by the retention job, can redact or remove expired rows.
+- **Status:** Proposed.
+
+## D-023 — Legal documents as versioned files
+- **Decision:**
+  - Legal texts are Markdown files in `laandet/legal/nb/` (authoritative) and `laandet/legal/en/` (translations), each with a version header.
+  - At deploy, the app loads them into `legal_document_versions` with a content hash. Users accept a specific version.
+  - A new material version asks users to accept again at their next login.
+- **Status:** Proposed.
+
+## D-024 — Demo listings
+- **Decision:**
+  - Prototype examples may be seeded with `is_demo = true`. They always carry an "Eksempel" badge and cannot be requested or messaged.
+  - They are excluded from profiles and statistics.
+  - A feature flag `show_demo_listings` lets the owner hide them all once enough real listings exist.
+- **Status:** Proposed.
+
+## D-025 — No analytics or tracking in the MVP
+- **Decision:**
+  - No analytics scripts, no advertising or tracking cookies, no fingerprinting.
+  - Only strictly necessary cookies: session, CSRF/state, language choice.
+  - Operational metrics come from the database (counts) and server logs (kept 30 days), so no cookie banner is needed.
+- **Status:** Proposed.
+
+## D-026 — Voluntary support ("Støtt Laandet")
+- **Decision:**
+  - The page explains voluntary support and running costs.
+  - It shows a fundraising link only when the owner sets `SUPPORT_CAMPAIGN_URL` for a real, verified campaign (for example Spleis). Until then it says no fundraiser has started.
+  - No payment code exists in Laandet. See `SUPPORT_AND_FUNDING.md`.
+- **Status:** Proposed.
+
+## D-027 — Error monitoring
+- **Decision:**
+  - Sentry in its EU (Frankfurt) data region on the free Developer plan, with personal data scrubbing (`sendDefaultPii: false`, no request bodies, user id only).
+  - UptimeRobot free tier for uptime.
+  - Both are optional. The app runs without them.
+- **Status:** Proposed. **Owner approves accounts.**
+
+## D-028 — Paid rental of "means of transport" paused until the reporting question is clarified
+- **Context:** Norway's platform-reporting rules (DPI, skatteforvaltningsloven § 7-11, in force from income year 2026) can oblige a platform to collect and report seller identity data. This includes tax identification numbers, which is close to collecting fødselsnummer. The rules cover rental of **means of transport**.
+  - Trailers, bicycles, kayaks, canoes and SUP boards may fall under "means of transport".
+  - It is unclear whether a platform that does not process payments, but records the agreed price, is covered.
+  - Research summary is in `LEGAL_REVIEW_CHECKLIST.md` L-07.
+- **Decision:**
+  - Categories `tilhengere`, `sykler` and `padling` start with `allow_paid_rental = false`. These items can be lent free of charge (0 kr), given away or wanted, but not rented for money.
+  - The owner asks a lawyer, or Skatteetaten through a binding advance ruling, in week 1.
+  - If the answer is "not reportable", or the owner accepts the reporting duty, an admin flips the flag; no code change is needed.
+- **Trade-off:** Trailers and kayaks are popular in the prototype. Pausing paid rental reduces early usefulness but avoids building identity/tax data collection that the MVP otherwise does not need.
+- **Alternatives:**
+  - (a) Accept the risk and launch with paid rental, and register as a reporting platform if required.
+  - (b) Implement DPI data collection for those categories only.
+- **Status:** Proposed. **Owner decision required before launch.**
+
+## D-029 — Geography
+- **Decision:**
+  - Listings must be located in one of the admin-managed localities in Steigen kommune: Leinesfjord, Leines, Nordfold, Engeløya, Nordskot, Bogøy, Helnessund and Bogen. Others can be added by an admin.
+  - Users may live anywhere.
+  - Adding other municipalities needs no schema change.
+- **Status:** Proposed. **Owner to confirm the locality list.**
