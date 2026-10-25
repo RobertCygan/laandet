@@ -43,4 +43,12 @@ export const LIMITS = {
   uploadsEstablished: { max: 60, windowSeconds: 60 * 60 },
   reports: { max: 10, windowSeconds: 24 * 60 * 60 },
   categorySuggestions: { max: 3, windowSeconds: 24 * 60 * 60 },
+  // Phase 02
+  conversationsNew: { max: 5, windowSeconds: 24 * 60 * 60 },
+  conversationsEstablished: { max: 20, windowSeconds: 24 * 60 * 60 },
+  messagesNew: { max: 60, windowSeconds: 60 * 60 },
+  messagesEstablished: { max: 200, windowSeconds: 60 * 60 },
+  // Rental requests and giveaway claims share one limit.
+  requestsNew: { max: 5, windowSeconds: 24 * 60 * 60 },
+  requestsEstablished: { max: 15, windowSeconds: 24 * 60 * 60 },
 } satisfies Record<string, RateRule>;

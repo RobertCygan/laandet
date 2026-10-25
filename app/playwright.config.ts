@@ -3,7 +3,8 @@ import { applyTestEnv } from "./tests/integration/env";
 
 // The server under test uses the *_test database and a temporary media folder (never dev or prod data).
 applyTestEnv();
-const PORT = 3100;
+// E2E_PORT lets two test runs share one machine.
+const PORT = Number(process.env.E2E_PORT ?? 3100);
 process.env.APP_URL = `http://localhost:${PORT}`;
 
 export default defineConfig({

@@ -11,7 +11,8 @@ export type EmailTemplate =
   | "deletion_requested"
   | "listing_hidden"
   | "appeal_decided"
-  | "role_granted";
+  | "role_granted"
+  | "activity";
 
 type Rendered = { subject: string; text: string };
 type Payload = Record<string, string>;
@@ -21,7 +22,73 @@ const signature = {
   en: "\n\nBest regards,\nLaandet\n\nYou are receiving this email because this address is registered with Laandet.",
 };
 
+/**
+ * Phase 02 activity notices: one short sentence per kind, plus a link. Never message text,
+ * prices or addresses (ARCHITECTURE §4.8).
+ */
+export const ACTIVITY_KINDS = {
+  booking_requested: { nb: "Du har fått en forespørsel om å leie «%s».", en: 'You have a new request to rent "%s".' },
+  booking_accepted: {
+    nb: "Forespørselen din om «%s» er godtatt. Les og godta leieavtalen.",
+    en: 'Your request for "%s" was accepted. Read and accept the agreement.',
+  },
+  booking_declined: { nb: "Forespørselen din om «%s» ble ikke godtatt.", en: 'Your request for "%s" was declined.' },
+  booking_withdrawn: { nb: "Forespørselen om «%s» er trukket tilbake.", en: 'The request for "%s" was withdrawn.' },
+  booking_expired: { nb: "Leieforholdet for «%s» er utløpt.", en: 'The rental of "%s" has expired.' },
+  booking_cancelled: { nb: "Leieforholdet for «%s» er avbestilt.", en: 'The rental of "%s" was cancelled.' },
+  agreement_new_revision: {
+    nb: "Det er laget en ny versjon av leieavtalen for «%s». Godta den på nytt.",
+    en: 'There is a new version of the agreement for "%s". Please accept it again.',
+  },
+  booking_confirmed: {
+    nb: "Leieavtalen for «%s» er godtatt av dere begge.",
+    en: 'Both of you have accepted the agreement for "%s".',
+  },
+  condition_to_confirm: {
+    nb: "Det er registrert tilstand for «%s». Se over og bekreft.",
+    en: 'The condition of "%s" has been recorded. Please review and confirm.',
+  },
+  handed_over: { nb: "«%s» er registrert som utlevert.", en: '"%s" is recorded as handed over.' },
+  return_reminder: {
+    nb: "Leieperioden for «%s» er over. Husk å levere tilbake og registrere tilstanden.",
+    en: 'The rental period for "%s" has ended. Remember to return it and record the condition.',
+  },
+  not_returned_possible: {
+    nb: "«%s» er ikke registrert som tilbakelevert. Du kan nå markere den som «Ikke tilbakelevert».",
+    en: '"%s" has not been recorded as returned. You can now mark it as "Not returned".',
+  },
+  booking_completed: { nb: "Leieforholdet for «%s» er fullført.", en: 'The rental of "%s" is completed.' },
+  booking_disputed: { nb: "Det er meldt fra om et problem med «%s».", en: 'A problem has been reported for "%s".' },
+  claim_received: { nb: "Noen vil gjerne ha «%s».", en: 'Someone would like "%s".' },
+  claim_selected: { nb: "Du er valgt som mottaker av «%s».", en: 'You have been chosen to receive "%s".' },
+  claim_not_selected: {
+    nb: "Giveren har valgt en annen mottaker av «%s» foreløpig.",
+    en: 'The giver has chosen someone else for "%s" for now.',
+  },
+  claim_cancelled: { nb: "Overleveringen av «%s» er avlyst.", en: 'The handover of "%s" was cancelled.' },
+  transfer_to_confirm: { nb: "Bekreft overleveringen av «%s».", en: 'Please confirm the handover of "%s".' },
+  transfer_confirmed: {
+    nb: "Overleveringen av «%s» er bekreftet av dere begge.",
+    en: 'Both of you have confirmed the handover of "%s".',
+  },
+  new_message: { nb: "Du har en ny melding om «%s».", en: 'You have a new message about "%s".' },
+} as const;
+export type ActivityKind = keyof typeof ACTIVITY_KINDS;
+
+const activityText = (locale: "nb" | "en", p: Payload) =>
+  (ACTIVITY_KINDS[p.kind as ActivityKind]?.[locale] ?? "").replace("%s", p.title ?? "");
+
 const templates: Record<EmailTemplate, Record<"nb" | "en", (p: Payload) => Rendered>> = {
+  activity: {
+    nb: (p) => ({
+      subject: `Laandet: ${activityText("nb", p)}`,
+      text: `Hei ${p.name}!\n\n${activityText("nb", p)}\n\n${p.url}`,
+    }),
+    en: (p) => ({
+      subject: `Laandet: ${activityText("en", p)}`,
+      text: `Hi ${p.name}!\n\n${activityText("en", p)}\n\n${p.url}`,
+    }),
+  },
   verify_email: {
     nb: (p) => ({
       subject: "Bekreft e-postadressen din hos Laandet",

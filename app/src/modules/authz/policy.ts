@@ -27,7 +27,20 @@ export type Action =
   | "category.manage"
   | "flag.manage"
   | "role.grant"
-  | "audit.view";
+  | "audit.view"
+  // Phase 02
+  | "conversation.start"
+  | "conversation.read"
+  | "message.send"
+  | "user.block"
+  | "booking.request"
+  | "booking.view"
+  | "booking.respond"
+  | "booking.participate"
+  | "claim.create"
+  | "claim.view"
+  | "claim.respond"
+  | "claim.participate";
 
 export type Resource =
   | { type: "none" }
@@ -39,7 +52,10 @@ export type Resource =
       appellantId: string;
       originalActorId: string;
       otherStaffAvailable: boolean;
-    };
+    }
+  | { type: "conversation"; participantIds: string[] }
+  | { type: "booking"; ownerId: string; renterId: string }
+  | { type: "claim"; giverId: string; claimantId: string };
 
 export type Decision = { allow: true } | { allow: false; reason: ErrorCode };
 
@@ -57,13 +73,21 @@ function staffAccess(a: UserActor): Decision {
 }
 
 /** Actions a suspended / deletion-pending account may still perform. */
-const ALLOWED_WHEN_SUSPENDED: ReadonlySet<Action> = new Set(["listing.view", "appeal.create"]);
+const ALLOWED_WHEN_SUSPENDED: ReadonlySet<Action> = new Set([
+  "listing.view",
+  "appeal.create",
+  "booking.view",
+  "claim.view",
+]);
 /** Actions a restricted account may not perform (AUTH_MODEL §3). */
 const DENIED_WHEN_RESTRICTED: ReadonlySet<Action> = new Set([
   "listing.create",
   "listing.publish",
   "media.upload",
   "categorySuggestion.create",
+  "conversation.start",
+  "booking.request",
+  "claim.create",
 ]);
 /** Actions that need a verified email (registered-but-unverified users are read-only). */
 const NEEDS_VERIFIED_EMAIL: ReadonlySet<Action> = new Set([
@@ -73,6 +97,14 @@ const NEEDS_VERIFIED_EMAIL: ReadonlySet<Action> = new Set([
   "listing.delete",
   "media.upload",
   "categorySuggestion.create",
+  "conversation.start",
+  "message.send",
+  "booking.request",
+  "booking.respond",
+  "booking.participate",
+  "claim.create",
+  "claim.respond",
+  "claim.participate",
 ]);
 
 export function can(actor: Actor, action: Action, resource: Resource = NONE): Decision {
@@ -139,6 +171,35 @@ export function can(actor: Actor, action: Action, resource: Resource = NONE): De
       }
       return ALLOW;
     }
+    // ---- Phase 02: only the parties themselves (a wrong party gets not_found, never a hint).
+    case "conversation.start":
+    case "booking.request":
+    case "claim.create":
+    case "user.block":
+      return ALLOW;
+    case "conversation.read":
+    case "message.send":
+      return resource.type === "conversation" && resource.participantIds.includes(actor.id) ? ALLOW : deny("not_found");
+    case "booking.view":
+    case "booking.participate":
+      return resource.type === "booking" && (resource.ownerId === actor.id || resource.renterId === actor.id)
+        ? ALLOW
+        : deny("not_found");
+    case "booking.respond":
+      if (resource.type !== "booking" || (resource.ownerId !== actor.id && resource.renterId !== actor.id)) {
+        return deny("not_found");
+      }
+      return resource.ownerId === actor.id ? ALLOW : deny("forbidden");
+    case "claim.view":
+    case "claim.participate":
+      return resource.type === "claim" && (resource.giverId === actor.id || resource.claimantId === actor.id)
+        ? ALLOW
+        : deny("not_found");
+    case "claim.respond":
+      if (resource.type !== "claim" || (resource.giverId !== actor.id && resource.claimantId !== actor.id)) {
+        return deny("not_found");
+      }
+      return resource.giverId === actor.id ? ALLOW : deny("forbidden");
     case "category.manage":
     case "flag.manage":
     case "role.grant":
