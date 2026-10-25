@@ -547,7 +547,8 @@
     "image_unsupported_type": "Bare JPEG, PNG, WebP og HEIC kan lastes opp.",
     "image_too_many_pixels": "Bildet har for høy oppløsning.",
     "image_undecodable": "Bildet kunne ikke leses. Prøv å ta bildet på nytt, eller lagre det som JPEG.",
-    "wrong_password": "Feil passord."
+    "wrong_password": "Feil passord.",
+    "image_heic_unsupported": "HEIC-bilder støttes ikke ennå. Lagre bildet som JPEG, eller velg «Mest kompatibel» i kamerainnstillingene på iPhone."
   },
   "pages": {
     "howTitle": "Slik fungerer Laandet",

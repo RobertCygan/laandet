@@ -656,7 +656,7 @@ function ImageUploader({
           {busy ? t("uploading") : t("addPhoto")}
           <input
             type="file"
-            accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+            accept="image/jpeg,image/png,image/webp"
             multiple
             className="visually-hidden"
             disabled={busy}

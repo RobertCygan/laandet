@@ -368,3 +368,11 @@ during Phase 01 start as *Proposed* (implementation-level) unless the owner says
   - Staff set up TOTP themselves at `/konto/tofaktor`: re-enter password → key + backup codes shown once → confirm with a code.
   - The secret is shown as text and an `otpauth://` link. No QR code library is used (KISS; very few staff members).
 - **Status:** Proposed (implementation-level).
+
+## D-039 — HEIC photos
+- **Context:** `TEST_STRATEGY.md` lists HEIC as an accepted upload format. The prebuilt `sharp` binary used here decodes AVIF but not HEIC, because of HEVC licensing.
+- **Decision:**
+  - The file picker asks for JPEG, PNG or WebP. iOS then converts camera photos to JPEG automatically.
+  - A HEIC file picked on a computer is rejected with a clear message. Content sniffing still recognises it.
+- **Revisit:** if pilot users report problems, decode HEIC in a separately licensed step (for example a libheif build on the server). This needs an owner decision on codec licensing.
+- **Status:** Proposed (implementation-level).

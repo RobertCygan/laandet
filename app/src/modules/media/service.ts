@@ -23,7 +23,11 @@ export async function uploadListingImage(actor: Actor, file: File): Promise<Uplo
   if (!(file instanceof File) || file.size === 0) throw new AppError("validation", "image_missing");
   if (file.size > MAX_UPLOAD_BYTES) throw new AppError("validation", "image_too_large");
   const input = Buffer.from(await file.arrayBuffer());
-  if (!sniffImageType(input)) throw new AppError("validation", "image_unsupported_type");
+  const type = sniffImageType(input);
+  if (!type) throw new AppError("validation", "image_unsupported_type");
+  // The prebuilt image library cannot decode HEIC. iPhones convert to JPEG on upload when the
+  // file picker does not ask for HEIC, so this only hits files picked from a computer.
+  if (type === "heic") throw new AppError("validation", "image_heic_unsupported");
 
   let processed;
   try {

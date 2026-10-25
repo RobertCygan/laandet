@@ -547,7 +547,8 @@
     "image_unsupported_type": "Only JPEG, PNG, WebP and HEIC can be uploaded.",
     "image_too_many_pixels": "The photo's resolution is too high.",
     "image_undecodable": "The photo could not be read. Try taking it again, or save it as JPEG.",
-    "wrong_password": "Wrong password."
+    "wrong_password": "Wrong password.",
+    "image_heic_unsupported": "HEIC images are not supported yet. Save the photo as JPEG, or choose \"Most Compatible\" in the iPhone camera settings."
   },
   "pages": {
     "howTitle": "How Laandet works",
