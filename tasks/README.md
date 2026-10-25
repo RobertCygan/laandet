@@ -18,19 +18,21 @@ under OUTPUT are updated. Report status precisely: planned → designed → impl
 
 | ID | Task | Depends on | Estimate (ideal days) | Status |
 |---|---|---|---|---|
-| [P01-01](phase-01/P01-01-scaffold.md) | Project scaffold, tooling, CI, security headers | owner approves D-002/D-004 | 1.5 | planned |
-| [P01-02](phase-01/P01-02-design-system.md) | Design system ported from the prototype | P01-01 | 2 | planned |
-| [P01-03](phase-01/P01-03-i18n.md) | i18n foundation (nb + en, formats) | P01-01 | 0.5 | planned |
-| [P01-04](phase-01/P01-04-database.md) | Database schema, migrations, roles, seeds | P01-01 | 1.5 | planned |
-| [P01-05](phase-01/P01-05-authentication.md) | Authentication (Better Auth) and email outbox | P01-03, P01-04 | 2 | planned |
-| [P01-06](phase-01/P01-06-authorization-audit.md) | Authorisation module and audit log | P01-04, P01-05 | 1 | planned |
-| [P01-07](phase-01/P01-07-profiles.md) | Profiles and account settings | P01-05, P01-06 | 1 | planned |
-| [P01-08](phase-01/P01-08-listings.md) | Listings for all three types | P01-02, P01-06, P01-09 | 3 | planned |
-| [P01-09](phase-01/P01-09-image-uploads.md) | Image upload pipeline and media delivery | P01-04, P01-06 | 1.5 | planned |
-| [P01-10](phase-01/P01-10-explore-search.md) | Explore, search, filters, listing detail | P01-08 | 2 | planned |
-| [P01-11](phase-01/P01-11-content-legal-pages.md) | Content pages and legal document publishing | P01-02, P01-03 | 1.5 | planned |
-| [P01-12](phase-01/P01-12-reporting-minimal.md) | Reporting and minimal moderation | P01-06, P01-08 | 1 | planned |
-| [P01-13](phase-01/P01-13-deployment-backups.md) | Staging/production deploy, backups, runbooks | P01-01, owner buys server and domain | 1.5 | planned |
+| [P01-01](phase-01/P01-01-scaffold.md) | Project scaffold, tooling, CI, security headers | owner approves D-002/D-004 | 1.5 | implemented, tested locally (CI pending) |
+| [P01-02](phase-01/P01-02-design-system.md) | Design system ported from the prototype | P01-01 | 2 | implemented, tested locally (CI pending) |
+| [P01-03](phase-01/P01-03-i18n.md) | i18n foundation (nb + en, formats) | P01-01 | 0.5 | implemented, tested locally (CI pending) |
+| [P01-04](phase-01/P01-04-database.md) | Database schema, migrations, roles, seeds | P01-01 | 1.5 | implemented, tested locally (CI pending) |
+| [P01-05](phase-01/P01-05-authentication.md) | Authentication (Better Auth) and email outbox | P01-03, P01-04 | 2 | implemented, tested locally (CI pending) |
+| [P01-06](phase-01/P01-06-authorization-audit.md) | Authorisation module and audit log | P01-04, P01-05 | 1 | implemented, tested locally (CI pending) |
+| [P01-07](phase-01/P01-07-profiles.md) | Profiles and account settings | P01-05, P01-06 | 1 | implemented, tested locally (CI pending) |
+| [P01-08](phase-01/P01-08-listings.md) | Listings for all three types | P01-02, P01-06, P01-09 | 3 | implemented, tested locally (CI pending) |
+| [P01-09](phase-01/P01-09-image-uploads.md) | Image upload pipeline and media delivery | P01-04, P01-06 | 1.5 | implemented, tested locally (CI pending) |
+| [P01-10](phase-01/P01-10-explore-search.md) | Explore, search, filters, listing detail | P01-08 | 2 | implemented, tested locally (CI pending) |
+| [P01-11](phase-01/P01-11-content-legal-pages.md) | Content pages and legal document publishing | P01-02, P01-03 | 1.5 | implemented, tested locally (CI pending) |
+| [P01-12](phase-01/P01-12-reporting-minimal.md) | Reporting and minimal moderation | P01-06, P01-08 | 1 | implemented, tested locally (CI pending) |
+| [P01-13](phase-01/P01-13-deployment-backups.md) | Staging/production deploy, backups, runbooks | P01-01, owner buys server and domain | 1.5 | files implemented; **not deployed** (needs server + domain) |
+
+Status of 25.10.2026: see `docs/CHANGELOG.md` (Phase 01) for exactly what was tested and the known gaps per task.
 
 **Total: about 20 ideal days.** Week 44–46 has 15 working days, so the plan relies on AI-assisted speed-up and
 parallel work (P01-11 and P01-13 can run alongside P01-05…P01-10). If Phase 01 is not accepted by

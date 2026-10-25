@@ -193,7 +193,22 @@ psql -v ON_ERROR_STOP=1 -d laandet_schema_check -f laandet/db/schema-checks.sql
 ```
 
 Production target is PostgreSQL 17. The schema uses nothing that changed between 16 and 17.
-Phase 01 CI runs the same checks against the generated Drizzle migrations (task P01-04).
+
+### 9a. Phase 01 implementation (25.10.2026)
+
+- The application schema is defined in `app/src/db/schema/` (Drizzle, snake_case). It is applied by the SQL migrations in `app/drizzle/`:
+  - `0000_extensions.sql`: `pg_trgm`, `btree_gist`.
+  - `0001_init.sql`: Phase 01 tables. Better Auth tables (`users`, `sessions`, `accounts`, `verifications`, `two_factors`, `rate_limits`), plus profiles, localities, categories, listings, media, reports, moderation actions, appeals, legal documents and acceptances, email outbox, flags, rate limits, audit log.
+  - `0002_privileges.sql`: grants for `laandet_app`. UPDATE/DELETE are revoked on `audit_events` and `legal_acceptances`, and the app role can only read `legal_document_versions`. Also a `purge_expired_audit_events()` function.
+- Tables for Phase 02+ (bookings, agreements, condition reports, disputes, reviews, conversations) are **not** in the migrations yet. They stay in `db/schema-draft.sql` until their phase.
+- **Difference from the reference schema (D-034):** the "complete terms" checks on `listings` apply only when `status <> 'draft'`, so drafts can be saved step by step. Value checks apply to drafts too: amounts ≥ 0, deposit ≤ value, radius 1–300 km, dates in order.
+- **What is tested against the real migrations** (integration tests, `app/tests/integration/`):
+  - the runtime role cannot UPDATE/DELETE the audit log or acceptances, and cannot write legal texts;
+  - listing publish rules, category B block, free-only categories;
+  - owner-only edits and visibility;
+  - moderation and appeal rules.
+
+  The 23 checks in `db/schema-checks.sql` still apply to the reference schema only. They are not run against the Drizzle migrations, because those do not contain the Phase 02+ tables yet.
 
 ## 10. Open modelling questions for the owner
 

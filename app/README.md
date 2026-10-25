@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Laandet — web application
 
-## Getting Started
+Next.js (App Router) + PostgreSQL + Drizzle + Better Auth. Phase 01 covers user accounts, all three listing types,
+image uploads, explore/search, legal pages, reporting and minimal moderation. Architecture and decisions:
+`../docs/ARCHITECTURE.md` and `../docs/DECISIONS.md`.
 
-First, run the development server:
+The UI is in Norwegian Bokmål (default, no URL prefix) and English (`/en/...`). Code and comments are in English.
+
+## Requirements
+
+- Node.js 22 (`>=22.12 <23`)
+- PostgreSQL 16 or 17, with the `pg_trgm` and `btree_gist` extensions
+- No other services are needed for development. Emails are written to the log when `SMTP_URL` is empty.
+
+## First run
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm ci
+cp .env.example .env.local            # then fill in the secrets (see the comments in the file)
+sudo -u postgres sh scripts/db-setup-local.sh   # local roles + laandet_dev / laandet_test (dev passwords)
+npm run db:migrate                    # migration role (DATABASE_MIGRATION_URL)
+npm run db:seed -- --demo             # localities, categories, flags, keywords + labelled demo listings
+npm run legal:load                    # legal texts from ../legal into the database
+npm run dev                           # http://localhost:3000
+npm run worker                        # separate terminal: email outbox and clean-up jobs
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+To give someone a staff role (server only, audited):
+`npm run grant-role -- --email ola@example.no --role moderator --reason "…"`. The person must then set up
+two-factor sign-in at `/konto/tofaktor` before `/admin` opens.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Commands
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command                                                       | What it does                                                                           |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `npm run dev` / `npm run build` / `npm start`                 | Next.js dev server, production build, production server                                |
+| `npm run lint` / `npm run format:check` / `npm run typecheck` | ESLint (incl. security rules), Prettier, TypeScript                                    |
+| `npm run test:unit`                                           | Vitest unit tests (`src/**/*.test.ts`)                                                 |
+| `npm run test:integration`                                    | Vitest against the `laandet_test` database (migrations, seed and legal load run first) |
+| `npm run build && npm run test:e2e`                           | Playwright (mobile + desktop) against the production build on port 3100                |
+| `npm run db:generate`                                         | Generate a migration from `src/db/schema` (review the SQL before committing)           |
+| `npm run worker -- --once`                                    | Run every worker job once and exit                                                     |
 
-## Learn More
+Tests only ever use databases whose name ends in `_test`. Override the URLs with `TEST_DATABASE_URL` and
+`TEST_DATABASE_MIGRATION_URL`.
 
-To learn more about Next.js, take a look at the following resources:
+## Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/
+  app/[locale]/…     pages (server components); no direct database access (ESLint rule)
+  app/api/auth/…     Better Auth handler
+  app/media/…        authorised image delivery
+  modules/           domain logic: auth, authz (central policy), listings, media, moderation, legal, users,
+                     notifications (email outbox), audit, ratelimit, flags, config (validated env)
+  ui/                components (forms are client components using Server Actions)
+  db/schema/         Drizzle schema (snake_case); drizzle/ holds the SQL migrations
+  proxy.ts           CSP nonce, request id and locale routing
+worker/              background jobs (email outbox, clean-up, retention)
+scripts/             migrate, seed, legal loader, grant-role, local database setup
+messages/            nb.json and en.json (same keys; checked by a unit test)
+tests/               integration (Vitest) and e2e (Playwright) tests
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Security notes
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- The runtime role `laandet_app` has least privilege. `audit_events` and `legal_acceptances` are append-only,
+  and legal texts are read-only for the app. Migrations and the legal loader use `laandet_owner`.
+- CSP with a per-request nonce and `strict-dynamic`. No third-party scripts, fonts or analytics.
+- Every write goes through `can()` in `src/modules/authz/policy.ts`. Objects that are not yours give 404.
+- Uploaded images are checked by their content, re-encoded to WebP and stripped of all metadata.
+  They are stored outside the web root under random names.
+- No money, card data or fødselsnummer is handled or stored.

@@ -314,3 +314,57 @@ during Phase 01 start as *Proposed* (implementation-level) unless the owner says
   - `formatKr` also accepts `bigint`.
   - There is no floating-point arithmetic on money; kroner input is parsed into integer øre at the boundary.
 - **Status:** Proposed (implementation-level).
+
+## D-032 — Search and pagination (implementation)
+- **Context:** P01-10 asked for keyset pagination and a separate `src/modules/search/` module.
+- **Decision:**
+  - Explore uses one parameterised query in `src/modules/listings/queries.ts`, with offset pagination: 24 per page, at most 50 pages.
+  - Real listings are always ranked before demo listings.
+- **Reason:** In Steigen, result sets are small. Offset pages keep shareable URLs simple (`?side=2`), and the cap stops deep-page scans. Keyset pagination can replace this without changing the URL format if volumes grow.
+- **Not done:** the `EXPLAIN` plan fixture from P01-10. The indexes (GIN full text, trigram, filters) exist in the migration.
+- **Status:** Proposed (implementation-level).
+
+## D-033 — Legal texts rendered without raw HTML
+- **Decision:**
+  - Legal Markdown is rendered with `react-markdown` + `remark-gfm` with `skipHtml`.
+  - Raw HTML and HTML comments are never output.
+  - Links are rewritten to app routes, and only `https:`, `mailto:` and internal paths survive.
+  - `dangerouslySetInnerHTML` is not used anywhere. ESLint forbids it, which is stricter than P01-11, where it was allowed in one component.
+- **Status:** Proposed (implementation-level).
+
+## D-034 — Drafts may be incomplete; database checks enforce published listings
+- **Decision:**
+  - The "complete terms" `CHECK` constraints (rent-out price/value/condition, give-away condition, description length) apply only when `status <> 'draft'`.
+  - Checks that protect stored values always apply, for drafts too: no negative amounts, deposit ≤ value, radius 1–300 km, dates in order. The service checks the same rules first (`storageViolations`), so users get field errors instead of a database error.
+- **Status:** Proposed (implementation-level).
+
+## D-035 — Restricted accounts stay signed in; the policy limits them
+- **Context:** P01-05 §5 suggested treating `suspended` and `deletion_pending` accounts as signed out, except on the appeal pages.
+- **Decision:**
+  - Only `deleted` accounts are treated as signed out (and cannot create sessions).
+  - `suspended` and `deletion_pending` accounts keep their session but may only view and appeal (`authz/policy.ts`). Their account page shows a status notice.
+  - `deletion_pending` sessions are revoked when deletion is requested, so in practice only suspended users are affected.
+- **Reason:** A suspended user must be able to read the statement of reasons and appeal (DSA-style good practice). Denying actions in one central policy is easier to test than special-casing pages.
+- **Status:** Proposed (implementation-level).
+
+## D-036 — Re-acceptance of material legal changes
+- **Decision:**
+  - When a `terms` or `privacy` version is loaded with `material_change: true`, signed-in users who have not accepted that version (or a later one) see a banner.
+  - They must accept on `/godta-vilkar` before they can publish. `saveListing` refuses with `terms_acceptance_required`, and `/ny-annonse` redirects to the acceptance page.
+  - Browsing is not blocked.
+  - Acceptances are append-only rows in `legal_acceptances`.
+- **Status:** Proposed (implementation-level).
+
+## D-037 — Browser tests run against the production build
+- **Decision:**
+  - Playwright starts `next start` on port 3100 against the `*_test` database after `npm run build`.
+  - The test helpers refuse any database whose name does not end in `_test`.
+- **Reason:** In this environment the Turbopack dev server reloaded pages in a loop ("HMR hash mismatch"). Production builds are also what users get.
+- **Status:** Proposed (implementation-level).
+
+## D-038 — Staff 2FA setup and role changes
+- **Decision:**
+  - Roles are granted only through the server CLI (`npm run grant-role -- --email … --role … --reason …`). The change is audited, existing sessions are revoked, and other admins are emailed.
+  - Staff set up TOTP themselves at `/konto/tofaktor`: re-enter password → key + backup codes shown once → confirm with a code.
+  - The secret is shown as text and an `otpauth://` link. No QR code library is used (KISS; very few staff members).
+- **Status:** Proposed (implementation-level).

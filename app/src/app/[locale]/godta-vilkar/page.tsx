@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { localePath, pageLocale, param } from "@/i18n/page";
+import { localePath, pageLocale, param, safeRedirectPath } from "@/i18n/page";
 import { requirePageUser } from "@/modules/auth/guards";
 import { pendingAcceptances } from "@/modules/legal/acceptance";
 import { LEGAL_ROUTES } from "@/modules/legal/content";
@@ -19,7 +19,7 @@ export default async function AcceptTermsPage({ params, searchParams }: PageProp
   const locale = await pageLocale(params);
   const actor = await requirePageUser(locale, "/godta-vilkar");
   const next = param((await searchParams).neste);
-  const safeNext = next && next.startsWith("/") && !next.startsWith("//") ? next : undefined;
+  const safeNext = safeRedirectPath(next);
   const pending = await pendingAcceptances(actor);
   if (!pending.length) redirect(safeNext ?? localePath(locale, "/konto"));
   const t = await getTranslations("legalPage");

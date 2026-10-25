@@ -11,10 +11,11 @@ It is an independent project in the **G-PSI.ai** portfolio.
 | Item | Status (25.10.2026) |
 |---|---|
 | Visual prototype (`../Laanndet.html`) | Exists. Static demo with fictional data (see `docs/CURRENT_STATE_ASSESSMENT.md`) |
-| **Phase 00:** inventory, architecture, data model, threat model, legal drafts, roadmap | **Delivered for owner review.** Nothing is approved yet. |
+| **Phase 00:** inventory, architecture, data model, threat model, legal drafts, roadmap | **Approved by the owner** on 25.10.2026 (D-001…D-029 accepted) |
+| **Phase 01:** accounts, listings, uploads, explore, legal pages, reporting (`app/`) | **Implemented and tested locally** (unit, integration, Playwright). CI has not run yet. See `docs/CHANGELOG.md`. |
+| Deployment (staging/production) | **Not deployed.** Deploy files and runbooks exist (`deploy/`, `docs/runbooks/`). A server and domain must first be bought by the owner. |
 | Database reference schema | Designed. **Validated:** applied to PostgreSQL 16 and 23/23 checks passed (`docs/DATA_MODEL.md` §9) |
 | Legal drafts (nb authoritative, en informational) | **Drafts. Not legally reviewed. Must not be used with real users before review.** |
-| Application code | **Not started.** Phase 01 tasks are in `tasks/phase-01/` |
 | Target | Public pilot 14.12.2026, subject to the gates in `docs/DEVELOPMENT_ROADMAP.md` |
 
 We distinguish *planned → designed → implemented → tested → verified → approved → released* and never claim a
@@ -28,7 +29,7 @@ laandet/
 ├─ docs/                        project documentation (English)
 │  ├─ MASTER_SPECIFICATION.md   owner's master prompt (verbatim) + amendments
 │  ├─ CURRENT_STATE_ASSESSMENT.md  what exists, what works, what to reuse
-│  ├─ DECISIONS.md              ADR log (D-001 … D-029), all "Proposed"
+│  ├─ DECISIONS.md              ADR log (D-001 … D-038); D-001…D-029 accepted 25.10.2026
 │  ├─ ARCHITECTURE.md           smallest viable secure architecture
 │  ├─ DATA_MODEL.md             entities, state machines, privileges, validation record
 │  ├─ AUTH_MODEL.md             authentication + authorisation matrix
@@ -53,6 +54,8 @@ laandet/
 │  ├─ schema-draft.sql          reference PostgreSQL schema (MVP)
 │  └─ schema-checks.sql         executable invariant checks
 ├─ design/prototype/            assets extracted from the prototype (CSS, images, demo content)
+├─ app/                         the web application (Next.js); see app/README.md
+├─ deploy/                      Docker Compose, Caddy, backups (for the future server)
 └─ tasks/                       development tasks (GOAL/CONTEXT/INPUT/OUTPUT/CONSTRAINTS/TESTS)
 ```
 
@@ -61,7 +64,7 @@ laandet/
 1. **Project owner:** read `docs/DEVELOPMENT_ROADMAP.md` §6 (decisions needed this week), then `docs/DECISIONS.md`.
 2. **Lawyer:** read `docs/LEGAL_REVIEW_CHECKLIST.md`, then `legal/nb/`.
 3. **Developer or AI assistant:** read `docs/ARCHITECTURE.md`, `docs/DATA_MODEL.md`, `docs/AUTH_MODEL.md` and
-   `docs/SECURITY.md`, then pick up `tasks/phase-01/P01-01-scaffold.md`.
+   `docs/SECURITY.md`, then `app/README.md` to run the application locally.
 
 ## Validate the reference schema locally
 

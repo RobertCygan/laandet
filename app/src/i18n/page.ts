@@ -18,3 +18,13 @@ export function localePath(locale: string, path: string): string {
 export function param(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
 }
+
+/**
+ * A same-site path that is safe to redirect to after sign-in (no open redirects): it must start with a
+ * single "/", and may not contain backslashes, whitespace or control characters (browsers strip tabs and
+ * newlines, which would turn "/\t/evil.example" into "//evil.example").
+ */
+export function safeRedirectPath(value: string | undefined | null): string | undefined {
+  if (!value || value.length > 512) return undefined;
+  return /^\/(?![/\\])[^\s\\\u0000-\u001f\u007f]*$/.test(value) ? value : undefined;
+}

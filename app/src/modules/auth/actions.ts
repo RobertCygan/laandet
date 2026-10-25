@@ -14,15 +14,14 @@ import {
   twoFactorStartSchema,
 } from "./schemas";
 import * as service from "./service";
-import { localePath } from "@/i18n/page";
+import { localePath, safeRedirectPath } from "@/i18n/page";
 import { formToObject, runAction, type ActionState } from "@/modules/server/action";
 
 const lp = localePath;
 
 /** Only same-site relative paths are accepted as a post-login target (no open redirects). */
 function safeNext(value: string | undefined, locale: string): string {
-  if (value && value.startsWith("/") && !value.startsWith("//") && !value.includes("\\")) return value;
-  return lp(locale, "/konto");
+  return safeRedirectPath(value) ?? lp(locale, "/konto");
 }
 
 export async function signUpAction(_prev: ActionState, form: FormData): Promise<ActionState> {
