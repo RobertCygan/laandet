@@ -2,6 +2,84 @@
 
 All notable changes to Laandet. Dates are DD.MM.YYYY.
 
+## [Phase 02] — 25.10.2026 (implemented and tested; awaiting owner approval; not deployed)
+
+### Added
+- **Messages (P02-01):**
+  - one conversation per listing and person, started from the listing page («Send melding»);
+  - plain text only, shown as text (N9), with a payment-link warning for both sender and reader;
+  - blocking in both directions; an active booking or handover keeps the thread open until it is finished;
+  - reporting a message to the moderation queue;
+  - new replies appear by polling, without a reload;
+  - email notices batched: at most one per conversation and recipient per 15 minutes, never with the message text, and not for messages read within 2 minutes;
+  - rate limits: 5 new conversations/day and 60 messages/hour for new accounts (20/day and 200/hour for established ones).
+- **Rental requests and bookings (P02-02):**
+  - «Send forespørsel» on the listing page, only while the `rentals_open` flag is on (default off). It has date and time in Europe/Oslo, handover and return method from the listing's options, an optional message, and a price preview before sending;
+  - a pure, unit-tested state machine for every status × event × role;
+  - the database refuses overlapping active bookings (exclusion constraint) and any category B booking (`mvp_category_a_only`);
+  - the booking stores a snapshot of the terms;
+  - owner accept/decline within 72 hours, renter withdraw, cancel with a reason, a private meeting place for the two parties only;
+  - every step writes `booking_events`, posts a system message in the thread and notifies the other party;
+  - `/leieforhold` (active, requests, finished, giveaways) and `/leieforhold/[id]` (next step, terms, history);
+  - a listing cannot be archived or deleted while a booking or handover is under way. Open requests are declined with a notice.
+- **Agreements (P02-04):**
+  - the simplified rental agreement is rendered once from the template and the terms snapshot (logic-less Mustache, every value Markdown-escaped) and stored with its SHA-256;
+  - numbers `LA-YYYY-NNNNNN` and `GB-YYYY-NNNNNN` from a database sequence;
+  - `/leieforhold/[id]/avtale` shows an overview, the stored text, the hash, the acceptances and «Jeg godtar avtalen». The form posts the hash of the text shown, and a database trigger checks party and hash again;
+  - when both have accepted, the booking is confirmed;
+  - a change of period or handover/return method before handover creates a new revision. The old one is superseded and both must accept again;
+  - English readers also see an informational English rendering («Den norske teksten gjelder»);
+  - the runtime role cannot change a contract's text, terms or hash, only its status.
+- **Giveaway claims (P02-03):**
+  - «Jeg vil gjerne ha den» (one per person per listing, shared limit with requests);
+  - the giver sees all claims on the listing page with «Velg» and «Avslå». Choosing one reserves the listing and tells the others «ikke valgt nå»;
+  - `/overlevering/[id]`: both confirm the exact transfer text after the handover → «Gitt bort». Either can cancel before that, and the listing is published again.
+- **Condition reports (P02-05):**
+  - `/leieforhold/[id]/utlevering` and `/tilbakelevering`: each party's own entries (condition, function, damage, accessories, fuel/battery, cleanliness, serial number, notes), photos straight from the phone camera (`capture="environment"`), re-encoded without metadata;
+  - entries, photos and confirmations are append-only. A correction is a new entry that supersedes the author's own earlier one, and any new entry resets earlier confirmations;
+  - the handover needs the five-point checklist and both confirmations → handed over;
+  - a return entry → return pending; both confirm → completed with the proposed outcome; a contest → disputed, with a minimal dispute record (the full dispute flow is P03-01);
+  - «Ikke tilbakelevert» for the owner from 24 hours after the end;
+  - condition photos are served only to the two parties (N13). Staff also get 404 until the audited dispute grant in P03.
+- **Worker jobs and notices (P02-06):**
+  - jobs `booking_request_expiry`, `agreement_expiry`, `handover_lapse` (category A, one confirmation, 24 hours after the start, labelled «Bekreftet av én part»), `return_lapse` (72 hours without an answer), `return_reminder` (at the end, then 24 hours later with a notice to the owner), `giveaway_claim_expiry` (14 days) and `message_email_batch`;
+  - each row is handled in its own transaction with a row lock and a status check. System transitions are written to `booking_events` with no actor;
+  - `/varsler` (newest first, opened = read) and unread counts for «Meldinger» and «Varsler» in the header;
+  - emails are a short notice and a link, never message text, prices or addresses. Essential notices are sent even when the user turned optional emails off.
+
+### Tested (run locally on 25.10.2026, PostgreSQL 16, Chromium from Playwright 1.63)
+- **Unit (Vitest): 157 passed**, including:
+  - the booking state machine;
+  - pricing and period limits;
+  - contract rendering: every template tag present in nb/en/giveaway, deterministic, Markdown injection escaped;
+  - message rules;
+  - Oslo date/time conversion including summer time.
+- **Integration (Vitest against `laandet_test`): 59 passed.** New for Phase 02:
+  - full rental flow with history, notices and system messages;
+  - overlap refused by the service and by the database;
+  - only the parties (404 for others);
+  - closed flag and blocked pairs;
+  - N4;
+  - change of terms and cancel;
+  - the runtime role cannot alter a contract or forge an acceptance;
+  - listing kept while in use;
+  - giveaway claims (select, second select refused, the trigger refuses another person's acceptance, withdraw reopens, decline);
+  - condition reports (checklist, confirmations reset by a newer entry, a correction only by its author, append-only privileges, contested return → dispute, «Ikke tilbakelevert» timing, N13 photo access);
+  - each worker job with a fake clock (the right rows move, a second run changes nothing, events have no actor);
+  - messaging (privacy, blocking, limits, reports, email batching).
+- **End-to-end (Playwright, production build): 34 passed** (31 from Phase 01 plus 3 new). The two new journeys run at 390 px with axe (WCAG 2.1 AA) checks on each new page:
+  - rental: request → accept → both accept the agreement → handover with a photo → return → completed. A third user gets 404 for the photo and the booking;
+  - giveaway: claim → choose → both confirm → «Gitt bort»;
+  - messaging (on the Pixel 7 profile): N2 + N9, the payment warning and polling.
+
+### Not done / known gaps
+- **Rentals are closed by default.** `rentals_open` is off until the owner decides to open them. Category B stays blocked (BankID, deposits and the extended agreement are later phases).
+- **Agreement texts are drafts.** They are not legally reviewed, and the pages show the draft banner.
+- The dispute flow is minimal: a record and a notice. Negotiation, support review and staff access with an audited grant come in P03-01.
+- The worker jobs were tested with a fake clock in integration tests. They have not run on a schedule on a real server, and real SMTP delivery is not tested.
+- No archiving of conversations in the UI (the column exists).
+- Not tested here: Safari/WebKit.
+
 ## [Phase 01] — 25.10.2026 (approved by the owner: «Zatwierdzam Phase 01»; not deployed)
 
 The application lives in `app/` (Next.js 16, PostgreSQL, Drizzle, Better Auth). Setup and commands: `app/README.md`.

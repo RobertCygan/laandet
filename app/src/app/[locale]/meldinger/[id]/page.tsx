@@ -66,8 +66,8 @@ export default async function ConversationPage({ params }: PageProps<"/[locale]/
               <li key={cl.id} className="flex flex-wrap items-center gap-2">
                 <span>{t("claim")}:</span>
                 <span className="badge">{t(`claimStatus.${cl.status}`)}</span>
-                <Link href={`/annonse/${c.listingId}`} className="text-link">
-                  {t("openListing")}
+                <Link href={`/overlevering/${cl.id}`} className="text-link">
+                  {t("openClaim")}
                 </Link>
               </li>
             ))}

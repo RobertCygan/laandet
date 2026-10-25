@@ -1,7 +1,8 @@
 # Laandet — web application
 
 Next.js (App Router) + PostgreSQL + Drizzle + Better Auth. Phase 01 covers user accounts, all three listing types,
-image uploads, explore/search, legal pages, reporting and minimal moderation. Architecture and decisions:
+image uploads, explore/search, legal pages, reporting and minimal moderation. Phase 02 adds messages, rental
+requests and bookings, agreements, giveaway claims, condition reports, and the worker jobs and notices around them. Architecture and decisions:
 `../docs/ARCHITECTURE.md` and `../docs/DECISIONS.md`.
 
 The UI is in Norwegian Bokmål (default, no URL prefix) and English (`/en/...`). Code and comments are in English.
@@ -22,8 +23,12 @@ npm run db:migrate                    # migration role (DATABASE_MIGRATION_URL)
 npm run db:seed -- --demo             # localities, categories, flags, keywords + labelled demo listings
 npm run legal:load                    # legal texts from ../legal into the database
 npm run dev                           # http://localhost:3000
-npm run worker                        # separate terminal: email outbox and clean-up jobs
+npm run worker                        # separate terminal: emails, deadlines, reminders and clean-up jobs
 ```
+
+Rental requests are closed until the `rentals_open` flag is on (category B stays blocked either way). There is
+no admin switch yet; with the migration role:
+`UPDATE feature_flags SET enabled = true, updated_at = now() WHERE key = 'rentals_open';`
 
 To give someone a staff role (server only, audited):
 `npm run grant-role -- --email ola@example.no --role moderator --reason "…"`. The person must then set up
@@ -56,7 +61,7 @@ src/
   ui/                components (forms are client components using Server Actions)
   db/schema/         Drizzle schema (snake_case); drizzle/ holds the SQL migrations
   proxy.ts           CSP nonce, request id and locale routing
-worker/              background jobs (email outbox, clean-up, retention)
+worker/              background jobs (email outbox, message emails, booking/claim deadlines, reminders, clean-up, retention)
 scripts/             migrate, seed, legal loader, grant-role, local database setup
 messages/            nb.json and en.json (same keys; checked by a unit test)
 tests/               integration (Vitest) and e2e (Playwright) tests

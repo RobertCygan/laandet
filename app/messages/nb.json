@@ -749,7 +749,8 @@
         "transferred": "Begge har bekreftet overleveringen."
       },
       "unknown": "Oppdatering i saken."
-    }
+    },
+    "openClaim": "Åpne overleveringen"
   },
   "rentals": {
     "myTitle": "Mine leieforhold",

@@ -405,3 +405,45 @@ during Phase 01 start as *Proposed* (implementation-level) unless the owner says
   - All other auth operations go through our Server Actions, which call `auth.api.*` on the server.
   - Session rows store a keyed hash of the IP (SEC-43) and a shortened user agent.
 - **Status:** Accepted 25.10.2026 (owner approved Phase 01: «Zatwierdzam Phase 01»).
+
+## D-042 — Agreement revisions keep their number
+- **Context:** A change of period or handover method before handover needs a new agreement text. Both parties must be able to see that it is the same rental.
+- **Decision:** Revision 1 gets `LA-YYYY-NNNNNN` from the sequence. Later revisions use the same number with `-v{n}` (`LA-2026-000123-v2`). The earlier revision is kept as `superseded`, and acceptances never carry over.
+- **Status:** Proposed (Phase 02, awaiting owner approval).
+
+## D-043 — Price units and period limits
+- **Context:** The price preview and the server must count units the same way, and requests need sensible bounds.
+- **Decision:**
+  - Units are rounded up with a minimum of 1. An hour is 1 hour, a day 24 hours, a «helg» up to 3 days, a week 7 days.
+  - A period can be at most 60 days and at most 366 units. It can start at most 180 days ahead, and no earlier than 15 minutes ago.
+  - Dates and times in forms are Europe/Oslo wall time.
+- **Status:** Proposed (Phase 02, awaiting owner approval).
+
+## D-044 — Time-based steps in the worker
+- **Context:** Deadlines must move bookings without anyone checking the site, and never twice.
+- **Decision:**
+  - Each job reads due rows, then handles each row in its own transaction with `FOR UPDATE SKIP LOCKED` and a status-conditional update. A row that changed in the meantime is skipped.
+  - Handover lapse (category A only): needs one confirmation of the latest entry and no contest, 24 hours after the start. It is shown as «Bekreftet av én part», never as joint agreement. Without any confirmation, nothing happens.
+  - Return lapse: 72 hours after the newest return entry without a contest → completed with the outcome proposed in that entry.
+  - Reminders are recorded in `bookings.reminders_sent`. When both reminders are due at once, only the later one is sent.
+- **Status:** Proposed (Phase 02, awaiting owner approval).
+
+## D-045 — Listings in use cannot be archived or deleted
+- **Decision:** Archiving or deleting a listing is refused while a booking is accepted, confirmed, handed over, return pending, not returned or disputed, or while a giveaway recipient is selected. Open requests and claims are declined in the same step and the other person is told. Pausing stays possible, so no new requests come in.
+- **Status:** Proposed (Phase 02, awaiting owner approval).
+
+## D-046 — Agreement page layout and the English text
+- **Context:** The agreement templates already contain their own «Kort fortalt» section.
+- **Decision:**
+  - The page shows a short «Oversikt» box (outside the agreement text) and the stored Norwegian text.
+  - The English version for English readers is rendered on view from the same terms snapshot. It is not stored, not hashed and not what anyone accepts. «Den norske teksten gjelder».
+- **Status:** Proposed (Phase 02, awaiting owner approval).
+
+## D-047 — Message email batching
+- **Decision:**
+  - At most one email per conversation and recipient per 15 minutes (`conversation_participants.last_emailed_at`).
+  - Messages younger than 2 minutes are skipped, so people who are reading live are not emailed.
+  - The email never contains the message text.
+  - Message notices respect the user's email setting. Booking and handover notices are essential and always sent.
+- **Status:** Proposed (Phase 02, awaiting owner approval).
+

@@ -749,7 +749,8 @@
         "transferred": "Both have confirmed the handover."
       },
       "unknown": "Update in this case."
-    }
+    },
+    "openClaim": "Open the handover"
   },
   "rentals": {
     "myTitle": "My rentals",
