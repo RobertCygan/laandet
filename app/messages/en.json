@@ -564,7 +564,6 @@
       "review_restored": "Restored review",
       "message_redacted": "Hidden message"
     },
-    "profileNote": "Measures against profiles (restriction or suspension) are for now done manually by an administrator. Dismiss the report with a note once the case is handled.",
     "removeReview": "Remove the review"
   },
   "errors": {

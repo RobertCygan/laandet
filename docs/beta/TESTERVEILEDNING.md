@@ -15,7 +15,7 @@ Det du tester nå, er en **testversjon**. Den er ikke åpen for alle ennå.
 
 ## Slik kommer du inn
 
-1. Du får **adressen** til testversjonen og et **passord** av Eier fyller inn (navn på den som inviterer).
+1. Du får **adressen** til testversjonen og et **passord** av «Eier fyller inn: navn på den som inviterer».
    Passordet er felles for alle testere og slipper deg inn på siden. Ikke del det med andre.
 2. Åpne adressen på mobilen. Skriv brukernavnet `tester` og passordet du fikk.
 3. Trykk **«Opprett konto»** og registrer deg med din egen e-postadresse og et passord du velger selv (minst 6 tegn).
@@ -44,7 +44,7 @@ Gjør det du har lyst til, men prøv gjerne dette:
 ## Slik gir du tilbakemelding
 
 - Trykk **«Gi tilbakemelding»** nederst på siden, eller under kontoen din.
-- Velg om det er en **feil**, et **forslag** eller **annet**, og skriv hva som skjedde. Vi ser selv hvilken side du var på.
+- Velg **«Noe virker ikke»**, **«Forslag til forbedring»** eller **«Noe annet»**, og skriv hva som skjedde. Vi ser selv hvilken side du var på.
 - Skriv gjerne: hva du prøvde å gjøre, hva du forventet, og hva som skjedde i stedet.
 - Alt er nyttig, også «jeg skjønte ikke hva denne knappen gjør».
 

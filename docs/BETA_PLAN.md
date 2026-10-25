@@ -48,7 +48,7 @@ is done.
 
 ## 4. Collecting feedback
 
-- **In the app:** «Gi tilbakemelding» (`/tilbakemelding`, linked in the footer and on the account page). The tester picks feil, forslag or annet and writes what happened. The page they came from is added automatically.
+- **In the app:** «Gi tilbakemelding» (`/tilbakemelding`, linked in the footer and on the account page). The tester picks «Noe virker ikke», «Forslag til forbedring» or «Noe annet» and writes what happened. The page they came from is added automatically.
 - **Staff list:** `/admin/tilbakemeldinger` for moderators and admins, newest first. Mark each item as handled when it has been triaged.
 - **Usability sessions:** results go into the table in [`beta/BRUKERTEST.md`](beta/BRUKERTEST.md).
 - Feedback that arrives by email or in person is entered in the app by the owner, so everything is in one place.

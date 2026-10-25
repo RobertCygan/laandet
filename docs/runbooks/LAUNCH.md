@@ -118,8 +118,9 @@ go/no-go decision.
 **Check:** all three pass.
 
 ### B8. «Eier» External uptime monitor
-Create a free account with an uptime service (for example UptimeRobot, D-027). Monitor `https://<domain>/healthz`
-every 5 minutes, with alerts to the owner's email or phone. The owner creates the account; it is not created for
+Create a free account with an uptime service (for example UptimeRobot, D-027). Monitor `https://<domain>/healthz?worker=1`
+every 5 minutes. With `?worker=1` it also fails when the worker has run no job for 15 minutes, which the worker's own
+emails cannot report. Send alerts to the owner's email or phone. The owner creates the account; it is not created for
 them.
 
 **Check:** the monitor shows «up», and a test alert reaches the owner (G4-8).

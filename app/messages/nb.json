@@ -564,7 +564,6 @@
       "review_restored": "Gjenopprettet vurdering",
       "message_redacted": "Skjult melding"
     },
-    "profileNote": "Tiltak mot profiler (begrensning eller suspensjon) gjøres foreløpig manuelt av en administrator. Avvis rapporten med et notat når saken er håndtert.",
     "removeReview": "Fjern vurderingen"
   },
   "errors": {
