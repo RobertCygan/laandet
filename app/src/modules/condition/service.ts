@@ -356,3 +356,19 @@ export async function markNotReturned(actor: Actor, bookingId: string, now = new
     await announce(tx, b, "booking.not_returned", "booking_disputed", ["renter"], l?.title ?? "");
   });
 }
+
+/**
+ * Who may see a condition photo (CONDITION_REPORTS §8, N13): the two booking parties; before the photo
+ * is attached to an entry, only the uploader. Staff access needs an audited dispute grant (P03-01).
+ */
+export async function mayViewConditionMedia(actor: Actor, mediaId: string, uploadedBy: string | null) {
+  if (actor.kind !== "user") return false;
+  const [party] = await db
+    .select({ ownerId: bookings.ownerId, renterId: bookings.renterId })
+    .from(conditionPhotos)
+    .innerJoin(conditionEntries, eq(conditionEntries.id, conditionPhotos.entryId))
+    .innerJoin(conditionReports, eq(conditionReports.id, conditionEntries.reportId))
+    .innerJoin(bookings, eq(bookings.id, conditionReports.bookingId))
+    .where(eq(conditionPhotos.mediaId, mediaId));
+  return party ? actor.id === party.ownerId || actor.id === party.renterId : actor.id === uploadedBy;
+}

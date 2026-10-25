@@ -66,6 +66,10 @@ export const ACTIVITY_KINDS = {
     en: 'The giver has chosen someone else for "%s" for now.',
   },
   claim_cancelled: { nb: "Overleveringen av «%s» er avlyst.", en: 'The handover of "%s" was cancelled.' },
+  claim_expired: {
+    nb: "Ønsket ditt om å få «%s» fikk ikke svar innen 14 dager og er utløpt.",
+    en: 'Your request for "%s" got no answer within 14 days and has expired.',
+  },
   transfer_to_confirm: { nb: "Bekreft overleveringen av «%s».", en: 'Please confirm the handover of "%s".' },
   transfer_confirmed: {
     nb: "Overleveringen av «%s» er bekreftet av dere begge.",

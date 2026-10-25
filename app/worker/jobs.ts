@@ -3,6 +3,14 @@ import type { DbOrTx } from "@/db/client";
 import { appRateLimits, verifications, workerHeartbeats } from "@/db/schema";
 import { releaseStuckEmails, sendDueEmails } from "@/modules/notifications/outbox";
 import { deleteOrphanMedia } from "@/modules/media/cleanup";
+import { expireClaims } from "@/modules/giveaways/jobs";
+import {
+  expireAgreements,
+  expireBookingRequests,
+  lapseHandovers,
+  lapseReturns,
+  sendReturnReminders,
+} from "@/modules/rentals/jobs";
 
 export type Job = { name: string; everySeconds: number; run: (db: DbOrTx) => Promise<unknown> };
 
@@ -24,6 +32,13 @@ export const JOBS: Job[] = [
     },
   },
   { name: "orphan_media", everySeconds: 3600, run: (db) => deleteOrphanMedia(db) },
+  // Phase 02 time-based steps (P02-06). They use the shared connection and lock row by row.
+  { name: "booking_request_expiry", everySeconds: 300, run: () => expireBookingRequests() },
+  { name: "agreement_expiry", everySeconds: 300, run: () => expireAgreements() },
+  { name: "handover_lapse", everySeconds: 900, run: () => lapseHandovers() },
+  { name: "return_lapse", everySeconds: 900, run: () => lapseReturns() },
+  { name: "return_reminder", everySeconds: 900, run: () => sendReturnReminders() },
+  { name: "giveaway_claim_expiry", everySeconds: 3600, run: () => expireClaims() },
   {
     name: "audit_retention",
     everySeconds: 24 * 3600,
