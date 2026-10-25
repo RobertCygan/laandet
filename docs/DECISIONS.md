@@ -305,7 +305,7 @@ during Phase 01 start as *Proposed* (implementation-level) unless the owner says
   - No locale cookie and no automatic language detection. The language is in the URL, and the user's choice is also stored in `user_profiles.locale` for emails.
   - next-intl is used for messages and formatting only.
 - **Consequence:** the cookie list shrinks. `NEXT_LOCALE` is not used, and `PRIVACY.md` and the cookie page are updated to match.
-- **Status:** Proposed (implementation-level). Revisit before Next.js 17, when Cache Components become mandatory.
+- **Status:** Accepted 25.10.2026 (owner approved Phase 01: «Zatwierdzam Phase 01»).
 
 ## D-031 — Money in TypeScript
 - **Decision:**
@@ -313,7 +313,7 @@ during Phase 01 start as *Proposed* (implementation-level) unless the owner says
   - The TypeScript layer uses `number`, validated as a safe integer (`Number.isSafeInteger`), because no realistic amount comes close to 2^53 øre.
   - `formatKr` also accepts `bigint`.
   - There is no floating-point arithmetic on money; kroner input is parsed into integer øre at the boundary.
-- **Status:** Proposed (implementation-level).
+- **Status:** Accepted 25.10.2026 (owner approved Phase 01: «Zatwierdzam Phase 01»).
 
 ## D-032 — Search and pagination (implementation)
 - **Context:** P01-10 asked for keyset pagination and a separate `src/modules/search/` module.
@@ -322,7 +322,7 @@ during Phase 01 start as *Proposed* (implementation-level) unless the owner says
   - Real listings are always ranked before demo listings.
 - **Reason:** In Steigen, result sets are small. Offset pages keep shareable URLs simple (`?side=2`), and the cap stops deep-page scans. Keyset pagination can replace this without changing the URL format if volumes grow.
 - **Not done:** the `EXPLAIN` plan fixture from P01-10. The indexes (GIN full text, trigram, filters) exist in the migration.
-- **Status:** Proposed (implementation-level).
+- **Status:** Accepted 25.10.2026 (owner approved Phase 01: «Zatwierdzam Phase 01»).
 
 ## D-033 — Legal texts rendered without raw HTML
 - **Decision:**
@@ -330,13 +330,13 @@ during Phase 01 start as *Proposed* (implementation-level) unless the owner says
   - Raw HTML and HTML comments are never output.
   - Links are rewritten to app routes, and only `https:`, `mailto:` and internal paths survive.
   - `dangerouslySetInnerHTML` is not used anywhere. ESLint forbids it, which is stricter than P01-11, where it was allowed in one component.
-- **Status:** Proposed (implementation-level).
+- **Status:** Accepted 25.10.2026 (owner approved Phase 01: «Zatwierdzam Phase 01»).
 
 ## D-034 — Drafts may be incomplete; database checks enforce published listings
 - **Decision:**
   - The "complete terms" `CHECK` constraints (rent-out price/value/condition, give-away condition, description length) apply only when `status <> 'draft'`.
   - Checks that protect stored values always apply, for drafts too: no negative amounts, deposit ≤ value, radius 1–300 km, dates in order. The service checks the same rules first (`storageViolations`), so users get field errors instead of a database error.
-- **Status:** Proposed (implementation-level).
+- **Status:** Accepted 25.10.2026 (owner approved Phase 01: «Zatwierdzam Phase 01»).
 
 ## D-035 — Restricted accounts stay signed in; the policy limits them
 - **Context:** P01-05 §5 suggested treating `suspended` and `deletion_pending` accounts as signed out, except on the appeal pages.
@@ -345,7 +345,7 @@ during Phase 01 start as *Proposed* (implementation-level) unless the owner says
   - `suspended` and `deletion_pending` accounts keep their session but may only view and appeal (`authz/policy.ts`). Their account page shows a status notice.
   - `deletion_pending` sessions are revoked when deletion is requested, so in practice only suspended users are affected.
 - **Reason:** A suspended user must be able to read the statement of reasons and appeal (DSA-style good practice). Denying actions in one central policy is easier to test than special-casing pages.
-- **Status:** Proposed (implementation-level).
+- **Status:** Accepted 25.10.2026 (owner approved Phase 01: «Zatwierdzam Phase 01»).
 
 ## D-036 — Re-acceptance of material legal changes
 - **Decision:**
@@ -353,21 +353,21 @@ during Phase 01 start as *Proposed* (implementation-level) unless the owner says
   - They must accept on `/godta-vilkar` before they can publish. `saveListing` refuses with `terms_acceptance_required`, and `/ny-annonse` redirects to the acceptance page.
   - Browsing is not blocked.
   - Acceptances are append-only rows in `legal_acceptances`.
-- **Status:** Proposed (implementation-level).
+- **Status:** Accepted 25.10.2026 (owner approved Phase 01: «Zatwierdzam Phase 01»).
 
 ## D-037 — Browser tests run against the production build
 - **Decision:**
   - Playwright starts `next start` on port 3100 against the `*_test` database after `npm run build`.
   - The test helpers refuse any database whose name does not end in `_test`.
 - **Reason:** In this environment the Turbopack dev server reloaded pages in a loop ("HMR hash mismatch"). Production builds are also what users get.
-- **Status:** Proposed (implementation-level).
+- **Status:** Accepted 25.10.2026 (owner approved Phase 01: «Zatwierdzam Phase 01»).
 
 ## D-038 — Staff 2FA setup and role changes
 - **Decision:**
   - Roles are granted only through the server CLI (`npm run grant-role -- --email … --role … --reason …`). The change is audited, existing sessions are revoked, and other admins are emailed.
   - Staff set up TOTP themselves at `/konto/tofaktor`: re-enter password → key + backup codes shown once → confirm with a code.
   - The secret is shown as text and an `otpauth://` link. No QR code library is used (KISS; very few staff members).
-- **Status:** Proposed (implementation-level).
+- **Status:** Accepted 25.10.2026 (owner approved Phase 01: «Zatwierdzam Phase 01»).
 
 ## D-039 — HEIC photos
 - **Context:** `TEST_STRATEGY.md` lists HEIC as an accepted upload format. The prebuilt `sharp` binary used here decodes AVIF but not HEIC, because of HEVC licensing.
@@ -375,7 +375,7 @@ during Phase 01 start as *Proposed* (implementation-level) unless the owner says
   - The file picker asks for JPEG, PNG or WebP. iOS then converts camera photos to JPEG automatically.
   - A HEIC file picked on a computer is rejected with a clear message. Content sniffing still recognises it.
 - **Revisit:** if pilot users report problems, decode HEIC in a separately licensed step (for example a libheif build on the server). This needs an owner decision on codec licensing.
-- **Status:** Proposed (implementation-level).
+- **Status:** Accepted 25.10.2026 (owner approved Phase 01: «Zatwierdzam Phase 01»).
 
 ## D-040 — Deployment layout (P01-13 implementation)
 - **Decision:**
@@ -396,7 +396,7 @@ during Phase 01 start as *Proposed* (implementation-level) unless the owner says
   - backup → restore into a throwaway environment with matching row counts;
   - `shellcheck`, `actionlint`, `docker compose config` and `caddy validate` all pass.
 - **Not verified:** Let's Encrypt, GHCR pushes, the workflow on GitHub, the SSH forced command, off-site storage, the systemd timer on a real server, and the first real restore test. These need the server and domain.
-- **Status:** Proposed (implementation-level). Running it needs the owner's purchases (`docs/runbooks/BILLING.md`).
+- **Status:** Accepted 25.10.2026 (owner approved Phase 01: «Zatwierdzam Phase 01»).
 
 ## D-041 — Better Auth endpoints are not public
 - **Context:** An independent security review found that the catch-all `/api/auth/*` route exposed every Better Auth endpoint. Calling them directly skipped the app's own checks: consent records, bot checks, per-account rate limits, re-authentication for email changes and audit logging. An email change without a password could lead to account takeover with a stolen session.
@@ -404,4 +404,4 @@ during Phase 01 start as *Proposed* (implementation-level) unless the owner says
   - Only the two links sent by email are served over HTTP: `GET /api/auth/verify-email` and `GET /api/auth/reset-password/:token`. Everything else returns 404.
   - All other auth operations go through our Server Actions, which call `auth.api.*` on the server.
   - Session rows store a keyed hash of the IP (SEC-43) and a shortened user agent.
-- **Status:** Proposed (implementation-level).
+- **Status:** Accepted 25.10.2026 (owner approved Phase 01: «Zatwierdzam Phase 01»).

@@ -2,7 +2,7 @@
 
 All notable changes to Laandet. Dates are DD.MM.YYYY.
 
-## [Phase 01] — 25.10.2026 (implemented and tested; CI green; not deployed)
+## [Phase 01] — 25.10.2026 (approved by the owner: «Zatwierdzam Phase 01»; not deployed)
 
 The application lives in `app/` (Next.js 16, PostgreSQL, Drizzle, Better Auth). Setup and commands: `app/README.md`.
 

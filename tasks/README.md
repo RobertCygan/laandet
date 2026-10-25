@@ -18,18 +18,18 @@ under OUTPUT are updated. Report status precisely: planned → designed → impl
 
 | ID | Task | Depends on | Estimate (ideal days) | Status |
 |---|---|---|---|---|
-| [P01-01](phase-01/P01-01-scaffold.md) | Project scaffold, tooling, CI, security headers | owner approves D-002/D-004 | 1.5 | implemented, tested (CI green 25.10.2026) |
-| [P01-02](phase-01/P01-02-design-system.md) | Design system ported from the prototype | P01-01 | 2 | implemented, tested (CI green 25.10.2026) |
-| [P01-03](phase-01/P01-03-i18n.md) | i18n foundation (nb + en, formats) | P01-01 | 0.5 | implemented, tested (CI green 25.10.2026) |
-| [P01-04](phase-01/P01-04-database.md) | Database schema, migrations, roles, seeds | P01-01 | 1.5 | implemented, tested (CI green 25.10.2026) |
-| [P01-05](phase-01/P01-05-authentication.md) | Authentication (Better Auth) and email outbox | P01-03, P01-04 | 2 | implemented, tested (CI green 25.10.2026) |
-| [P01-06](phase-01/P01-06-authorization-audit.md) | Authorisation module and audit log | P01-04, P01-05 | 1 | implemented, tested (CI green 25.10.2026) |
-| [P01-07](phase-01/P01-07-profiles.md) | Profiles and account settings | P01-05, P01-06 | 1 | implemented, tested (CI green 25.10.2026) |
-| [P01-08](phase-01/P01-08-listings.md) | Listings for all three types | P01-02, P01-06, P01-09 | 3 | implemented, tested (CI green 25.10.2026) |
-| [P01-09](phase-01/P01-09-image-uploads.md) | Image upload pipeline and media delivery | P01-04, P01-06 | 1.5 | implemented, tested (CI green 25.10.2026) |
-| [P01-10](phase-01/P01-10-explore-search.md) | Explore, search, filters, listing detail | P01-08 | 2 | implemented, tested (CI green 25.10.2026) |
-| [P01-11](phase-01/P01-11-content-legal-pages.md) | Content pages and legal document publishing | P01-02, P01-03 | 1.5 | implemented, tested (CI green 25.10.2026) |
-| [P01-12](phase-01/P01-12-reporting-minimal.md) | Reporting and minimal moderation | P01-06, P01-08 | 1 | implemented, tested (CI green 25.10.2026) |
+| [P01-01](phase-01/P01-01-scaffold.md) | Project scaffold, tooling, CI, security headers | owner approves D-002/D-004 | 1.5 | **approved** 25.10.2026 (CI green) |
+| [P01-02](phase-01/P01-02-design-system.md) | Design system ported from the prototype | P01-01 | 2 | **approved** 25.10.2026 (CI green) |
+| [P01-03](phase-01/P01-03-i18n.md) | i18n foundation (nb + en, formats) | P01-01 | 0.5 | **approved** 25.10.2026 (CI green) |
+| [P01-04](phase-01/P01-04-database.md) | Database schema, migrations, roles, seeds | P01-01 | 1.5 | **approved** 25.10.2026 (CI green) |
+| [P01-05](phase-01/P01-05-authentication.md) | Authentication (Better Auth) and email outbox | P01-03, P01-04 | 2 | **approved** 25.10.2026 (CI green) |
+| [P01-06](phase-01/P01-06-authorization-audit.md) | Authorisation module and audit log | P01-04, P01-05 | 1 | **approved** 25.10.2026 (CI green) |
+| [P01-07](phase-01/P01-07-profiles.md) | Profiles and account settings | P01-05, P01-06 | 1 | **approved** 25.10.2026 (CI green) |
+| [P01-08](phase-01/P01-08-listings.md) | Listings for all three types | P01-02, P01-06, P01-09 | 3 | **approved** 25.10.2026 (CI green) |
+| [P01-09](phase-01/P01-09-image-uploads.md) | Image upload pipeline and media delivery | P01-04, P01-06 | 1.5 | **approved** 25.10.2026 (CI green) |
+| [P01-10](phase-01/P01-10-explore-search.md) | Explore, search, filters, listing detail | P01-08 | 2 | **approved** 25.10.2026 (CI green) |
+| [P01-11](phase-01/P01-11-content-legal-pages.md) | Content pages and legal document publishing | P01-02, P01-03 | 1.5 | **approved** 25.10.2026 (CI green) |
+| [P01-12](phase-01/P01-12-reporting-minimal.md) | Reporting and minimal moderation | P01-06, P01-08 | 1 | **approved** 25.10.2026 (CI green) |
 | [P01-13](phase-01/P01-13-deployment-backups.md) | Staging/production deploy, backups, runbooks | P01-01, owner buys server and domain | 1.5 | files implemented; **not deployed** (needs server + domain) |
 
 Status of 25.10.2026: see `docs/CHANGELOG.md` (Phase 01) for exactly what was tested and the known gaps per task.
@@ -38,16 +38,21 @@ Status of 25.10.2026: see `docs/CHANGELOG.md` (Phase 01) for exactly what was te
 parallel work (P01-11 and P01-13 can run alongside P01-05…P01-10). If Phase 01 is not accepted by
 **15.11.2026** (gate G1), apply the scope cuts in `docs/DEVELOPMENT_ROADMAP.md` §3 (Should items first).
 
-## Phase 02–04 (outline — detailed task files are written at the end of the previous phase)
+## Phase 02 — Rentals and giveaways (weeks 47–48)
+
+| ID | Task | Depends on | Estimate (ideal days) | Status |
+|---|---|---|---|---|
+| [P02-01](phase-02/P02-01-messaging.md) | Conversations and messages (block, report, polling, email batching) | P01 | 2 | planned |
+| [P02-02](phase-02/P02-02-rental-requests-bookings.md) | Rental requests and the booking state machine (incl. the exclusion constraint) | P01 | 2.5 | planned |
+| [P02-03](phase-02/P02-03-giveaway-claims.md) | Giveaway claims and transfer confirmation | P02-01, P02-04 | 1 | planned |
+| [P02-04](phase-02/P02-04-agreements.md) | Agreement generation, rendering, acceptance, revisions | P02-02 | 2 | planned |
+| [P02-05](phase-02/P02-05-condition-reports.md) | Handover and return condition reports with photos | P02-04 | 2.5 | planned |
+| [P02-06](phase-02/P02-06-worker-notifications.md) | Worker jobs, reminders, in-app notifications, emails | P02-02…05 | 1 | planned |
+
+## Phase 03–04 (outline — detailed task files are written at the end of the previous phase)
 
 | ID | Task |
 |---|---|
-| P02-01 | Conversations and messages (block, report, polling, email batching) |
-| P02-02 | Rental requests and booking state machine (incl. the exclusion constraint) |
-| P02-03 | Giveaway claims and transfer confirmation |
-| P02-04 | Agreement generation, rendering, acceptance, revisions (`RENTAL_AGREEMENTS.md`) |
-| P02-05 | Handover and return condition reports with photos (`CONDITION_REPORTS.md`) |
-| P02-06 | Worker jobs: expiries, reminders, not-returned flow, notifications |
 | P03-01 | Dispute workflow steps 1–6 (`DISPUTE_POLICY.md`) |
 | P03-02 | Reviews (double-blind) |
 | P03-03 | Moderation: full queue, actions, appeals, support access grants |
