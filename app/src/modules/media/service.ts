@@ -20,7 +20,11 @@ export function uploadListingImage(actor: Actor, file: File): Promise<UploadedMe
  * Same pipeline for condition-report photos (P02-05): stored under `condition/`, visible only to the
  * uploader until attached to an entry, then only to the two booking parties.
  */
-export async function uploadImage(actor: Actor, file: File, scope: "listing" | "condition"): Promise<UploadedMedia> {
+export async function uploadImage(
+  actor: Actor,
+  file: File,
+  scope: "listing" | "condition" | "dispute",
+): Promise<UploadedMedia> {
   assertCan(actor, "media.upload");
   await enforceRateLimits(db, [
     {

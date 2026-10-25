@@ -75,6 +75,16 @@ export const ACTIVITY_KINDS = {
     nb: "Overleveringen av «%s» er bekreftet av dere begge.",
     en: 'Both of you have confirmed the handover of "%s".',
   },
+  dispute_opened: {
+    nb: "Det er meldt fra om et problem i leieforholdet «%s». Se saken og svar innen 7 dager.",
+    en: 'A problem has been reported for the rental of "%s". See the case and answer within 7 days.',
+  },
+  dispute_update: { nb: "Det er nytt i saken om «%s».", en: 'There is news in the case about "%s".' },
+  dispute_escalated: {
+    nb: "Laandet er bedt om hjelp i saken om «%s». Support leser saken.",
+    en: 'Laandet has been asked to help with the case about "%s". Support will read the case.',
+  },
+  dispute_closed: { nb: "Saken om «%s» er avsluttet.", en: 'The case about "%s" is closed.' },
   new_message: { nb: "Du har en ny melding om «%s».", en: 'You have a new message about "%s".' },
 } as const;
 export type ActivityKind = keyof typeof ACTIVITY_KINDS;

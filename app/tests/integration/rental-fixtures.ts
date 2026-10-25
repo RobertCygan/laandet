@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import * as schema from "@/db/schema";
-import { entrySchema } from "@/modules/condition/service";
+import { addEntry, confirmReport, entrySchema } from "@/modules/condition/service";
 import { saveListing } from "@/modules/listings/service";
 import { acceptAgreement, acceptBooking, requestBooking } from "@/modules/rentals/service";
 import { createUser, owner, rentalDraft } from "./helpers";
@@ -74,4 +74,28 @@ export async function noticesFor(userId: string) {
     .from(schema.notifications)
     .where(eq(schema.notifications.userId, userId));
   return rows.map((r) => r.type);
+}
+
+/** A confirmed booking whose handover both parties confirmed (status `handed_over`). */
+export async function handedOverBooking() {
+  const f = await confirmedBooking();
+  await addEntry(f.lender, entry(f.id, "handover"), new Date(f.start.getTime() - HOUR));
+  for (const who of [f.renter, f.lender])
+    await confirmReport(who, {
+      bookingId: f.id,
+      phase: "handover",
+      decision: "confirm",
+      checklist: ALL_CHECKED,
+      comment: "",
+    });
+  return f;
+}
+
+/** A rental that both parties completed (status `completed`). */
+export async function completedBooking() {
+  const f = await handedOverBooking();
+  await addEntry(f.renter, entry(f.id, "return", { proposedOutcome: "returned_ok" }), f.end);
+  for (const who of [f.renter, f.lender])
+    await confirmReport(who, { bookingId: f.id, phase: "return", decision: "confirm", checklist: {}, comment: "" });
+  return f;
 }

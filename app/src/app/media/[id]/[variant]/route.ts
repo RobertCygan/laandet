@@ -4,13 +4,15 @@ import { listingImages, listings, mediaObjects, userProfiles } from "@/db/schema
 import { getActor } from "@/modules/auth/actor";
 import { can } from "@/modules/authz/policy";
 import { mayViewConditionMedia } from "@/modules/condition/service";
+import { mayViewDisputeMedia } from "@/modules/disputes/access";
 import { mediaStore } from "@/modules/media/store";
 
 const notFound = () => new Response("Not found", { status: 404, headers: { "Cache-Control": "no-store" } });
 
 /**
  * Authorised image delivery (SEC-33). Published listing images are public; drafts only for
- * the owner (or the uploader before attaching); condition photos only for the booking parties.
+ * the owner (or the uploader before attaching); condition and case photos only for the parties, or for
+ * staff with an active dispute grant (audited).
  */
 export async function GET(_req: Request, ctx: RouteContext<"/media/[id]/[variant]">) {
   const { id, variant } = await ctx.params;
@@ -31,12 +33,16 @@ export async function GET(_req: Request, ctx: RouteContext<"/media/[id]/[variant
     .leftJoin(listings, eq(listings.id, listingImages.listingId))
     .leftJoin(userProfiles, eq(userProfiles.userId, listings.ownerId))
     .where(and(eq(mediaObjects.id, id), isNull(mediaObjects.deletedAt)));
-  if (!m || (m.scope !== "listing" && m.scope !== "condition")) return notFound();
+  if (!m) return notFound();
 
   let isPublic = false;
   if (m.scope === "condition") {
-    // Condition photos (P02-05): only the two booking parties (N13).
+    // Condition photos (P02-05): only the two booking parties (N13), or staff with a dispute grant.
     if (!(await mayViewConditionMedia(await getActor(), id, m.uploadedBy))) return notFound();
+    return serve(m, variant, false);
+  }
+  if (m.scope === "dispute") {
+    if (!(await mayViewDisputeMedia(await getActor(), id, m.uploadedBy))) return notFound();
     return serve(m, variant, false);
   }
   // Same visibility as the listing page: published, and the owner's account in good standing.
