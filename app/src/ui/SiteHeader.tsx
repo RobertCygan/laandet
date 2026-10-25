@@ -6,6 +6,7 @@ import { LanguageSwitch } from "./LanguageSwitch";
 import { Logo } from "./Logo";
 import { MobileMenu } from "./MobileMenu";
 import { InboxLink } from "./messaging/InboxLink";
+import { NotificationsLink } from "./rentals/NotificationsLink";
 
 export async function SiteHeader({ actor, locale }: { actor: Actor; locale: "nb" | "en" }) {
   const t = await getTranslations("nav");
@@ -24,6 +25,8 @@ export async function SiteHeader({ actor, locale }: { actor: Actor; locale: "nb"
   const accountLinks = signedIn ? (
     <>
       <InboxLink />
+      <NotificationsLink />
+      <Link href="/leieforhold">{t("rentals")}</Link>
       <Link href="/mine-annonser">{t("myListings")}</Link>
       <Link href="/konto">{t("myProfile")}</Link>
       {staff && <Link href="/admin">{t("admin")}</Link>}

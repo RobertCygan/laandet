@@ -16,6 +16,7 @@ import { ReportForm } from "@/ui/listings/ListingActions";
 import { ReportSignedOut } from "@/ui/listings/ReportSignedOut";
 import { SaveWarnings } from "@/ui/listings/SaveWarnings";
 import { ContactOwnerButton } from "@/ui/messaging/ContactOwnerButton";
+import { GiverClaims, ListingCta } from "@/ui/rentals/ListingCta";
 import { Notice } from "@/ui/Notice";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/annonse/[id]">): Promise<Metadata> {
@@ -271,30 +272,29 @@ export default async function ListingPage({ params, searchParams }: PageProps<"/
             {l.type === "rent_out" && highValue && <Notice tone="warning">{t("highValueNotice")}</Notice>}
             {l.type === "rent_out" && !d.category.allowPaidRental && <Notice>{t("freeLoanNotice")}</Notice>}
             {!l.isDemo && !isOwner && l.status === "published" && (
-              <div className="flex flex-col gap-2">
-                {l.type === "rent_out" && !rentalsOpen && (
-                  <button
-                    type="button"
-                    className="button button-primary w-full"
-                    disabled
-                    aria-describedby="request-soon"
-                  >
-                    {t("sendRequest")}
-                  </button>
-                )}
-                <Notice>
-                  <div id="request-soon">
-                    {l.type === "rent_out" && !rentalsOpen ? (
-                      <>
-                        <p className="font-bold">{t("requestSoon")}</p>
-                        <p>{t("requestSoonText")}</p>
-                      </>
-                    ) : (
-                      <p>{t("contactSoon")}</p>
-                    )}
-                  </div>
-                </Notice>
-              </div>
+              <ListingCta
+                actor={actor}
+                locale={locale}
+                rentalsOpen={rentalsOpen}
+                requestable={!highValue}
+                listing={{
+                  id: l.id,
+                  type: l.type,
+                  priceOre: l.priceOre === null ? null : Number(l.priceOre),
+                  priceUnit: l.priceUnit,
+                  depositOre: l.depositOre === null ? null : Number(l.depositOre),
+                  methods: [
+                    ...(l.handoverPickup ? (["pickup"] as const) : []),
+                    ...(l.handoverOwnerDelivery ? (["owner_delivery"] as const) : []),
+                    ...(l.handoverMeet ? (["meet"] as const) : []),
+                  ],
+                }}
+              />
+            )}
+            {isOwner && l.type === "rent_out" && rentalsOpen && (
+              <Link href="/leieforhold" className="text-link">
+                {t("ownerRequestsLink")}
+              </Link>
             )}
 
             {!isOwner && l.status === "published" && (
@@ -319,6 +319,10 @@ export default async function ListingPage({ params, searchParams }: PageProps<"/
               locale={locale}
             />
           </div>
+
+          {isOwner && l.type === "give_away" && !l.isDemo && (
+            <GiverClaims actor={actor} listingId={l.id} locale={locale} />
+          )}
 
           <div className="card flex flex-col gap-2 p-6">
             <h2 className="text-base">{t("owner")}</h2>

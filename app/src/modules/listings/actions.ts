@@ -6,6 +6,7 @@ import { z } from "zod";
 import { localePath } from "@/i18n/page";
 import { getActor, requireUser } from "@/modules/auth/actor";
 import { uploadListingImage, type UploadedMedia } from "@/modules/media/service";
+import { isAppError } from "@/modules/errors";
 import { formToObject, runAction, type ActionState } from "@/modules/server/action";
 import { listingFormSchema, toDraft } from "./schemas";
 import { changeListingStatus, saveListing, toggleSavedListing, type StatusAction } from "./service";
@@ -59,7 +60,14 @@ const statusSchema = z.object({
 export async function changeStatusAction(form: FormData): Promise<void> {
   const { listingId, op, locale } = statusSchema.parse(formToObject(form));
   const actor = await requireUser();
-  await changeListingStatus(actor, listingId, op as StatusAction);
+  try {
+    await changeListingStatus(actor, listingId, op as StatusAction);
+  } catch (err) {
+    // A booking or giveaway under way keeps the listing (P02-02): explain instead of failing.
+    if (isAppError(err) && err.message === "listing_in_use")
+      redirect(`${localePath(locale, "/mine-annonser")}?feil=in_use`);
+    throw err;
+  }
   revalidatePath("/[locale]", "layout");
   redirect(localePath(locale, "/mine-annonser"));
 }

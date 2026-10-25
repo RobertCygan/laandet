@@ -12,15 +12,20 @@ import {
   contracts,
   disputes,
   giveawayClaims,
+  legalDocumentVersions,
   listings,
   users,
   type BookingStatus,
   type ClaimStatus,
+  type ContractKind,
   type ReportPhase,
 } from "@/db/schema";
 import type { Actor } from "@/modules/authz/actor-types";
 import { can } from "@/modules/authz/policy";
-import { decisions } from "@/modules/condition/service";
+import { CONDITION_DEADLINES, decisions } from "@/modules/condition/service";
+import { renderContract } from "@/modules/contracts/render";
+import { loadTemplate } from "@/modules/contracts/service";
+import type { ContractTerms } from "@/modules/contracts/terms";
 import { ACTIVE_STATUSES, TERMINAL_STATUSES } from "./state";
 
 /**
@@ -123,10 +128,19 @@ export async function listMyBookings(actor: Actor) {
 }
 
 /** Everything the booking page needs, for one of the two parties only. */
-export async function getBookingForParty(actor: Actor, bookingId: string) {
+export async function getBookingForParty(actor: Actor, bookingId: string, now = new Date()) {
   if (!/^[0-9a-f-]{36}$/i.test(bookingId)) return null;
   const [b] = await db
-    .select({ booking: bookings, title: listings.title, listingStatus: listings.status, ...period })
+    .select({
+      booking: bookings,
+      title: listings.title,
+      listingStatus: listings.status,
+      pickup: listings.handoverPickup,
+      delivery: listings.handoverOwnerDelivery,
+      meet: listings.handoverMeet,
+      accessories: listings.includedAccessories,
+      ...period,
+    })
     .from(bookings)
     .innerJoin(listings, eq(listings.id, bookings.listingId))
     .where(eq(bookings.id, bookingId));
@@ -142,11 +156,7 @@ export async function getBookingForParty(actor: Actor, bookingId: string) {
   const name = (id: string) => people.find((p) => p.id === id)?.name ?? "";
 
   const [events, allContracts, reports, dispute] = await Promise.all([
-    db
-      .select()
-      .from(bookingEvents)
-      .where(eq(bookingEvents.bookingId, bookingId))
-      .orderBy(asc(bookingEvents.createdAt)),
+    db.select().from(bookingEvents).where(eq(bookingEvents.bookingId, bookingId)).orderBy(asc(bookingEvents.createdAt)),
     db.select().from(contracts).where(eq(contracts.bookingId, bookingId)).orderBy(desc(contracts.revision)),
     db.select().from(conditionReports).where(eq(conditionReports.bookingId, bookingId)),
     db
@@ -160,9 +170,21 @@ export async function getBookingForParty(actor: Actor, bookingId: string) {
   const acceptances = live
     ? await db.select().from(contractAcceptances).where(eq(contractAcceptances.contractId, live.id))
     : [];
+  const shown = live ?? allContracts[0] ?? null;
+  const HOUR = 60 * 60 * 1000;
 
   return {
     booking: b.booking,
+    methods: [
+      ...(b.pickup ? (["pickup"] as const) : []),
+      ...(b.delivery ? (["owner_delivery"] as const) : []),
+      ...(b.meet ? (["meet"] as const) : []),
+    ],
+    accessories: b.accessories ?? [],
+    /** Handover entries open 48 h before the start; «Ikke tilbakelevert» 24 h after the end. */
+    handoverOpen: now.getTime() >= b.start.getTime() - CONDITION_DEADLINES.handoverPrepareFromHours * HOUR,
+    notReturnedOpen: now.getTime() >= b.end.getTime() + CONDITION_DEADLINES.notReturnedAfterHours * HOUR,
+    templateIsDraft: shown ? await templateIsDraft(shown.templateVersionId) : false,
     title: b.title,
     start: b.start,
     end: b.end,
@@ -180,6 +202,24 @@ export async function getBookingForParty(actor: Actor, bookingId: string) {
 }
 
 export type BookingView = NonNullable<Awaited<ReturnType<typeof getBookingForParty>>>;
+
+/** AI-drafted templates stay labelled as not legally reviewed until a lawyer has approved them. */
+async function templateIsDraft(templateVersionId: string): Promise<boolean> {
+  const [t] = await db
+    .select({ isDraft: legalDocumentVersions.isDraft })
+    .from(legalDocumentVersions)
+    .where(eq(legalDocumentVersions.id, templateVersionId));
+  return t?.isDraft ?? true;
+}
+
+/**
+ * The informational English rendering of a stored agreement, from the same terms snapshot.
+ * The Norwegian stored text is the one that applies and the one that is accepted.
+ */
+export async function englishAgreementText(c: { kind: ContractKind; terms: unknown }): Promise<string | null> {
+  const en = await loadTemplate(db, c.kind, "en");
+  return en ? renderContract(en.contentMd, c.terms as ContractTerms, "en").text : null;
+}
 
 /** One report with its full history, photos and the current decisions. */
 export async function getConditionReport(bookingId: string, phase: ReportPhase) {
@@ -244,13 +284,12 @@ export async function getClaimForParty(actor: Actor, claimId: string) {
   const [contract] = await db
     .select()
     .from(contracts)
-    .where(
-      and(eq(contracts.giveawayClaimId, claimId), inArray(contracts.status, ["pending_acceptance", "accepted"])),
-    );
+    .where(and(eq(contracts.giveawayClaimId, claimId), inArray(contracts.status, ["pending_acceptance", "accepted"])));
   const acceptances = contract
     ? await db.select().from(contractAcceptances).where(eq(contractAcceptances.contractId, contract.id))
     : [];
   return {
+    templateIsDraft: contract ? await templateIsDraft(contract.templateVersionId) : false,
     claim: g.claim,
     title: g.title,
     role: g.claim.giverId === me ? ("giver" as const) : ("recipient" as const),
@@ -286,4 +325,15 @@ export async function myClaimOn(actor: Actor, listingId: string) {
     .from(giveawayClaims)
     .where(and(eq(giveawayClaims.listingId, listingId), eq(giveawayClaims.claimantId, actor.id)));
   return g ?? null;
+}
+
+/** The viewer's own booking on a listing that is still open or under way (to link to it instead of a new form). */
+export async function myOpenBookingOn(actor: Actor, listingId: string) {
+  if (actor.kind !== "user") return null;
+  const rows = await db
+    .select({ id: bookings.id, status: bookings.status })
+    .from(bookings)
+    .where(and(eq(bookings.listingId, listingId), eq(bookings.renterId, actor.id)))
+    .orderBy(desc(bookings.createdAt));
+  return rows.find((b) => !TERMINAL_STATUSES.includes(b.status)) ?? null;
 }

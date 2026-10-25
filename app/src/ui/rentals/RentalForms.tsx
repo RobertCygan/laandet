@@ -130,7 +130,12 @@ function MethodSelect({
   return (
     <label className="field">
       {label}
-      <select name={name} required defaultValue={prev(state, name) ?? initial ?? methods[0]} aria-invalid={invalid(state, name)}>
+      <select
+        name={name}
+        required
+        defaultValue={prev(state, name) ?? initial ?? methods[0]}
+        aria-invalid={invalid(state, name)}
+      >
         {methods.map((m) => (
           <option key={m} value={m}>
             {t(`method.${m}`)}
@@ -195,7 +200,10 @@ export function RequestForm({
           <p>
             {priceOre === 0
               ? t("freeLoanSummary")
-              : t("priceSummary", { units: n, unit: t(`units.${priceUnit}`, { n }), total: formatKr(totalOre(priceOre, n)) })}
+              : t("priceSummary", {
+                  unit: t(`units.${priceUnit}`, { n }),
+                  total: formatKr(totalOre(priceOre, n)),
+                })}
           </p>
         )}
         <p>{depositOre ? t("depositSummary", { amount: formatKr(depositOre) }) : t("noDeposit")}</p>

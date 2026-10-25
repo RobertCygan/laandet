@@ -3,26 +3,28 @@ import { getTranslations } from "next-intl/server";
 import { Plus } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { formatDate } from "@/i18n/format";
-import { pageLocale } from "@/i18n/page";
+import { pageLocale, param } from "@/i18n/page";
 import { requirePageUser } from "@/modules/auth/guards";
 import { changeStatusAction } from "@/modules/listings/actions";
 import { listOwnListings, listSavedListings } from "@/modules/listings/queries";
 import { PageHeader } from "@/ui/layout/PageHeader";
 import { ConfirmButton } from "@/ui/listings/ListingActions";
 import { ListingCard } from "@/ui/ListingCard";
+import { Notice } from "@/ui/Notice";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("myListings");
   return { title: t("title") };
 }
 
-export default async function MyListingsPage({ params }: PageProps<"/[locale]/mine-annonser">) {
+export default async function MyListingsPage({ params, searchParams }: PageProps<"/[locale]/mine-annonser">) {
   const locale = await pageLocale(params);
   const actor = await requirePageUser(locale, "/mine-annonser");
   const [own, saved] = await Promise.all([listOwnListings(actor), listSavedListings(actor)]);
   const t = await getTranslations("myListings");
   const tl = await getTranslations("listing");
   const tc = await getTranslations("common");
+  const inUse = param((await searchParams).feil) === "in_use";
 
   const op = (id: string, value: "pause" | "resume" | "archive", label: string) => (
     <form action={changeStatusAction}>
@@ -43,6 +45,13 @@ export default async function MyListingsPage({ params }: PageProps<"/[locale]/mi
           {t("create")}
         </Link>
       </PageHeader>
+      {inUse && (
+        <div className="mb-6">
+          <Notice tone="warning" role="alert">
+            {t("inUse")}
+          </Notice>
+        </div>
+      )}
 
       {own.length === 0 ? (
         <p>{t("empty")}</p>

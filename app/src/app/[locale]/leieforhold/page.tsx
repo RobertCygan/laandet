@@ -19,6 +19,7 @@ export default async function MyRentalsPage({ params }: PageProps<"/[locale]/lei
   const data = (await listMyBookings(actor))!;
   const t = await getTranslations("rentals");
   const tg = await getTranslations("claims");
+  const ti = await getTranslations("inbox");
 
   const group = (title: string, rows: MyBooking[]) =>
     rows.length > 0 && (
@@ -66,10 +67,13 @@ export default async function MyRentalsPage({ params }: PageProps<"/[locale]/lei
           <ul className="flex flex-col gap-3">
             {data.claims.map((g) => (
               <li key={g.id}>
-                <Link href={`/overlevering/${g.id}`} className="card flex flex-col gap-1 p-4 no-underline hover:shadow-md">
+                <Link
+                  href={`/overlevering/${g.id}`}
+                  className="card flex flex-col gap-1 p-4 no-underline hover:shadow-md"
+                >
                   <span className="flex flex-wrap items-center gap-2">
                     <strong className="text-lg">{g.title}</strong>
-                    <span className="badge">{tg(`status.${g.status}`)}</span>
+                    <span className="badge">{ti(`claimStatus.${g.status}`)}</span>
                   </span>
                   <span className="text-sm text-muted">
                     {tg(g.role === "giver" ? "youGiveTo" : "youGetFrom", { name: g.otherName })} ·{" "}

@@ -65,7 +65,13 @@ function PhotoPicker() {
           {photos.map((id) => (
             <li key={id} className="relative">
               {/* eslint-disable-next-line @next/next/no-img-element -- own upload via the authorised media route */}
-              <img src={`/media/${id}/thumb`} alt="" width={240} height={180} className="aspect-[4/3] w-full rounded object-cover" />
+              <img
+                src={`/media/${id}/thumb`}
+                alt=""
+                width={240}
+                height={180}
+                className="aspect-[4/3] w-full rounded object-cover"
+              />
               <input type="hidden" name="photoId" value={id} />
               <button
                 type="button"
@@ -205,7 +211,13 @@ export function ConditionEntryForm({
           <legend className="mb-1 font-bold">{t("outcome")}</legend>
           {OUTCOMES.map((o) => (
             <label key={o} className="check">
-              <input type="radio" name="proposedOutcome" value={o} required defaultChecked={prev(state, "proposedOutcome") === o} />
+              <input
+                type="radio"
+                name="proposedOutcome"
+                value={o}
+                required
+                defaultChecked={prev(state, "proposedOutcome") === o}
+              />
               <span>{t(`outcomeValue.${o}`)}</span>
             </label>
           ))}
@@ -249,10 +261,20 @@ export function ConfirmConditionForm({ bookingId, phase, locale }: { bookingId: 
         <FieldError state={state} name="comment" />
       </label>
       <div className="flex flex-col gap-2 sm:flex-row">
-        <SubmitButton className="button button-primary w-full" name="decision" value="confirm" pendingLabel={tc("sending")}>
+        <SubmitButton
+          className="button button-primary w-full"
+          name="decision"
+          value="confirm"
+          pendingLabel={tc("sending")}
+        >
           {t("confirm")}
         </SubmitButton>
-        <SubmitButton className="button button-outline w-full" name="decision" value="contest" pendingLabel={tc("sending")}>
+        <SubmitButton
+          className="button button-outline w-full"
+          name="decision"
+          value="contest"
+          pendingLabel={tc("sending")}
+        >
           {t("contest")}
         </SubmitButton>
       </div>

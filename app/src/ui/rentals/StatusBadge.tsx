@@ -9,6 +9,6 @@ const TONE: Partial<Record<BookingStatus, string>> = {
 };
 
 export async function StatusBadge({ status }: { status: BookingStatus }) {
-  const t = await getTranslations("rentals");
-  return <span className={`badge ${TONE[status] ?? ""}`}>{t(`status.${status}`)}</span>;
+  const t = await getTranslations("inbox");
+  return <span className={`badge ${TONE[status] ?? ""}`}>{t(`bookingStatus.${status}`)}</span>;
 }
