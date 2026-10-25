@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { formatDate, formatDateTime, formatIsoDate, formatKr, oreToInput, parseKrToOre } from "./format";
+import {
+  formatDate,
+  formatDateTime,
+  formatIsoDate,
+  formatKr,
+  oreToInput,
+  osloInputs,
+  osloLocalToDate,
+  parseKrToOre,
+} from "./format";
 
 const NBSP = " ";
 
@@ -53,6 +62,15 @@ describe("dates (Europe/Oslo)", () => {
     const d = new Date("2026-12-14T09:00:00Z"); // 10:00 in Oslo (CET)
     expect(formatDateTime(d, "nb")).toBe(`14.12.2026 kl.${NBSP}10:00`);
     expect(formatDateTime(d, "en")).toBe("14.12.2026, 10:00");
+  });
+
+  it("reads form date + time as Oslo wall time, winter and summer", () => {
+    expect(osloLocalToDate("2026-12-14", "10:00")?.toISOString()).toBe("2026-12-14T09:00:00.000Z");
+    expect(osloLocalToDate("2026-07-01", "10:00")?.toISOString()).toBe("2026-07-01T08:00:00.000Z");
+    expect(osloInputs(new Date("2026-07-01T08:00:00Z"))).toEqual({ date: "2026-07-01", time: "10:00" });
+    expect(osloLocalToDate("2026-13-01", "10:00")).toBeNull();
+    expect(osloLocalToDate("2026-12-14", "24:00")).toBeNull();
+    expect(osloLocalToDate("", "")).toBeNull();
   });
 });
 

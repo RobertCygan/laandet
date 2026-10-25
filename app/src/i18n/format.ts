@@ -73,13 +73,13 @@ export function formatDate(date: Date): string {
   return `${p.day}.${p.month}.${p.year}`;
 }
 
-/** nb → "14.12.2026 kl. 10:00", en → "14.12.2026, 10:00" (Europe/Oslo). */
 /** Calendar date stored as "YYYY-MM-DD" → "14.12.2026" (no time-zone shift). */
 export function formatIsoDate(iso: string): string {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
   return m ? `${m[3]}.${m[2]}.${m[1]}` : iso;
 }
 
+/** nb → "14.12.2026 kl. 10:00", en → "14.12.2026, 10:00" (Europe/Oslo). */
 export function formatDateTime(date: Date, locale: "nb" | "en"): string {
   const p = parts(date);
   const day = `${p.day}.${p.month}.${p.year}`;
@@ -93,4 +93,27 @@ export function formatMonthYear(date: Date, locale: "nb" | "en"): string {
     month: "long",
     year: "numeric",
   }).format(date);
+}
+
+/** Form fields "2026-12-14" + "10:00", read as Europe/Oslo wall time (summer time included) → Date. */
+export function osloLocalToDate(date: string, time: string): Date | null {
+  const d = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
+  const t = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(time);
+  if (!d || !t) return null;
+  const wall = Date.UTC(+d[1]!, +d[2]! - 1, +d[3]!, +t[1]!, +t[2]!);
+  let guess = wall;
+  for (let i = 0; i < 2; i++) {
+    const p = parts(new Date(guess));
+    guess += wall - Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute);
+  }
+  if (Number.isNaN(guess)) return null;
+  // Rejects 2026-02-30 and the like (Date.UTC rolls them over).
+  const back = osloInputs(new Date(guess));
+  return back.date === date ? new Date(guess) : null;
+}
+
+/** Date → the Europe/Oslo values for `<input type="date">` and `<input type="time">`. */
+export function osloInputs(date: Date): { date: string; time: string } {
+  const p = parts(date);
+  return { date: `${p.year}-${p.month}-${p.day}`, time: `${p.hour}:${p.minute}` };
 }
