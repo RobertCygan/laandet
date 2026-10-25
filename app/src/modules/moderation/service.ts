@@ -3,7 +3,9 @@ import { z } from "zod";
 import { db } from "@/db/client";
 import {
   appeals,
+  conversations,
   listings,
+  messages,
   moderationActions,
   notifications,
   REPORT_REASONS,
@@ -21,7 +23,7 @@ import { enforceRateLimits, LIMITS } from "@/modules/ratelimit/ratelimit";
 import { getRequestMeta } from "@/modules/server/request-meta";
 
 export const reportSchema = z.object({
-  targetType: z.enum(["listing", "user"]),
+  targetType: z.enum(["listing", "user", "message"]),
   targetId: z.uuid(),
   reason: z.enum(REPORT_REASONS, { error: "required" }),
   details: z.string().trim().max(2000, { error: "too_long" }).optional().default(""),
@@ -37,6 +39,20 @@ export async function createReport(actor: Actor, input: z.infer<typeof reportSch
       .from(listings)
       .where(and(eq(listings.id, input.targetId), ne(listings.status, "deleted")));
     if (!l) throw new AppError("not_found");
+  } else if (input.targetType === "message") {
+    // Only a participant can report a message, and only one written by the other party (P02-01).
+    const [m] = await db
+      .select({
+        senderId: messages.senderId,
+        initiatorId: conversations.initiatorId,
+        ownerId: conversations.listingOwnerId,
+      })
+      .from(messages)
+      .innerJoin(conversations, eq(conversations.id, messages.conversationId))
+      .where(and(eq(messages.id, input.targetId), eq(messages.kind, "user")));
+    if (!m || (m.initiatorId !== actor.id && m.ownerId !== actor.id) || m.senderId === actor.id) {
+      throw new AppError("not_found");
+    }
   } else {
     const [u] = await db.select({ id: users.id }).from(users).where(eq(users.id, input.targetId));
     if (!u || u.id === actor.id) throw new AppError("not_found");
@@ -51,6 +67,8 @@ export async function createReport(actor: Actor, input: z.infer<typeof reportSch
         targetId: input.targetId,
         reason: input.reason,
         details: input.details || null,
+        // Staff may read only messages attached to a report (AUTH_MODEL §4).
+        attachedMessageIds: input.targetType === "message" ? [input.targetId] : [],
       })
       .returning({ id: reports.id });
     await recordAudit(tx, { actorId: actor.id, action: "report.create", targetType: "report", targetId: r!.id, meta });
@@ -72,9 +90,13 @@ export async function listOpenReports(actor: Actor, opts: { automaticOnly?: bool
       listingTitle: listings.title,
       listingStatus: listings.status,
       listingOwnerId: listings.ownerId,
+      // A reported message is the one piece of a conversation staff may read (AUTH_MODEL §4).
+      messageBody: messages.body,
+      messageSenderId: messages.senderId,
     })
     .from(reports)
     .leftJoin(listings, and(eq(reports.targetType, "listing"), eq(listings.id, reports.targetId)))
+    .leftJoin(messages, and(eq(reports.targetType, "message"), eq(messages.id, reports.targetId)))
     .where(
       and(
         inArray(reports.status, ["open", "in_review"]),
@@ -188,6 +210,10 @@ export async function hideListing(actor: Actor, input: z.infer<typeof hideSchema
 async function assertNotOwnCase(actor: UserActor, report: typeof reports.$inferSelect): Promise<void> {
   if (report.reporterId === actor.id) throw new AppError("forbidden");
   if (report.targetType === "user" && report.targetId === actor.id) throw new AppError("forbidden");
+  if (report.targetType === "message") {
+    const [m] = await db.select({ senderId: messages.senderId }).from(messages).where(eq(messages.id, report.targetId));
+    if (m?.senderId === actor.id) throw new AppError("forbidden");
+  }
   if (report.targetType === "listing") {
     const [l] = await db.select({ ownerId: listings.ownerId }).from(listings).where(eq(listings.id, report.targetId));
     if (l?.ownerId === actor.id) throw new AppError("forbidden");

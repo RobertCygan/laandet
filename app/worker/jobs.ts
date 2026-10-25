@@ -3,6 +3,7 @@ import type { DbOrTx } from "@/db/client";
 import { appRateLimits, verifications, workerHeartbeats } from "@/db/schema";
 import { releaseStuckEmails, sendDueEmails } from "@/modules/notifications/outbox";
 import { deleteOrphanMedia } from "@/modules/media/cleanup";
+import { sendMessageEmails } from "@/modules/messaging/email-batch";
 
 export type Job = { name: string; everySeconds: number; run: (db: DbOrTx) => Promise<unknown> };
 
@@ -24,6 +25,7 @@ export const JOBS: Job[] = [
     },
   },
   { name: "orphan_media", everySeconds: 3600, run: (db) => deleteOrphanMedia(db) },
+  { name: "message_email_batch", everySeconds: 60, run: (db) => sendMessageEmails(db) },
   {
     name: "audit_retention",
     everySeconds: 24 * 3600,
