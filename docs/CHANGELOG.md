@@ -2,7 +2,7 @@
 
 All notable changes to Laandet. Dates are DD.MM.YYYY.
 
-## [Phase 01] — 25.10.2026 (implemented and tested locally; CI pending; not deployed)
+## [Phase 01] — 25.10.2026 (implemented and tested; CI green; not deployed)
 
 The application lives in `app/` (Next.js 16, PostgreSQL, Drizzle, Better Auth). Setup and commands: `app/README.md`.
 
@@ -105,7 +105,7 @@ The application lives in `app/` (Next.js 16, PostgreSQL, Drizzle, Better Auth). 
 ### Not done / known gaps
 - **No deployment.** Staging and production need a server and a domain bought by the owner (`docs/runbooks/BILLING.md`).
 - **Legal texts are drafts.** They are not legally reviewed. Fields marked «MÅ FYLLES UT FØR LANSERING» block loading in production.
-- **CI** runs on the pull request. See the PR for the current state.
+- CI (`laandet-ci`) was green on 25.10.2026 for all five jobs: lint/format/types, unit, integration on PostgreSQL 17, build + Playwright, and secrets/audit.
 - Differences from the task files:
   - offset instead of keyset pagination, and no `EXPLAIN` fixture (D-032);
   - the keyword warning appears after saving, not while typing;
