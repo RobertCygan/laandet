@@ -398,3 +398,21 @@ export async function supportQueueCount(actor: Actor): Promise<number> {
     .where(inArray(disputes.status, ["support_review", "awaiting_documentation"]));
   return r?.n ?? 0;
 }
+
+/** What a staff member may know before taking a case: metadata only, never the text. */
+export async function getCaseMetaForStaff(actor: Actor, disputeId: string, now = new Date()) {
+  const d = await loadForStaff(actor, disputeId);
+  const grant = await activeGrant(db, (actor as UserActor).id, "dispute", d.id, now);
+  return {
+    id: d.id,
+    category: d.category,
+    status: d.status,
+    openedAt: d.openedAt,
+    escalatedAt: d.escalatedAt,
+    closedAt: d.closedAt,
+    reportedLate: d.reportedLate,
+    hasGrant: Boolean(grant),
+    canTake: d.status === "support_review" || d.status === "awaiting_documentation",
+    canReopen: canReopen(d, now),
+  };
+}

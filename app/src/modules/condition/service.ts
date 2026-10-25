@@ -81,7 +81,7 @@ export const entrySchema = z.object({
     .array(z.object({ name: z.string().max(80), present: z.boolean() }))
     .max(20)
     .default([]),
-  photoIds: z.array(z.uuid()).max(8).default([]),
+  photoIds: z.array(z.uuid()).max(6, { error: "too_many_photos" }).default([]), // SEC-30
 });
 
 async function reportFor(tx: Tx, bookingId: string, phase: ReportPhase) {

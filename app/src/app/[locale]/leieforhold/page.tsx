@@ -4,6 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { formatDate, formatDateTime, formatKr } from "@/i18n/format";
 import { pageLocale } from "@/i18n/page";
 import { requirePageUser } from "@/modules/auth/guards";
+import { listMyDisputes } from "@/modules/disputes/queries";
 import { listMyBookings, type MyBooking } from "@/modules/rentals/queries";
 import { PageHeader } from "@/ui/layout/PageHeader";
 import { StatusBadge } from "@/ui/rentals/StatusBadge";
@@ -16,7 +17,8 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function MyRentalsPage({ params }: PageProps<"/[locale]/leieforhold">) {
   const locale = await pageLocale(params);
   const actor = await requirePageUser(locale, "/leieforhold");
-  const data = (await listMyBookings(actor))!;
+  const [data, cases] = await Promise.all([listMyBookings(actor).then((d) => d!), listMyDisputes(actor)]);
+  const td = await getTranslations("disputes");
   const t = await getTranslations("rentals");
   const tg = await getTranslations("claims");
   const ti = await getTranslations("inbox");
@@ -47,7 +49,8 @@ export default async function MyRentalsPage({ params }: PageProps<"/[locale]/lei
       </section>
     );
 
-  const empty = !data.active.length && !data.requests.length && !data.finished.length && !data.claims.length;
+  const empty =
+    !data.active.length && !data.requests.length && !data.finished.length && !data.claims.length && !cases.length;
   return (
     <div className="wrap flex max-w-3xl flex-col gap-8 py-10">
       <PageHeader title={t("myTitle")} lead={t("myLead")} />
@@ -78,6 +81,26 @@ export default async function MyRentalsPage({ params }: PageProps<"/[locale]/lei
                   <span className="text-sm text-muted">
                     {tg(g.role === "giver" ? "youGiveTo" : "youGetFrom", { name: g.otherName })} ·{" "}
                     {formatDate(g.createdAt)}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      {cases.length > 0 && (
+        <section className="flex flex-col gap-3">
+          <h2 className="text-xl">{td("myCases")}</h2>
+          <ul className="flex flex-col gap-3">
+            {cases.map((c) => (
+              <li key={c.id}>
+                <Link href={`/saker/${c.id}`} className="card flex flex-col gap-1 p-4 no-underline hover:shadow-md">
+                  <span className="flex flex-wrap items-center gap-2">
+                    <strong className="text-lg">{c.title}</strong>
+                    <span className="badge">{td(`status.${c.status}`)}</span>
+                  </span>
+                  <span className="text-sm text-muted">
+                    {td(`categories.${c.category}`)} · {formatDate(c.openedAt)}
                   </span>
                 </Link>
               </li>

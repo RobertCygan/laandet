@@ -12,6 +12,8 @@ import { PageHeader } from "@/ui/layout/PageHeader";
 import { Notice } from "@/ui/Notice";
 import { CancelForm, ChangeTermsForm, MeetingPlaceForm, StepForm } from "@/ui/rentals/RentalForms";
 import { StatusBadge } from "@/ui/rentals/StatusBadge";
+import { openDisputeIdForBooking } from "@/modules/disputes/queries";
+import { REPORTABLE_BOOKING_STATUSES } from "@/modules/disputes/rules";
 
 const OK_KEYS = ["requested", "accept", "decline", "withdraw", "cancelled", "place", "not_returned"] as const;
 
@@ -26,6 +28,8 @@ export default async function BookingPage({ params, searchParams }: PageProps<"/
   const actor = await requirePageUser(locale, `/leieforhold/${id}`);
   const v = await getBookingForParty(actor, id);
   if (!v) notFound();
+  const caseId = await openDisputeIdForBooking(v.booking.id);
+  const td = await getTranslations("disputes");
   const b = v.booking;
   const t = await getTranslations("rentals");
   const ok = param((await searchParams).ok);
@@ -141,6 +145,17 @@ export default async function BookingPage({ params, searchParams }: PageProps<"/
         <Link href={`/meldinger/${b.conversationId}`} className="text-link">
           {t("openConversation")}
         </Link>
+        {caseId ? (
+          <Link href={`/saker/${caseId}`} className="text-link">
+            {td("seeCase")}
+          </Link>
+        ) : (
+          REPORTABLE_BOOKING_STATUSES.includes(b.status) && (
+            <Link href={`/leieforhold/${b.id}/problem`} className="text-link">
+              {td("reportProblem")}
+            </Link>
+          )
+        )}
       </section>
 
       {/* Terms snapshot: later edits to the listing never change it */}

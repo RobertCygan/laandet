@@ -4,7 +4,8 @@ import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Camera, X } from "lucide-react";
 import { confirmConditionAction, conditionEntryAction, uploadConditionPhotoAction } from "@/modules/rentals/actions";
-import { idle } from "@/modules/server/action";
+import type { UploadedMedia } from "@/modules/media/service";
+import { idle, type ActionState } from "@/modules/server/action";
 import { SubmitButton } from "@/ui/SubmitButton";
 import { FieldError, FormError, invalid, prev } from "@/ui/forms/FormMessages";
 
@@ -22,10 +23,19 @@ export const CHECKLIST = [
   "instructions_given",
   "handover_as_agreed",
 ] as const;
-const MAX_PHOTOS = 8;
+const MAX_PHOTOS = 6; // SEC-30: 6 per condition entry and per case statement
 
-/** Photos for a condition entry: the camera opens directly on phones (`capture="environment"`). */
-function PhotoPicker() {
+/**
+ * Photos for a condition entry or a case: the camera opens directly on phones (`capture="environment"`).
+ * Each photo is uploaded on its own and attached when the form is saved (`photoId` fields).
+ */
+export function PhotoPicker({
+  upload = uploadConditionPhotoAction,
+  max = MAX_PHOTOS,
+}: {
+  upload?: (form: FormData) => Promise<ActionState<UploadedMedia>>;
+  max?: number;
+}) {
   const t = useTranslations("condition");
   const tv = useTranslations("validation");
   const te = useTranslations("errors");
@@ -37,12 +47,12 @@ function PhotoPicker() {
     if (!files?.length) return;
     setBusy(true);
     const errs: string[] = [];
-    let room = MAX_PHOTOS - photos.length;
+    let room = max - photos.length;
     for (const file of Array.from(files)) {
       if (room <= 0) break;
       const fd = new FormData();
       fd.append("file", file);
-      const res = await uploadConditionPhotoAction(fd);
+      const res = await upload(fd);
       if (res.status === "ok" && res.data) {
         const id = res.data.id;
         setPhotos((p) => [...p, id]);
@@ -59,7 +69,7 @@ function PhotoPicker() {
   return (
     <fieldset className="flex flex-col gap-3 border-0 p-0">
       <legend className="mb-1 font-bold">{t("photos")}</legend>
-      <p className="field-hint">{t("photosHint")}</p>
+      <p className="field-hint">{t("photosHint", { max })}</p>
       {photos.length > 0 && (
         <ul className="grid grid-cols-3 gap-2">
           {photos.map((id) => (
@@ -85,7 +95,7 @@ function PhotoPicker() {
           ))}
         </ul>
       )}
-      {photos.length < MAX_PHOTOS && (
+      {photos.length < max && (
         <label className="button button-outline w-full cursor-pointer">
           <Camera size={20} aria-hidden="true" />
           {busy ? t("uploading") : t("takePhoto")}
