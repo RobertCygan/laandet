@@ -168,12 +168,13 @@ fi
 # ---- 3. Code and image ---------------------------------------------------------------------------
 step "3/8 Code ($REF) and application image (the longest step, about 10 minutes)"
 install -d -m 0755 "$ROOT" "$ROOT/bin"
+# The code is public and goes into the image: check it out readable for everyone (umask 022).
 if [[ -d $SRC/.git ]]; then
-  git -C "$SRC" fetch -q --depth 1 origin "$REF"
-  git -C "$SRC" checkout -q --force FETCH_HEAD
+  (umask 022 && git -C "$SRC" fetch -q --depth 1 origin "$REF" && git -C "$SRC" checkout -q --force FETCH_HEAD)
 else
-  git clone -q --depth 1 --branch "$REF" "$REPO_URL" "$SRC"
+  (umask 022 && git clone -q --depth 1 --branch "$REF" "$REPO_URL" "$SRC")
 fi
+chmod -R go+rX,go-w "$SRC" # also repairs a checkout made by an earlier version of this script
 version=$(sed -nE 's/^  "version": "([0-9]+\.[0-9]+\.[0-9]+)".*/\1/p' "$SRC/app/package.json" | head -n1)
 TAG="laandet-v${version}-$(git -C "$SRC" rev-parse --short=7 HEAD)"
 if ! docker image inspect "$IMAGE_REPO:$TAG" >/dev/null 2>&1; then
