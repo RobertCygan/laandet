@@ -1,9 +1,9 @@
 ---
 doc_key: rental_simple
 locale: nb
-version: 0.1.0-utkast
-status: UTKAST – ikke juridisk gjennomgått
-updated: 25.10.2026
+version: 1.0.0
+status: Gjeldende – ikke juridisk gjennomgått
+updated: 01.11.2026
 applies_to: oppgitt verdi ≤ 5 000 kr (≤ 500 000 øre)
 template_syntax: Mustache (logikkløs). {{felt}} = verdi, {{#felt}}…{{/felt}} = vises hvis satt, {{^felt}}…{{/felt}} = vises hvis ikke satt. Alle verdier settes inn som ren tekst.
 ---
@@ -16,8 +16,7 @@ UTVIKLERMERKNAD (vises ikke for brukerne):
   for teksten ikke endres når en part godtar.
 -->
 
-> **UTKAST – IKKE JURIDISK GJENNOMGÅTT.** Malen er et førsteutkast laget med hjelp av KI. Den skal ikke
-> brukes til ekte avtaler før en kvalifisert norsk jurist har godkjent den.
+> Teksten er skrevet med hjelp av KI og er ikke gjennomgått av jurist.
 
 # Forenklet leieavtale
 

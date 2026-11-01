@@ -1,14 +1,13 @@
 ---
 doc_key: giveaway_transfer
 locale: nb
-version: 0.1.0-utkast
-status: UTKAST – ikke juridisk gjennomgått
-updated: 25.10.2026
+version: 1.0.0
+status: Gjeldende – ikke juridisk gjennomgått
+updated: 01.11.2026
 template_syntax: Mustache (logikkløs)
 ---
 
-> **UTKAST – IKKE JURIDISK GJENNOMGÅTT.** Dette er et førsteutkast laget med hjelp av KI. Det må
-> gjennomgås av en kvalifisert norsk jurist før det tas i bruk.
+> Teksten er skrevet med hjelp av KI og er ikke gjennomgått av jurist.
 
 # Gis bort – overleveringsbekreftelse
 

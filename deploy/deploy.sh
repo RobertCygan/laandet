@@ -79,8 +79,14 @@ compose() { compose_in "$RELEASE" "$IMAGE" "$@"; }
 EDGE_NETWORK=laandet-edge-$ENVIRONMENT
 docker network inspect "$EDGE_NETWORK" >/dev/null 2>&1 || docker network create "$EDGE_NETWORK" >/dev/null
 
-log "pull $IMAGE"
-compose pull --quiet app
+# Release tags are immutable: an image that is already on the server (pulled earlier, or built
+# here by deploy/bootstrap.sh) is used as it is.
+if docker image inspect "$IMAGE" >/dev/null 2>&1; then
+  log "image $IMAGE is already on this server"
+else
+  log "pull $IMAGE"
+  compose pull --quiet app
+fi
 
 rollback() {
   local status=$?

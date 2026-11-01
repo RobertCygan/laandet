@@ -3,6 +3,8 @@
 All notable changes to Laandet. Dates are DD.MM.YYYY.
 
 ## Unreleased — 01.11.2026
+- **Launch set-up (D-060):** one Hostinger VPS (KVM 1), `https://laandet.gpsi.ai`, email through the mailbox laandet.steigen@gpsi.ai. New `deploy/bootstrap.sh` sets up or updates the server in one go (secrets generated on the server; the mailbox password is asked for and tested there) and installs `laandet-admin` and `laandet-update`. `deploy.sh` uses an image already on the server instead of pulling it.
+- **Legal texts final, version 1.0.0:** no draft notices; each says it was written with AI help and not reviewed by a lawyer (D-058). Data processors: Hostinger. Backups are described as stored on the same server for now. The extended rental agreement (not in use) stays a draft.
 - Larger type: nothing below 14 px, body text 17 px.
 - The operator: GPSI GovTech Solutions is a working name, not a registered business (D-059). The terms and the privacy notice, nb and en, version 0.1.3-utkast, name the person who runs Laandet, with address and e-mail, as the owner gave them. The footer, the about page and `app.env.example` use the same details.
 - Dispute guidelines, nb and en, version 0.1.1-utkast: the forliksråd fee for 2026, DSB for dangerous products, and what Forbrukerklageutvalget covers, in place of the three markers.

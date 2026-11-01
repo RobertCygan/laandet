@@ -25,6 +25,21 @@ One EU virtual server runs Docker Compose (D-005):
 Only `app` joins its environment's edge network. PostgreSQL has no published port and is on no edge
 network; production and staging cannot reach each other. Staging only ever holds synthetic data.
 
+## Quick set-up on one server (D-060)
+
+For the pilot, the owner runs one script as root on a fresh Ubuntu 24.04 VPS. It does the steps of
+`docs/runbooks/SERVER_SETUP.md` that one production server needs, builds the image on the server and
+deploys it (no GitHub deploy workflow, no registry, no staging):
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/RobertCygan/laandet/main/deploy/bootstrap.sh -o bootstrap.sh
+bash bootstrap.sh
+```
+
+It asks only for the password of the sending mailbox and tests it. Afterwards: `laandet-admin <e-mail>`
+gives a registered user the admin role, and `laandet-update` deploys the newest code from `main`
+(secrets and settings are kept).
+
 ## Files
 
 | File | Purpose |
@@ -34,7 +49,8 @@ network; production and staging cannot reach each other. Staging only ever holds
 | `compose.staging.yaml` | Staging override: own project name and edge alias, draft legal texts allowed, demo listings seeded. |
 | `compose.edge.yaml` + `Caddyfile` | Caddy for both environments (it alone owns ports 80/443). |
 | `db/init/10-laandet-roles.sh` | First start of an empty database: roles `laandet_owner` and `laandet_app`, database `laandet`, extensions. |
-| `deploy.sh` | Server-side deploy with automatic rollback (installed as `/opt/laandet/bin/laandet-deploy`, SSH forced command). |
+| `bootstrap.sh` | One-step set-up or update of a single production server (D-060). |
+| `deploy.sh` | Server-side deploy with automatic rollback (installed as `/opt/laandet/bin/laandet-deploy`, SSH forced command). Uses an image already on the server, or pulls it. |
 | `backup/backup.sh`, `backup/laandet-backup@.{service,timer}` | Nightly restic backup of the database dump and the media volume. |
 | `backup/restore.sh` | Restore test into a throw-away scratch environment. |
 | `env/*.example` | Names of every setting and secret (no values). |

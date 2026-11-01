@@ -1,9 +1,9 @@
 ---
 doc_key: safe_rental
 locale: en
-version: 0.1.0-utkast
-status: DRAFT – not legally reviewed – informational translation
-updated: 25.10.2026
+version: 1.0.0
+status: Current – not legally reviewed – informational translation
+updated: 01.11.2026
 translation_of: legal/nb/retningslinjer-for-trygg-utleie.md
 ---
 
@@ -11,7 +11,7 @@ translation_of: legal/nb/retningslinjer-for-trygg-utleie.md
 
 > **Informational translation.** The Norwegian version of this document is the legally binding one. If the two versions differ, the Norwegian text prevails.
 
-**Version 0.1.0-utkast · Last updated 25.10.2026**
+**Version 1.0.0 · Last updated 01.11.2026**
 
 Good agreements are built on trust, and trust comes more easily when both of you know what has been agreed. Here are
 some simple tips that make it safer to rent, borrow and give away.

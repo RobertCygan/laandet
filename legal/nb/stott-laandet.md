@@ -1,9 +1,9 @@
 ---
 doc_key: support_page
 locale: nb
-version: 0.1.0-utkast
-status: UTKAST – sidetekst, ikke juridisk dokument
-updated: 25.10.2026
+version: 1.0.0
+status: Gjeldende – sidetekst, ikke juridisk dokument
+updated: 01.11.2026
 ---
 
 <!--

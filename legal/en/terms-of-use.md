@@ -1,8 +1,8 @@
 ---
 doc_key: terms
 locale: en
-version: 0.1.3-utkast
-status: DRAFT – not legally reviewed – informational translation
+version: 1.0.0
+status: Current – not legally reviewed – informational translation
 updated: 01.11.2026
 translation_of: legal/nb/brukervilkar.md
 ---
@@ -11,11 +11,9 @@ translation_of: legal/nb/brukervilkar.md
 
 > **Informational translation.** The Norwegian version of this document is the legally binding one. If the two versions differ, the Norwegian text prevails.
 
-**Version 0.1.3-utkast · Last updated 01.11.2026**
+**Version 1.0.0 · Last updated 01.11.2026**
 
-> **DRAFT – NOT LEGALLY REVIEWED.** This is a first draft prepared with the help of AI. It has not
-> been approved by a lawyer, and it must not be used with users until a qualified Norwegian lawyer has
-> reviewed it. Fields marked "MUST BE COMPLETED BEFORE LAUNCH" are missing information.
+> This text was written with the help of AI and has not been reviewed by a lawyer.
 
 ## 1. About Laandet and these terms
 

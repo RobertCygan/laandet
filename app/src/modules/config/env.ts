@@ -23,7 +23,8 @@ export const envSchema = z
     MEDIA_DIR: z.string().min(1),
     SMTP_URL: optionalText,
     MAIL_FROM: z.string().min(3).default("Laandet <noreply@example.invalid>"),
-    HIBP_ENABLED: z.stringbool().optional(),
+    // Empty (as in deploy/env/app.env.example) means «not set»: the default below applies.
+    HIBP_ENABLED: optionalText.pipe(z.stringbool().optional()),
     OPERATOR_LEGAL_NAME: optionalText,
     OPERATOR_ORGNR: optionalText,
     OPERATOR_ADDRESS: optionalText,

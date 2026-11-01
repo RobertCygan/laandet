@@ -1,8 +1,8 @@
 ---
 doc_key: dispute_guidelines
 locale: en
-version: 0.1.1-utkast
-status: DRAFT – not legally reviewed – informational translation
+version: 1.0.0
+status: Current – not legally reviewed – informational translation
 updated: 01.11.2026
 translation_of: legal/nb/retningslinjer-for-tvister.md
 ---
@@ -11,10 +11,9 @@ translation_of: legal/nb/retningslinjer-for-tvister.md
 
 > **Informational translation.** The Norwegian version of this document is the legally binding one. If the two versions differ, the Norwegian text prevails.
 
-**Version 0.1.1-utkast · Last updated 01.11.2026**
+**Version 1.0.0 · Last updated 01.11.2026**
 
-> **DRAFT – NOT LEGALLY REVIEWED.** The information about the conciliation board (forliksrådet), fees and other options
-> outside Laandet must be checked before launch.
+> This text was written with the help of AI and has not been reviewed by a lawyer.
 
 Most rentals go well. But now and then something gets broken, goes missing or is late, or you
 disagree about what was agreed. Here we explain how Laandet can help, and what Laandet cannot do.

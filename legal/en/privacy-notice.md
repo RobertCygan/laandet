@@ -1,8 +1,8 @@
 ---
 doc_key: privacy
 locale: en
-version: 0.1.3-utkast
-status: DRAFT – not legally reviewed – informational translation
+version: 1.0.0
+status: Current – not legally reviewed – informational translation
 updated: 01.11.2026
 translation_of: legal/nb/personvernerklaering.md
 ---
@@ -11,11 +11,9 @@ translation_of: legal/nb/personvernerklaering.md
 
 > **Informational translation.** The Norwegian version of this document is the legally binding one. If the two versions differ, the Norwegian text prevails.
 
-**Version 0.1.3-utkast · Last updated 01.11.2026**
+**Version 1.0.0 · Last updated 01.11.2026**
 
-> **DRAFT – NOT LEGALLY REVIEWED.** This is a first draft prepared with the help of AI. It must be
-> reviewed by a qualified lawyer before launch. Fields marked "MUST BE COMPLETED BEFORE LAUNCH"
-> are missing information.
+> This text was written with the help of AI and has not been reviewed by a lawyer.
 
 Here we explain what personal data Laandet processes, why we do it, how long we store it and what
 rights you have. We only collect what we need to run the service.
@@ -86,10 +84,10 @@ them.
 
 | Service | Supplier | Where |
 |---|---|---|
-| Server, database and image storage | **[MUST BE COMPLETED BEFORE LAUNCH]** | EU/EEA |
-| Backups (encrypted before upload) | **[MUST BE COMPLETED BEFORE LAUNCH]** | EU/EEA |
-| Sending email | **[MUST BE COMPLETED BEFORE LAUNCH]** | EU/EEA |
-| Error logging (if used) | **[MUST BE COMPLETED BEFORE LAUNCH]** | Storage in the EU/EEA. It must be assessed whether the supplier can get access from countries outside the EEA. |
+| Server, database and image storage | Hostinger (virtual server) | Data centre in the EU |
+| Backups (encrypted) | Hostinger, on the same server | Data centre in the EU |
+| Sending email | Hostinger (email service) | Transfers outside the EU/EEA follow the EU Standard Contractual Clauses in Hostinger's data processing agreement |
+| Error logging | Not used | – |
 
 We update this list before we start using new suppliers. If data is transferred to countries
 outside the EU/EEA, this only happens on a valid transfer basis, for example the EU's
@@ -151,9 +149,9 @@ We protect your data like this:
 - Passwords are stored as a cryptographic hash. We cannot see your password.
 - No one can see content other than what they are entitled to see. This is checked on the server every time.
 - Staff must use two-factor login. Access to private content is logged.
-- Backups are encrypted and stored in a different place from the service.
+- Backups are encrypted. For now they are stored on the same server as the service.
 - We remove metadata, such as GPS location, from photos.
-- We regularly test restoring from backup.
+- We can restore the service from a backup.
 
 If a security breach occurs that may affect you, we will notify the Norwegian Data Protection Authority
 (Datatilsynet) and you, as required by law.

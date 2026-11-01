@@ -1,18 +1,16 @@
 ---
 doc_key: privacy
 locale: nb
-version: 0.1.3-utkast
-status: UTKAST – ikke juridisk gjennomgått
+version: 1.0.0
+status: Gjeldende – ikke juridisk gjennomgått
 updated: 01.11.2026
 ---
 
 # Personvernerklæring for Laandet
 
-**Versjon 0.1.3-utkast · Sist oppdatert 01.11.2026**
+**Versjon 1.0.0 · Sist oppdatert 01.11.2026**
 
-> **UTKAST – IKKE JURIDISK GJENNOMGÅTT.** Dette er et førsteutkast laget med hjelp av KI. Det må
-> gjennomgås av en kvalifisert jurist før lansering. Felter merket «MÅ FYLLES UT FØR LANSERING»
-> mangler opplysninger.
+> Teksten er skrevet med hjelp av KI og er ikke gjennomgått av jurist.
 
 Her forklarer vi hvilke personopplysninger Laandet behandler, hvorfor vi gjør det, hvor lenge vi
 lagrer dem og hvilke rettigheter du har. Vi samler bare inn det vi trenger for å drive tjenesten.
@@ -83,10 +81,10 @@ dem.
 
 | Tjeneste | Leverandør | Hvor |
 |---|---|---|
-| Server, database og bildelagring | **[MÅ FYLLES UT FØR LANSERING]** | EU/EØS |
-| Sikkerhetskopier (kryptert før opplasting) | **[MÅ FYLLES UT FØR LANSERING]** | EU/EØS |
-| Utsending av e-post | **[MÅ FYLLES UT FØR LANSERING]** | EU/EØS |
-| Feillogging (hvis i bruk) | **[MÅ FYLLES UT FØR LANSERING]** | EU/EØS-lagring. Det må vurderes om leverandøren kan få tilgang fra land utenfor EØS. |
+| Server, database og bildelagring | Hostinger (virtuell server) | Datasenter i EU |
+| Sikkerhetskopier (krypterte) | Hostinger, på samme server | Datasenter i EU |
+| Utsending av e-post | Hostinger (e-posttjeneste) | Overføringer utenfor EU/EØS skjer etter EUs standardkontraktsklausuler i Hostingers databehandleravtale |
+| Feillogging | Ikke i bruk | – |
 
 Vi oppdaterer denne listen før vi tar i bruk nye leverandører. Hvis opplysninger overføres til land
 utenfor EU/EØS, skjer det bare med et gyldig overføringsgrunnlag, for eksempel EUs
@@ -147,9 +145,9 @@ Vi beskytter opplysningene dine slik:
 - Passord lagres som kryptografisk hash. Vi kan ikke se passordet ditt.
 - Ingen kan se annet innhold enn det de har rett til å se. Dette kontrolleres på serveren hver gang.
 - Ansatte må bruke tofaktorinnlogging. Tilgang til privat innhold blir logget.
-- Sikkerhetskopiene krypteres og lagres et annet sted enn tjenesten.
+- Sikkerhetskopiene krypteres. Foreløpig lagres de på samme server som tjenesten.
 - Vi fjerner metadata, som GPS-posisjon, fra bilder.
-- Vi tester gjenoppretting fra sikkerhetskopi jevnlig.
+- Vi kan gjenopprette tjenesten fra sikkerhetskopi.
 
 Hvis det skjer et sikkerhetsbrudd som kan få betydning for deg, varsler vi Datatilsynet og deg slik
 loven krever.

@@ -1,18 +1,16 @@
 ---
 doc_key: terms
 locale: nb
-version: 0.1.3-utkast
-status: UTKAST – ikke juridisk gjennomgått
+version: 1.0.0
+status: Gjeldende – ikke juridisk gjennomgått
 updated: 01.11.2026
 ---
 
 # Brukervilkår for Laandet
 
-**Versjon 0.1.3-utkast · Sist oppdatert 01.11.2026**
+**Versjon 1.0.0 · Sist oppdatert 01.11.2026**
 
-> **UTKAST – IKKE JURIDISK GJENNOMGÅTT.** Dette er et førsteutkast laget med hjelp av KI. Det er ikke
-> godkjent av advokat, og det skal ikke brukes overfor brukere før en kvalifisert norsk jurist har
-> gått gjennom det. Felter merket «MÅ FYLLES UT FØR LANSERING» mangler opplysninger.
+> Teksten er skrevet med hjelp av KI og er ikke gjennomgått av jurist.
 
 ## 1. Om Laandet og disse vilkårene
 

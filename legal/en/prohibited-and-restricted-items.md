@@ -1,9 +1,9 @@
 ---
 doc_key: prohibited_items
 locale: en
-version: 0.1.0-utkast
-status: DRAFT – not legally reviewed – informational translation
-updated: 25.10.2026
+version: 1.0.0
+status: Current – not legally reviewed – informational translation
+updated: 01.11.2026
 translation_of: legal/nb/forbudte-og-begrensede-gjenstander.md
 ---
 
@@ -11,9 +11,9 @@ translation_of: legal/nb/forbudte-og-begrensede-gjenstander.md
 
 > **Informational translation.** The Norwegian version of this document is the legally binding one. If the two versions differ, the Norwegian text prevails.
 
-**Version 0.1.0-utkast · Last updated 25.10.2026**
+**Version 1.0.0 · Last updated 01.11.2026**
 
-> **DRAFT – NOT LEGALLY REVIEWED.**
+> This text was written with the help of AI and has not been reviewed by a lawyer.
 
 Laandet is made for ordinary things that people have at home, in the shed and in the garage. To keep the
 service safe and legal, some things are not allowed. Other things require extra care.

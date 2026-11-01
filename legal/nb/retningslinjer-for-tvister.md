@@ -1,17 +1,16 @@
 ---
 doc_key: dispute_guidelines
 locale: nb
-version: 0.1.1-utkast
-status: UTKAST – ikke juridisk gjennomgått
+version: 1.0.0
+status: Gjeldende – ikke juridisk gjennomgått
 updated: 01.11.2026
 ---
 
 # Retningslinjer for tvister – når noe går galt
 
-**Versjon 0.1.1-utkast · Sist oppdatert 01.11.2026**
+**Versjon 1.0.0 · Sist oppdatert 01.11.2026**
 
-> **UTKAST – IKKE JURIDISK GJENNOMGÅTT.** Opplysningene om forliksråd, gebyrer og andre muligheter
-> utenfor Laandet må kontrolleres før lansering.
+> Teksten er skrevet med hjelp av KI og er ikke gjennomgått av jurist.
 
 De fleste leieforhold går fint. Men av og til blir noe ødelagt, borte eller forsinket, eller dere er
 uenige om hva som er avtalt. Her forklarer vi hvordan Laandet kan hjelpe, og hva Laandet ikke kan gjøre.

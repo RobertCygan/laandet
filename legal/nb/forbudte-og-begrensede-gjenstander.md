@@ -1,16 +1,16 @@
 ---
 doc_key: prohibited_items
 locale: nb
-version: 0.1.0-utkast
-status: UTKAST – ikke juridisk gjennomgått
-updated: 25.10.2026
+version: 1.0.0
+status: Gjeldende – ikke juridisk gjennomgått
+updated: 01.11.2026
 ---
 
 # Forbudte og begrensede gjenstander
 
-**Versjon 0.1.0-utkast · Sist oppdatert 25.10.2026**
+**Versjon 1.0.0 · Sist oppdatert 01.11.2026**
 
-> **UTKAST – IKKE JURIDISK GJENNOMGÅTT.**
+> Teksten er skrevet med hjelp av KI og er ikke gjennomgått av jurist.
 
 Laandet er laget for vanlige ting som folk har hjemme, i boden og i garasjen. For å holde tjenesten
 trygg og lovlig er noen ting ikke tillatt. Andre ting krever ekstra forsiktighet.

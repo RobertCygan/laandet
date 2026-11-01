@@ -1,9 +1,9 @@
 ---
 doc_key: support_page
 locale: en
-version: 0.1.0-utkast
-status: DRAFT – not legally reviewed – informational translation
-updated: 25.10.2026
+version: 1.0.0
+status: Current – not legally reviewed – informational translation
+updated: 01.11.2026
 translation_of: legal/nb/stott-laandet.md
 ---
 

@@ -1,14 +1,14 @@
 ---
 doc_key: safe_rental
 locale: nb
-version: 0.1.0-utkast
-status: UTKAST – ikke juridisk gjennomgått
-updated: 25.10.2026
+version: 1.0.0
+status: Gjeldende – ikke juridisk gjennomgått
+updated: 01.11.2026
 ---
 
 # Retningslinjer for trygg utleie
 
-**Versjon 0.1.0-utkast · Sist oppdatert 25.10.2026**
+**Versjon 1.0.0 · Sist oppdatert 01.11.2026**
 
 Gode avtaler bygger på tillit, og tillit blir lettere når begge vet hva som er avtalt. Her er noen enkle
 råd som gjør det tryggere å leie, låne og gi bort.

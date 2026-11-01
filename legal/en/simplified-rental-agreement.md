@@ -1,9 +1,9 @@
 ---
 doc_key: rental_simple
 locale: en
-version: 0.1.0-utkast
-status: DRAFT – not legally reviewed – informational translation
-updated: 25.10.2026
+version: 1.0.0
+status: Current – not legally reviewed – informational translation
+updated: 01.11.2026
 applies_to: declared value ≤ 5 000 kr (≤ 500 000 øre)
 template_syntax: Mustache (logic-less). {{field}} = value, {{#field}}…{{/field}} = shown if set, {{^field}}…{{/field}} = shown if not set. All values are inserted as plain text.
 translation_of: legal/nb/forenklet-leieavtale.md
@@ -17,8 +17,7 @@ DEVELOPER NOTE (not shown to users):
   of the text does not change when a party accepts.
 -->
 
-> **DRAFT – NOT LEGALLY REVIEWED.** This template is a first draft made with the help of AI. It must not
-> be used for real agreements until a qualified Norwegian lawyer has approved it.
+> This text was written with the help of AI and has not been reviewed by a lawyer.
 
 # Simplified rental agreement
 

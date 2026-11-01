@@ -1,17 +1,16 @@
 ---
 doc_key: cookies
 locale: nb
-version: 0.1.0-utkast
-status: UTKAST – ikke juridisk gjennomgått
-updated: 25.10.2026
+version: 1.0.0
+status: Gjeldende – ikke juridisk gjennomgått
+updated: 01.11.2026
 ---
 
 # Informasjonskapsler (cookies)
 
-**Versjon 0.1.0-utkast · Sist oppdatert 25.10.2026**
+**Versjon 1.0.0 · Sist oppdatert 01.11.2026**
 
-> **UTKAST – IKKE JURIDISK GJENNOMGÅTT.** Listen beskriver løsningen slik den er planlagt. Den skal
-> kontrolleres mot den ferdige tjenesten før lansering.
+> Teksten er skrevet med hjelp av KI og er ikke gjennomgått av jurist.
 
 ## Kort fortalt
 

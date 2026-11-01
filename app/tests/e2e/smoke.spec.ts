@@ -30,9 +30,13 @@ test("every footer and content page answers in both languages", async ({ request
   }
 });
 
-test("legal pages show version and the draft label; English shows that Norwegian prevails", async ({ page }) => {
+test("legal pages show version and that no lawyer has reviewed them; English shows that Norwegian prevails", async ({
+  page,
+}) => {
   await page.goto("/vilkar");
-  await expect(page.getByText("Utkast – ikke juridisk gjennomgått").first()).toBeVisible();
+  // Final texts (D-058): no draft banner, but an honest note that no lawyer has reviewed them.
+  await expect(page.getByText("Utkast – ikke juridisk gjennomgått")).toHaveCount(0);
+  await expect(page.getByText("ikke gjennomgått av jurist").first()).toBeVisible();
   await expect(page.getByText(/Versjon \d+\.\d+\.\d+/).first()).toBeVisible();
   await expect(page.locator("#rangering")).toHaveCount(1);
   await page.goto("/en/vilkar");

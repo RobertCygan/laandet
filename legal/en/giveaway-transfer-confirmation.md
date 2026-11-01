@@ -1,15 +1,14 @@
 ---
 doc_key: giveaway_transfer
 locale: en
-version: 0.1.0-utkast
-status: DRAFT – not legally reviewed – informational translation
-updated: 25.10.2026
+version: 1.0.0
+status: Current – not legally reviewed – informational translation
+updated: 01.11.2026
 template_syntax: Mustache (logic-less)
 translation_of: legal/nb/gis-bort-overleveringsbekreftelse.md
 ---
 
-> **DRAFT – NOT LEGALLY REVIEWED.** This is a first draft made with the help of AI. It must be
-> reviewed by a qualified Norwegian lawyer before it is put into use.
+> This text was written with the help of AI and has not been reviewed by a lawyer.
 
 # Giving away – transfer confirmation
 
