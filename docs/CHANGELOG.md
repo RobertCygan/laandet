@@ -3,6 +3,7 @@
 All notable changes to Laandet. Dates are DD.MM.YYYY.
 
 ## Unreleased — 01.11.2026
+- **Daily Facebook post (D-064):** `/admin/dagens` shows the last 24 hours' new listings as a ready Norwegian post with a copy button; the worker emails it to the operator from 17:45 (`DIGEST_EMAIL`, else `OPS_ALERT_EMAIL`). Facebook has no API for posting in groups, so it is pasted by hand.
 - **Tjenester (D-063):** new listing types «Tjeneste tilbys» and «Tjeneste ønskes» with eight service categories; price per hour, per m² or for the whole job, free, or by agreement; contact through messages only (no booking, no payment). A «Tjenester» tab in «Utforsk», a header link and a section on the front page. Migration `0013_services_and_business` (new types and units, checks that services carry no item terms or handover, rentals keep rental units).
 - **Business accounts (D-063):** «Bedrift eller forening» at sign-up; the org number is looked up in Enhetsregisteret (Brønnøysund) and the registered name is shown with a «Bedrift» badge on listings and the profile. Business accounts post services only and cannot request rentals or claim give-aways. Business data is in the data export and removed when the account is erased. New optional setting `BRREG_API_URL`.
 - Terms 1.1.0, prohibited items 1.1.0 and privacy notice 1.2.0 (nb and en) cover services and business accounts.

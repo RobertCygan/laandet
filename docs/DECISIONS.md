@@ -593,3 +593,11 @@ during Phase 01 start as *Proposed* (implementation-level) unless the owner says
   - Business accounts can only post services and send messages; rental requests, give-away claims and item listings stay between private people. Business accounts are free; there are still no paid or promoted listings.
   - Terms 1.1.0 (account types, section 8.4–8.6 on businesses incl. prices with VAT, new section 11a on services, tax is each user's responsibility), prohibited items 1.1.0, privacy 1.2.0 (business data, the Brønnøysund lookup). Not marked as a material change: nothing is taken away from existing users.
 - **Status:** Accepted 01.11.2026 (owner: «Na razie robimy krok 1»). Step 2 (paid ads, registering an ENK, VAT) is not started.
+
+## D-064 — Daily post for the Steigen groups on Facebook: ready text, pasted by hand
+- **Context:** The owner, 01.11.2026, wants a post with the day's new listings in the Steigen groups on Facebook every day at about 18:00, ideally posted automatically by an agent through Laandet's Facebook account.
+- **Decision:**
+  - Facebook has no API for posting in groups any more (Meta removed the Groups API in 2024), and posting with a bot that drives a browser breaks Facebook's terms and can get the account blocked. Laandet therefore does not post by itself.
+  - Laandet writes the post: `/admin/dagens` (all staff) shows the public listings published in the last 24 hours as Norwegian text with a link per listing and a «Kopier teksten» button. The worker job `daily_digest` emails the same text from 17:45 Oslo time to `DIGEST_EMAIL` (or `OPS_ALERT_EMAIL`), once a day and only when there is something new.
+  - Only what is already public on the listing pages is used (title, place, price, the business name of business accounts); never the names of private people. Example listings are left out.
+- **Status:** Accepted 01.11.2026 (owner: «Tak zrób»).

@@ -14,7 +14,8 @@ export type AdminSection =
   | "security"
   | "metrics"
   | "transparency"
-  | "feedback";
+  | "feedback"
+  | "digest";
 
 /** Sections every staff member sees; the rest are for admins (AUTH_MODEL §4). */
 const STAFF: readonly AdminSection[] = [
@@ -25,6 +26,7 @@ const STAFF: readonly AdminSection[] = [
   "categories",
   "metrics",
   "feedback",
+  "digest",
 ];
 const HREF: Record<AdminSection, string> = {
   dashboard: "/admin",
@@ -39,6 +41,7 @@ const HREF: Record<AdminSection, string> = {
   metrics: "/admin/tall",
   transparency: "/admin/apenhet",
   feedback: "/admin/tilbakemeldinger",
+  digest: "/admin/dagens",
 };
 
 export async function AdminNav({ current }: { current: AdminSection }) {

@@ -566,7 +566,8 @@
       "security": "Sikkerhetslogg",
       "metrics": "Driftstall",
       "transparency": "Åpenhet",
-      "feedback": "Tilbakemeldinger"
+      "feedback": "Tilbakemeldinger",
+      "digest": "Dagens innlegg"
     },
     "targetTypes": {
       "listing": "Annonser",
@@ -1712,5 +1713,16 @@
     "handledHeading": "Behandlet",
     "markHandled": "Marker som behandlet",
     "handledSaved": "Tilbakemeldingen er markert som behandlet."
+  },
+  "digest": {
+    "title": "Dagens innlegg",
+    "lead": "Nye annonser de siste 24 timene, ferdig skrevet for Steigen-gruppene på Facebook.",
+    "count": "{count, plural, =0 {Ingen nye annonser de siste 24 timene.} one {# ny annonse de siste 24 timene.} other {# nye annonser de siste 24 timene.}}",
+    "textLabel": "Tekst til Facebook",
+    "copy": "Kopier teksten",
+    "copied": "Kopiert",
+    "emailOn": "Teksten sendes også på e-post til {email} hver dag fra kl. 17.45 (bare når det er nye annonser).",
+    "emailOff": "Ingen e-postadresse for dagens innlegg er satt (DIGEST_EMAIL eller OPS_ALERT_EMAIL).",
+    "whyManual": "Facebook har ikke lenger et API for å legge ut innlegg i grupper, og automatisk publisering med en robot bryter Facebooks vilkår. Derfor limer du inn teksten selv."
   }
 }

@@ -14,6 +14,7 @@ import {
 import { sendMessageEmails } from "@/modules/messaging/email-batch";
 import { expireRestrictions } from "@/modules/moderation/users";
 import { checkOpsAlerts } from "@/modules/ops/alerts";
+import { sendDailyDigest } from "@/modules/digest/daily";
 import { eraseDueAccounts, handleInactiveAccounts } from "@/modules/privacy/erasure";
 import { deleteOrphanPrivateMedia, runRetention } from "@/modules/privacy/retention";
 import { publishDueReviews } from "@/modules/reviews/service";
@@ -60,6 +61,8 @@ export const JOBS: Job[] = [
     everySeconds: 24 * 3600,
     run: (db) => db.execute(sql`SELECT purge_expired_audit_events()`),
   },
+  // D-064: the day's new listings as a ready Facebook post, emailed to the operator from 17:45.
+  { name: "daily_digest", everySeconds: 300, run: () => sendDailyDigest() },
   // P04-04: emails the operator when a job above keeps failing or stops running.
   {
     name: "ops_alerts",
