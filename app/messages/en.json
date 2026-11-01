@@ -536,7 +536,7 @@
     "setup2faTitle": "Set up two-factor sign-in",
     "setup2faLead": "Enter your password. You get a key to add to an authenticator app. Then confirm with a code from the app.",
     "setup2faStart": "Start setup",
-    "setup2faUri": "Add this key to your app (or use the link on your phone):",
+    "setup2faUri": "Or type the key into the app (or use the link on your phone):",
     "setup2faBackup": "Backup codes (shown only now – store them safely):",
     "setup2faVerify": "Confirm with code",
     "setup2faDone": "Two-factor sign-in is on.",
@@ -617,7 +617,9 @@
       "review_restored": "Restored review",
       "message_redacted": "Hidden message"
     },
-    "removeReview": "Remove the review"
+    "removeReview": "Remove the review",
+    "setup2faQr": "Scan the code with your authenticator app (Google Authenticator, Microsoft Authenticator or similar):",
+    "setup2faQrAlt": "QR code for two-factor sign-in to Laandet"
   },
   "errors": {
     "auth_required": "Please sign in first.",
