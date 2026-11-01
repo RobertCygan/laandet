@@ -29,6 +29,7 @@ test.describe("admin panel and transparency (P03-04, P03-07)", () => {
       ["/admin/juridisk", "Juridiske tekster"],
       ["/admin/sikkerhet", "Sikkerhetslogg"],
       ["/admin/apenhet", "Åpenhet: tall"],
+      ["/admin/dagens", "Dagens innlegg"],
     ] as const) {
       await page.goto(path);
       await expect(page.getByRole("heading", { level: 1, name: heading })).toBeVisible();

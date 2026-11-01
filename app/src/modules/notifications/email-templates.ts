@@ -16,6 +16,7 @@ export type EmailTemplate =
   | "account_erased"
   | "inactivity_warning"
   | "ops_alert"
+  | "daily_digest"
   | "activity";
 
 type Rendered = { subject: string; text: string };
@@ -262,6 +263,17 @@ const templates: Record<EmailTemplate, Record<"nb" | "en", (p: Payload) => Rende
     }),
   },
   // P04-04: to the operator only. Job name, state, time and the redacted error; never personal data.
+  // D-064: to the operator only. The ready-to-paste Facebook post with today's new public listings.
+  daily_digest: {
+    nb: (p) => ({
+      subject: `Laandet: dagens innlegg til Facebook (${p.count} nye annonser)`,
+      text: `Her er dagens innlegg til Steigen-gruppene. Kopier teksten mellom strekene:\n\n----------\n${p.text}\n----------\n\nDu finner den også under /admin/dagens.`,
+    }),
+    en: (p) => ({
+      subject: `Laandet: today's Facebook post (${p.count} new listings)`,
+      text: `Here is today's post for the Steigen groups. Copy the text between the lines:\n\n----------\n${p.text}\n----------\n\nIt is also under /admin/dagens.`,
+    }),
+  },
   ops_alert: {
     nb: (p) => ({
       subject: `Laandet drift: ${p.job} ${p.state === "recovered" ? "virker igjen" : "trenger tilsyn"}`,

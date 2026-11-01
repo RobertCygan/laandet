@@ -37,6 +37,8 @@ export const envSchema = z
     // Operations alerts from the worker (P04-04); empty = no alerts.
     OPS_ALERT_EMAIL: optionalText.pipe(z.email().optional()),
     // Brønnøysund Enhetsregisteret, for business accounts (D-063); tests point it at a stub.
+    // The daily Facebook post (D-064) goes here; empty = OPS_ALERT_EMAIL.
+    DIGEST_EMAIL: optionalText.pipe(z.email().optional()),
     BRREG_API_URL: optionalText.pipe(z.url().optional()),
   })
   .superRefine((e, ctx) => {

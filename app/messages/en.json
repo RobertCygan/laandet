@@ -566,7 +566,8 @@
       "security": "Security log",
       "metrics": "Operations",
       "transparency": "Transparency",
-      "feedback": "Feedback"
+      "feedback": "Feedback",
+      "digest": "Today's post"
     },
     "targetTypes": {
       "listing": "Listings",
@@ -1712,5 +1713,16 @@
     "handledHeading": "Handled",
     "markHandled": "Mark as handled",
     "handledSaved": "The feedback is marked as handled."
+  },
+  "digest": {
+    "title": "Today's post",
+    "lead": "New listings from the last 24 hours, written up for the Steigen groups on Facebook.",
+    "count": "{count, plural, =0 {No new listings in the last 24 hours.} one {# new listing in the last 24 hours.} other {# new listings in the last 24 hours.}}",
+    "textLabel": "Text for Facebook",
+    "copy": "Copy the text",
+    "copied": "Copied",
+    "emailOn": "The text is also emailed to {email} every day from 17:45 (only when there are new listings).",
+    "emailOff": "No email address for the daily post is set (DIGEST_EMAIL or OPS_ALERT_EMAIL).",
+    "whyManual": "Facebook no longer has an API for posting in groups, and automated posting with a bot breaks Facebook's terms. That is why you paste the text yourself."
   }
 }
