@@ -1,0 +1,21 @@
+# Nightly Laandet backup of one environment (SEC-53). Install (as root):
+#   install -m 0755 backup.sh /opt/laandet/bin/laandet-backup
+#   install -m 0644 laandet-backup@.service laandet-backup@.timer /etc/systemd/system/
+#   systemctl daemon-reload && systemctl enable --now laandet-backup@production.timer
+[Unit]
+Description=Laandet backup (%i): database dump and media to restic
+Wants=network-online.target
+After=network-online.target docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/laandet/bin/laandet-backup %i
+Nice=10
+IOSchedulingClass=idle
+# Hardening that still allows reading the media volume and talking to Docker.
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectHome=read-only
+ProtectSystem=full
+ReadWritePaths=/var/backups/laandet -/root/.cache/restic

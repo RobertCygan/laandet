@@ -1,0 +1,45 @@
+# Laandet edge: one Caddy for both environments (it alone owns ports 80/443).
+#
+#   docker network create laandet-edge-production; docker network create laandet-edge-staging
+#   (once; deploy.sh also creates its environment's network)
+#   LAANDET_EDGE_SECRETS_DIR=/opt/laandet/edge/secrets docker compose -f compose.edge.yaml up -d
+#
+# Caddy reaches each app through that environment's edge network only. The databases live on
+# each environment's private network, and production and staging cannot reach each other.
+name: laandet-edge
+
+services:
+  caddy:
+    image: caddy:2.11.7@sha256:504a44d7d74bd2bc28a66afc4774912fc21223ca8a67734af1c54ab2f999b489
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    env_file:
+      - ${LAANDET_EDGE_SECRETS_DIR:?LAANDET_EDGE_SECRETS_DIR must point to the edge secrets directory}/edge.env
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ${LAANDET_EDGE_SECRETS_DIR}/staging-basic-auth.caddy:/etc/caddy/secrets/staging-basic-auth.caddy:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [edge_production, edge_staging]
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m
+    cap_drop: [ALL]
+    cap_add: [NET_BIND_SERVICE]
+    security_opt: ["no-new-privileges:true"]
+
+networks:
+  edge_production:
+    external: true
+    name: laandet-edge-production
+  edge_staging:
+    external: true
+    name: laandet-edge-staging
+
+volumes:
+  # Certificates and ACME account. Not secret enough to need the off-site backup: Caddy re-issues.
+  caddy_data: {}
+  caddy_config: {}

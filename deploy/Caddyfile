@@ -1,0 +1,67 @@
+# Laandet — Caddy (TLS, HSTS, fallback security headers, size limits). P01-13, SEC-01.
+#
+# Environment (edge.env):
+#   LAANDET_DOMAIN   production host name, e.g. laandet.example.invalid (staging is staging.<domain>)
+#   ACME_EMAIL       address for Let's Encrypt expiry notices
+# Staging basic auth comes from /etc/caddy/secrets/staging-basic-auth.caddy (see env/ examples).
+#
+# Notes
+# - No access log is written: logs must not contain raw IP addresses (SEC-43).
+# - /healthz is public on purpose (uptime monitor, deploy check). It returns only {"db","media"}.
+# - The app sets the full Content-Security-Policy with a per-request nonce. The headers below are
+#   defaults (`?`) used only where the app sets none (e.g. /media, /api/auth).
+{
+	email {$ACME_EMAIL}
+	admin off
+}
+
+(common) {
+	encode zstd gzip
+
+	request_body {
+		max_size 12MB
+	}
+
+	# Responses from the app. HSTS is Caddy's alone; the rest are defaults (`?`) for the few
+	# responses where the app sets none, so the app's nonce-based CSP is never doubled.
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		?X-Content-Type-Options "nosniff"
+		?Referrer-Policy "strict-origin-when-cross-origin"
+		?X-Frame-Options "DENY"
+		?Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+		?Content-Security-Policy "default-src 'self'; img-src 'self' data:; frame-ancestors 'none'; base-uri 'none'; object-src 'none'; form-action 'self'"
+		-Server
+		-X-Powered-By
+	}
+
+	# Responses Caddy produces itself (401 from staging basic auth, 413, 502 …) skip the block
+	# above, so they get the same headers here.
+	handle_errors {
+		header {
+			Strict-Transport-Security "max-age=31536000; includeSubDomains"
+			X-Content-Type-Options "nosniff"
+			Referrer-Policy "strict-origin-when-cross-origin"
+			X-Frame-Options "DENY"
+			Content-Security-Policy "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
+			-Server
+		}
+		respond "{err.status_code} {err.status_text}"
+	}
+}
+
+{$LAANDET_DOMAIN} {
+	import common
+	reverse_proxy laandet-app:3000
+}
+
+staging.{$LAANDET_DOMAIN} {
+	import common
+	header X-Robots-Tag "noindex, nofollow"
+
+	# Everything except the health check needs the staging password.
+	@protected not path /healthz
+	import /etc/caddy/secrets/staging-basic-auth.caddy
+
+	reverse_proxy laandet-staging-app:3000
+}

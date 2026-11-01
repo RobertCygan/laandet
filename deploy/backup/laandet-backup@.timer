@@ -1,0 +1,11 @@
+# Runs laandet-backup@<environment>.service every night at about 03:15 Oslo time.
+[Unit]
+Description=Nightly Laandet backup (%i)
+
+[Timer]
+OnCalendar=*-*-* 03:15:00 Europe/Oslo
+RandomizedDelaySec=15min
+Persistent=true
+
+[Install]
+WantedBy=timers.target
