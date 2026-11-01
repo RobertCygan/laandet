@@ -7,6 +7,7 @@ import { formatMonthYear } from "@/i18n/format";
 import { pageLocale } from "@/i18n/page";
 import { getActor } from "@/modules/auth/actor";
 import { getPublicProfile } from "@/modules/users/service";
+import { Avatar } from "@/ui/Avatar";
 import { ReportForm } from "@/ui/listings/ListingActions";
 import { ReportSignedOut } from "@/ui/listings/ReportSignedOut";
 import { ReviewCard } from "@/ui/reviews/ReviewCard";
@@ -33,7 +34,10 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
   return (
     <div className="wrap max-w-3xl py-10">
       <header className="card mb-8 flex flex-col gap-3 p-6">
-        <h1 className="text-[clamp(28px,4vw,40px)] leading-tight">{p.name}</h1>
+        <div className="flex items-center gap-4">
+          <Avatar name={p.name} mediaId={p.avatarMediaId} size="lg" />
+          <h1 className="text-[clamp(28px,4vw,40px)] leading-tight">{p.name}</h1>
+        </div>
         <p className="flex flex-wrap items-center gap-2 text-sm text-muted">
           <span>{t("memberSince", { date: formatMonthYear(p.createdAt, locale) })}</span>
           {isNew && <span className="badge">{t("newMember")}</span>}

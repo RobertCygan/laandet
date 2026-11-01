@@ -23,9 +23,10 @@ export function uploadListingImage(actor: Actor, file: File): Promise<UploadedMe
 export async function uploadImage(
   actor: Actor,
   file: File,
-  scope: "listing" | "condition" | "dispute",
+  scope: "listing" | "condition" | "dispute" | "avatar",
 ): Promise<UploadedMedia> {
-  assertCan(actor, scope === "listing" ? "media.upload" : "evidence.upload");
+  // Profile photos are public like listing photos, so they need the same right (D-061).
+  assertCan(actor, scope === "listing" || scope === "avatar" ? "media.upload" : "evidence.upload");
   await enforceRateLimits(db, [
     {
       bucket: `upload:user:${actor.id}`,

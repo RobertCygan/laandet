@@ -1,5 +1,7 @@
+import path from "node:path";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { query, registerAndVerify, uniqueEmail } from "./support";
 
 const FOOTER_PATHS = [
   "/om",
@@ -90,3 +92,63 @@ for (const p of ["/", "/utforsk", "/kategorier", "/registrer", "/logg-inn", "/vi
     ).toEqual([]);
   });
 }
+
+test("signed in, the account links sit in one menu and the main menu stays on one line", async ({ page, isMobile }) => {
+  test.skip(isMobile, "The account menu belongs to the desktop header; phones use the menu button.");
+  await registerAndVerify(page, uniqueEmail("meny"), "Kari Nordmann");
+  await page.goto("/");
+  const main = page.getByRole("navigation", { name: "Hovedmeny" });
+  for (const name of ["Utforsk", "Kategorier", "Ønskes leid", "Gis bort"]) {
+    const box = await main.getByRole("link", { name, exact: true }).boundingBox();
+    expect(box?.height, `${name} on one line`).toBeLessThan(60);
+  }
+  await expect(main.getByRole("link", { name: "Slik fungerer det" })).toHaveCount(0);
+
+  const button = page.getByRole("button", { name: /Kontomeny/ });
+  await expect(button).toContainText("Kari Nordmann");
+  await expect(page.getByRole("link", { name: "Min profil" })).toHaveCount(0);
+  await button.click();
+  const menu = page.getByRole("navigation", { name: "Kontomeny" });
+  for (const name of ["Slik fungerer det", "Meldinger", "Varsler", "Leieforhold", "Mine annonser", "Min profil"]) {
+    await expect(menu.getByRole("link", { name, exact: true })).toBeVisible();
+  }
+  await expect(page.getByRole("button", { name: "Logg ut" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(menu).toHaveCount(0);
+  await expect(button).toBeFocused();
+  await menu.waitFor({ state: "detached" });
+  await button.click();
+  await page.getByRole("navigation", { name: "Kontomeny" }).getByRole("link", { name: "Min profil" }).click();
+  await expect(page).toHaveURL(/\/konto$/);
+});
+
+test("a profile photo can be added, is shown to others and can be removed (D-061)", async ({
+  page,
+  browser,
+  isMobile,
+}) => {
+  test.skip(isMobile, "One run is enough; the header part needs the desktop layout.");
+  const email = uniqueEmail("bilde");
+  await registerAndVerify(page, email, "Per Bilde");
+  await page.goto("/konto");
+  await page.getByLabel("Velg bilde").setInputFiles(path.resolve("seed/demo-images/equipment-1.webp"));
+  await page.getByRole("button", { name: "Lagre bilde" }).click();
+  await expect(page.getByText("Profilbildet er lagret.")).toBeVisible();
+
+  const [row] = await query<{ id: string; avatar: string }>(
+    "SELECT u.id, p.avatar_media_id AS avatar FROM users u JOIN user_profiles p ON p.user_id = u.id WHERE u.email = $1",
+    [email],
+  );
+  expect(row?.avatar).toBeTruthy();
+  await page.reload();
+  await expect(page.locator(`header img[src="/media/${row!.avatar}/thumb"]`)).toBeVisible();
+
+  const visitor = await (await browser.newContext()).newPage();
+  await visitor.goto(`/profil/${row!.id}`);
+  await expect(visitor.locator(`main img[src="/media/${row!.avatar}/thumb"]`)).toBeVisible();
+  expect((await visitor.request.get(`/media/${row!.avatar}/thumb`)).status()).toBe(200);
+
+  await page.getByRole("button", { name: "Fjern bilde" }).click();
+  await expect(page.getByText("Profilbildet er fjernet.")).toBeVisible();
+  expect((await visitor.request.get(`/media/${row!.avatar}/thumb`)).status()).toBe(404);
+});

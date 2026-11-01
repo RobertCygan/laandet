@@ -1,7 +1,7 @@
 ---
 doc_key: privacy
 locale: en
-version: 1.0.0
+version: 1.1.0
 status: Current – not legally reviewed – informational translation
 updated: 01.11.2026
 translation_of: legal/nb/personvernerklaering.md
@@ -11,7 +11,7 @@ translation_of: legal/nb/personvernerklaering.md
 
 > **Informational translation.** The Norwegian version of this document is the legally binding one. If the two versions differ, the Norwegian text prevails.
 
-**Version 1.0.0 · Last updated 01.11.2026**
+**Version 1.1.0 · Last updated 01.11.2026**
 
 > This text was written with the help of AI and has not been reviewed by a lawyer.
 
@@ -30,8 +30,8 @@ organisation number (01.11.2026). The controller is therefore the person who run
 ## 2. In short
 
 - We do not ask for your national identity number (fødselsnummer), date of birth or home address.
-- Other users only see your display name, the area you live in, when you became a member and actual
-  statistics. Your email address is not shown.
+- Other users only see your display name, your profile photo if you have added one, the area you live
+  in, when you became a member and actual statistics. Your email address is not shown.
 - Messages, agreements, condition reports and cases can only be seen by those who are parties to them.
   Laandet staff only see them when you report something, or when you ask for help in a case. Every time a
   staff member sees the content, this is logged.
@@ -45,6 +45,7 @@ organisation number (01.11.2026). The controller is therefore the person who run
 | What | Why | Legal basis |
 |---|---|---|
 | **Account:** email, password (stored as a cryptographic hash), display name, email confirmation, confirmation that you are over 18 and a private person, language choice | Creating and running your account | Contract (Art. 6(1)(b) of the GDPR) |
+| **Profile photo (optional):** the photo you upload, without location data and other metadata | Showing who you are on your profile and next to your name | Contract (Art. 6(1)(b)) |
 | **Login:** sessions, IP address and browser type while the session lasts, and two-factor code for staff | Keeping you logged in and protecting the account | Contract and legitimate interest in security (Art. 6(1)(b) and (f)) |
 | **Profile:** area, short introduction, membership date, number of completed rentals, reviews | Making it easier to trust each other | Contract (Art. 6(1)(b)) |
 | **Listings and photos** | Showing what you offer, need or give away | Contract (Art. 6(1)(b)) |
@@ -65,8 +66,8 @@ is necessary for the case.
 
 ## 4. Who can see the data
 
-- **Everyone who visits Laandet:** published listings and photos, your display name, your area,
-  membership date, actual statistics and published reviews.
+- **Everyone who visits Laandet:** published listings and photos, your display name, your profile photo,
+  your area, membership date, actual statistics and published reviews.
 - **The other party in a conversation, a rental or a handover:** the messages, the agreement,
   the condition reports, the photos and the agreed meeting place.
 - **Laandet's moderators:**
@@ -100,6 +101,7 @@ standard contractual clauses. If so, we will say so here.
 | Account details | As long as you have an account. If you have not logged in for 24 months, we will send you an email. If you do not log in within 60 days after that, we delete the account. |
 | Login sessions, with IP address and browser type | Until the session expires, and no longer than 30 days |
 | Deleted listings and their photos | 30 days after the listing was deleted |
+| Profile photo | Until you replace or remove it, or delete your account. The old photo is deleted within a day. |
 | Messages | 12 months after the later of these dates: the last message in the conversation, or the end of the last rental in the conversation. Messages used in a case are stored together with the case. |
 | Agreements, acceptances, condition reports, photos and history for rentals and handovers | 3 years after the rental or handover has ended. This is the general limitation period for claims. |
 | Cases | 3 years after the case is closed. If a party shows that the case is being dealt with by the conciliation board (forliksrådet), in court or by the police, we store the data until those proceedings are finished. |
@@ -114,7 +116,7 @@ standard contractual clauses. If so, we will say so here.
 You can delete your account under "My profile". If you have an ongoing rental, a handover or
 an open case, it must be closed first. After that, we do the following within 30 days:
 
-- **We delete** your email address, password, introduction, area, listings you saved as favourites, notifications and
+- **We delete** your email address, password, profile photo, introduction, area, listings you saved as favourites, notifications and
   listings that are not linked to a rental, with their photos.
 - **We keep** agreements, condition reports, history and cases until the retention period in section 6
   has ended. This data is necessary so that the other party can document any claim. Your display name

@@ -51,7 +51,9 @@
     "closeMenu": "Close menu",
     "localStart": "Starting locally in Steigen",
     "otherLanguage": "Norsk",
-    "rentals": "Rentals"
+    "rentals": "Rentals",
+    "accountMenu": "Account menu",
+    "unreadSomething": "something unread"
   },
   "footer": {
     "tagline": "More use. Less buying. A little closer to each other.",
@@ -391,7 +393,14 @@
     "changeEmailHint": "We send a confirmation link to the new address.",
     "feedbackHeading": "Something not working?",
     "feedbackLead": "Tell us about errors, unclear texts or ideas. Laandet reads everything.",
-    "feedbackLink": "Give feedback"
+    "feedbackLink": "Give feedback",
+    "avatarHeading": "Profile photo",
+    "avatarHint": "Optional. The photo is shown to everyone on your profile and next to your name. We remove location data and other information from the image file. JPG, PNG or WebP, at most 10 MB.",
+    "avatarChoose": "Choose photo",
+    "avatarUpload": "Save photo",
+    "avatarRemove": "Remove photo",
+    "avatarSaved": "Your profile photo is saved.",
+    "avatarRemoved": "Your profile photo is removed."
   },
   "profile": {
     "memberSince": "Member since {date}",

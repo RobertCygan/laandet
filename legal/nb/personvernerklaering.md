@@ -1,14 +1,14 @@
 ---
 doc_key: privacy
 locale: nb
-version: 1.0.0
+version: 1.1.0
 status: Gjeldende – ikke juridisk gjennomgått
 updated: 01.11.2026
 ---
 
 # Personvernerklæring for Laandet
 
-**Versjon 1.0.0 · Sist oppdatert 01.11.2026**
+**Versjon 1.1.0 · Sist oppdatert 01.11.2026**
 
 > Teksten er skrevet med hjelp av KI og er ikke gjennomgått av jurist.
 
@@ -27,8 +27,8 @@ organisasjonsnummer (01.11.2026). Behandlingsansvarlig er derfor personen som dr
 ## 2. Kort fortalt
 
 - Vi spør ikke om fødselsnummer, fødselsdato eller hjemmeadresse.
-- Andre brukere ser bare visningsnavnet ditt, hvilket område du bor i, når du ble medlem og faktisk
-  statistikk. E-postadressen din vises ikke.
+- Andre brukere ser bare visningsnavnet ditt, profilbildet hvis du har lagt inn et, hvilket område du bor
+  i, når du ble medlem og faktisk statistikk. E-postadressen din vises ikke.
 - Meldinger, avtaler, tilstandsrapporter og saker kan bare de som er part i dem, se. Laandet-ansatte
   ser dem bare når du rapporterer noe, eller når du ber om hjelp i en sak. Hver gang en ansatt ser
   innholdet, blir det logget.
@@ -42,6 +42,7 @@ organisasjonsnummer (01.11.2026). Behandlingsansvarlig er derfor personen som dr
 | Hva | Hvorfor | Rettslig grunnlag |
 |---|---|---|
 | **Konto:** e-post, passord (lagret som kryptografisk hash), visningsnavn, bekreftelse av e-post, bekreftelse på at du er over 18 år og privatperson, språkvalg | Opprette og drive kontoen din | Avtale (personvernforordningen art. 6 nr. 1 b) |
+| **Profilbilde (valgfritt):** bildet du laster opp, uten posisjonsdata og andre metadata | Vise hvem du er på profilen din og ved navnet ditt | Avtale (art. 6 nr. 1 b) |
 | **Innlogging:** økter, IP-adresse og nettlesertype mens økten varer, og tofaktorkode for ansatte | Holde deg innlogget og beskytte kontoen | Avtale og berettiget interesse i sikkerhet (art. 6 nr. 1 b og f) |
 | **Profil:** område, kort presentasjon, medlemsdato, antall fullførte leieforhold, vurderinger | Gjøre det lettere å stole på hverandre | Avtale (art. 6 nr. 1 b) |
 | **Annonser og bilder** | Vise det du tilbyr, trenger eller gir bort | Avtale (art. 6 nr. 1 b) |
@@ -62,8 +63,8 @@ som er nødvendig for saken.
 
 ## 4. Hvem kan se opplysningene
 
-- **Alle som besøker Laandet:** publiserte annonser og bilder, visningsnavnet ditt, området ditt,
-  medlemsdato, faktisk statistikk og publiserte vurderinger.
+- **Alle som besøker Laandet:** publiserte annonser og bilder, visningsnavnet ditt, profilbildet ditt,
+  området ditt, medlemsdato, faktisk statistikk og publiserte vurderinger.
 - **Den andre parten i en samtale, et leieforhold eller en overlevering:** meldingene, avtalen,
   tilstandsrapportene, bildene og det avtalte møtestedet.
 - **Laandets moderatorer:**
@@ -97,6 +98,7 @@ standardkontraktsklausuler. Vi opplyser i så fall om det her.
 | Kontoopplysninger | Så lenge du har konto. Har du ikke logget inn på 24 måneder, sender vi deg en e-post. Logger du ikke inn innen 60 dager etter det, sletter vi kontoen. |
 | Innloggingsøkter, med IP-adresse og nettlesertype | Til økten utløper, og høyst 30 dager |
 | Slettede annonser og bildene deres | 30 dager etter at annonsen ble slettet |
+| Profilbilde | Til du bytter eller fjerner det, eller sletter kontoen. Det gamle bildet slettes innen ett døgn. |
 | Meldinger | 12 måneder etter den siste av disse datoene: siste melding i samtalen, eller slutten av siste leieforhold i samtalen. Meldinger som er brukt i en sak, lagres sammen med saken. |
 | Avtaler, godkjenninger, tilstandsrapporter, bilder og historikk for leieforhold og overleveringer | 3 år etter at leieforholdet eller overleveringen er avsluttet. Det er den alminnelige foreldelsesfristen for krav. |
 | Saker | 3 år etter at saken er avsluttet. Hvis en part viser at saken behandles i forliksrådet, i retten eller av politiet, lagrer vi opplysningene til den behandlingen er ferdig. |
@@ -111,7 +113,7 @@ standardkontraktsklausuler. Vi opplyser i så fall om det her.
 Du kan slette kontoen din under «Min profil». Hvis du har et pågående leieforhold, en overlevering eller
 en åpen sak, må den avsluttes først. Deretter gjør vi dette innen 30 dager:
 
-- **Vi sletter** e-postadressen din, passordet, presentasjonen, området, annonser du har lagret som favoritter, varsler og
+- **Vi sletter** e-postadressen din, passordet, profilbildet, presentasjonen, området, annonser du har lagret som favoritter, varsler og
   annonser som ikke er knyttet til et leieforhold, med bilder.
 - **Vi lagrer fortsatt** avtaler, tilstandsrapporter, historikk og saker til lagringstiden i punkt 6 er
   ute. Disse opplysningene er nødvendige for at den andre parten skal kunne dokumentere et eventuelt

@@ -6,7 +6,7 @@ import { signOutAction } from "@/modules/auth/actions";
 import { requirePageUser } from "@/modules/auth/guards";
 import { listLocalities } from "@/modules/listings/queries";
 import { getOwnProfile } from "@/modules/users/service";
-import { ChangeEmailForm, ChangePasswordForm, ProfileForm } from "@/ui/forms/AccountForms";
+import { AvatarForm, ChangeEmailForm, ChangePasswordForm, ProfileForm } from "@/ui/forms/AccountForms";
 import { ResendVerificationForm, SignOutEverywhereForm } from "@/ui/forms/AuthForms";
 import { NarrowPage, PageHeader } from "@/ui/layout/PageHeader";
 import { Notice } from "@/ui/Notice";
@@ -79,6 +79,13 @@ export default async function AccountPage({ params, searchParams }: PageProps<"/
               </div>
             </details>
           )}
+        </section>
+
+        <section className="card p-6" aria-labelledby="avatar-h">
+          <h2 id="avatar-h" className="mb-4 text-xl">
+            {t("avatarHeading")}
+          </h2>
+          <AvatarForm name={profile.name} mediaId={profile.avatarMediaId} />
         </section>
 
         <section className="card p-6" aria-labelledby="profile-h">

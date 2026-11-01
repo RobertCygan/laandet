@@ -51,7 +51,9 @@
     "closeMenu": "Lukk meny",
     "localStart": "Starter lokalt i Steigen",
     "otherLanguage": "English",
-    "rentals": "Leieforhold"
+    "rentals": "Leieforhold",
+    "accountMenu": "Kontomeny",
+    "unreadSomething": "noe ulest"
   },
   "footer": {
     "tagline": "Mer bruk. Mindre kjøp. Litt nærmere hverandre.",
@@ -391,7 +393,14 @@
     "changeEmailHint": "Vi sender en bekreftelseslenke til den nye adressen.",
     "feedbackHeading": "Noe som ikke virker?",
     "feedbackLead": "Fortell oss om feil, uklare tekster eller ideer. Alt leses av Laandet.",
-    "feedbackLink": "Gi tilbakemelding"
+    "feedbackLink": "Gi tilbakemelding",
+    "avatarHeading": "Profilbilde",
+    "avatarHint": "Valgfritt. Bildet vises for alle på profilen din og ved navnet ditt. Vi fjerner stedsdata og annen informasjon fra bildefilen. JPG, PNG eller WebP, høyst 10 MB.",
+    "avatarChoose": "Velg bilde",
+    "avatarUpload": "Lagre bilde",
+    "avatarRemove": "Fjern bilde",
+    "avatarSaved": "Profilbildet er lagret.",
+    "avatarRemoved": "Profilbildet er fjernet."
   },
   "profile": {
     "memberSince": "Medlem siden {date}",

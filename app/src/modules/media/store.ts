@@ -10,7 +10,7 @@ export interface MediaStore {
   delete(key: string): Promise<void>;
 }
 
-const KEY_RE = /^(listing|condition|dispute)\/[0-9a-f-]{36}(-thumb)?\.webp$/;
+const KEY_RE = /^(listing|condition|dispute|avatar)\/[0-9a-f-]{36}(-thumb)?\.webp$/;
 
 export function assertValidKey(key: string): void {
   if (!KEY_RE.test(key)) throw new Error("invalid media key");

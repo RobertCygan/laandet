@@ -45,6 +45,18 @@ export async function GET(_req: Request, ctx: RouteContext<"/media/[id]/[variant
     if (!(await mayViewDisputeMedia(await getActor(), id, m.uploadedBy))) return notFound();
     return serve(m, variant, false);
   }
+  if (m.scope === "avatar") {
+    // Profile photos (D-061): public while they are someone's current photo and the profile is visible;
+    // otherwise only for the person who uploaded them.
+    const [p] = await db
+      .select({ status: userProfiles.status })
+      .from(userProfiles)
+      .where(eq(userProfiles.avatarMediaId, id));
+    if (p && (p.status === "active" || p.status === "restricted")) return serve(m, variant, true);
+    const actor = await getActor();
+    if (actor.kind === "user" && actor.id === m.uploadedBy) return serve(m, variant, false);
+    return notFound();
+  }
   // Same visibility as the listing page: published, and the owner's account in good standing.
   if (m.listingStatus === "published" && (m.ownerStatus === "active" || m.ownerStatus === "restricted")) {
     isPublic = true;

@@ -63,6 +63,7 @@ export async function buildDataExport(actor: Actor, now = new Date()) {
       role: userProfiles.role,
       locale: userProfiles.locale,
       bio: userProfiles.bio,
+      avatarMediaId: userProfiles.avatarMediaId,
       locality: localities.name,
       emailNotifications: userProfiles.emailNotifications,
       age18ConfirmedAt: userProfiles.age18ConfirmedAt,

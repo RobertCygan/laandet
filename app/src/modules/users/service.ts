@@ -1,12 +1,13 @@
 import { and, desc, eq, inArray, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db/client";
-import { categories, listings, localities, userProfiles, users } from "@/db/schema";
+import { categories, listings, localities, mediaObjects, userProfiles, users } from "@/db/schema";
 import { recordAudit } from "@/modules/audit/audit";
 import { displayNameSchema } from "@/modules/auth/schemas";
 import type { Actor } from "@/modules/authz/actor-types";
 import { assertCan } from "@/modules/authz/policy";
 import { isFlagEnabled } from "@/modules/flags/flags";
+import { uploadImage } from "@/modules/media/service";
 import { completedRentalCount, listPublishedReviews, ratingSummary } from "@/modules/reviews/service";
 import { getRequestMeta } from "@/modules/server/request-meta";
 
@@ -62,6 +63,56 @@ export async function updateProfile(actor: Actor, input: ProfileInput): Promise<
   });
 }
 
+/**
+ * Set the profile photo (D-061): the upload goes through the listing-image pipeline (type check, re-encode,
+ * EXIF and GPS removed). The previous photo is marked deleted and removed by the media cleanup job.
+ */
+export async function setAvatar(actor: Actor, file: File): Promise<void> {
+  assertCan(actor, "profile.update", { type: "profile", userId: actor.kind === "user" ? actor.id : "" });
+  const uploaded = await uploadImage(actor, file, "avatar");
+  await replaceAvatar(actor.id, uploaded.id);
+}
+
+/** Remove the profile photo; the file is deleted by the media cleanup job. */
+export async function removeAvatar(actor: Actor): Promise<void> {
+  assertCan(actor, "profile.update", { type: "profile", userId: actor.kind === "user" ? actor.id : "" });
+  await replaceAvatar(actor.id, null);
+}
+
+/** The current profile photo of a person, for the header. */
+export async function getAvatarMediaId(userId: string): Promise<string | null> {
+  const [p] = await db
+    .select({ avatar: userProfiles.avatarMediaId })
+    .from(userProfiles)
+    .where(eq(userProfiles.userId, userId));
+  return p?.avatar ?? null;
+}
+
+async function replaceAvatar(userId: string, mediaId: string | null): Promise<void> {
+  const meta = await getRequestMeta();
+  await db.transaction(async (tx) => {
+    const [p] = await tx
+      .select({ old: userProfiles.avatarMediaId })
+      .from(userProfiles)
+      .where(eq(userProfiles.userId, userId))
+      .for("update");
+    await tx
+      .update(userProfiles)
+      .set({ avatarMediaId: mediaId, updatedAt: new Date() })
+      .where(eq(userProfiles.userId, userId));
+    if (p?.old && p.old !== mediaId) {
+      await tx.update(mediaObjects).set({ deletedAt: new Date() }).where(eq(mediaObjects.id, p.old));
+    }
+    await recordAudit(tx, {
+      actorId: userId,
+      action: mediaId ? "profile.avatar_set" : "profile.avatar_removed",
+      targetType: "user",
+      targetId: userId,
+      meta,
+    });
+  });
+}
+
 export async function getOwnProfile(actor: Actor) {
   if (actor.kind !== "user") return null;
   const [row] = await db
@@ -76,6 +127,7 @@ export async function getOwnProfile(actor: Actor) {
       emailNotifications: userProfiles.emailNotifications,
       status: userProfiles.status,
       role: userProfiles.role,
+      avatarMediaId: userProfiles.avatarMediaId,
       localitySlug: localities.slug,
     })
     .from(users)
@@ -95,6 +147,7 @@ export async function getPublicProfile(userId: string) {
       createdAt: users.createdAt,
       bio: userProfiles.bio,
       status: userProfiles.status,
+      avatarMediaId: userProfiles.avatarMediaId,
       localityName: localities.name,
     })
     .from(users)
@@ -134,6 +187,7 @@ export async function getPublicProfile(userId: string) {
     name: p.name,
     createdAt: p.createdAt,
     bio: p.bio,
+    avatarMediaId: p.avatarMediaId,
     localityName: p.localityName,
     activeListings: active,
     completedRentals,
