@@ -8,6 +8,7 @@
 #             scripts/load-legal.mjs               legal texts from /app/legal (D-023)
 #             scripts/grant-role.mjs               staff roles (AUTH_MODEL §2)
 #             scripts/seed.mjs                     reference data (+ --demo for staging)
+#             scripts/release-check.mjs            go/no-go blockers code can check (P04-02)
 # The tools are the same TypeScript sources that `npm run worker` etc. run through tsx in
 # development, bundled with esbuild so the image needs no second node_modules tree.
 #
@@ -35,6 +36,7 @@ COPY . .
 RUN npm run build
 # sharp stays external: it is resolved at runtime from the standalone node_modules in /app.
 RUN ./node_modules/.bin/esbuild worker/index.ts scripts/migrate.ts scripts/load-legal.ts scripts/grant-role.ts scripts/seed.ts \
+      scripts/release-check.ts \
       --bundle --platform=node --target=node22 --format=esm \
       --outdir=dist-tools --out-extension:.js=.mjs \
       --external:sharp --external:pg-native \
@@ -43,6 +45,9 @@ RUN ./node_modules/.bin/esbuild worker/index.ts scripts/migrate.ts scripts/load-
 
 # ---------------------------------------------------------------- runtime
 FROM ${NODE_IMAGE} AS runtime
+# HOSTNAME must stay 0.0.0.0. With another value (e.g. 127.0.0.1) Next.js treats the proxy's rewrite of
+# Norwegian pages to /nb/… as a request to another server: every Norwegian page then loops on 308, or
+# fails with 500 behind Caddy's X-Forwarded-Proto: https (seen in a local test on 01.11.2026).
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
     PORT=3000 \

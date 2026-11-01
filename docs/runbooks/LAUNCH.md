@@ -69,8 +69,13 @@ In `/opt/laandet/production/secrets/app.env` ([`SERVER_SETUP.md`](SERVER_SETUP.m
 the check.
 
 ### B2. Release check
-Run `npm run release:check` against the production database (P04-02; how to run it on the server is in
-`app/README.md`). It reports:
+Run the release check against the production database (P04-02). On the server, in the release directory:
+
+```sh
+docker compose -f compose.yaml run --rm tools node scripts/release-check.mjs
+```
+
+In development it is `npm run release:check`. It reports:
 - legal markers;
 - legal texts still stored as drafts;
 - demo listings in the production database;

@@ -64,6 +64,7 @@ Runbooks: `../docs/runbooks/` — SERVER_SETUP, DEPLOY, RESTORE, RESTORE_LOG, AC
 | migrations | `node scripts/migrate.mjs` (owner role) |
 | legal texts | `node scripts/load-legal.mjs [--allow-draft]` |
 | reference data | `node scripts/seed.mjs [--demo]` |
+| release check | `node scripts/release-check.mjs` (exits 1 while blockers remain) |
 | staff role | `node scripts/grant-role.mjs --email … --role moderator --reason "…"` |
 
 The tools are the TypeScript sources from `app/worker` and `app/scripts`, bundled with esbuild in the
