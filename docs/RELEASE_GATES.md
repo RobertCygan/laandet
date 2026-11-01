@@ -49,7 +49,7 @@ evidence for some of the rows below, not for all of them.
 | S-3 | Backup restore test performed and logged | ⏳ ❌ | Same as G4-5. | Eier, Developer |
 | S-4 | Negative authorisation tests green | ✅ (re-check on the release commit) | 79 policy unit tests and the negative integration tests per area ([`SECURITY_VERIFICATION.md`](SECURITY_VERIFICATION.md), SEC-20). | Developer |
 | S-5 | Owner account 2FA confirmed | ❌ | The owner confirms 2FA on GitHub, the hosting provider, the domain registrar, the email provider, backup storage and the Laandet admin account. | Eier |
-| S-6 | Privacy notice and terms published with real controller details, no `MÅ FYLLES UT` markers | ❌ | On 25.10.2026, `brukervilkar.md` (8 lines), `personvernerklaering.md` (9) and `retningslinjer-for-tvister.md` (3) still contain markers. `release:check` lists them. | Eier (details), Lawyer |
+| S-6 | Privacy notice and terms published with real controller details, no `MÅ FYLLES UT` markers | ❌ | On 01.11.2026 the legal name is filled in (GPSI GovTech Solution); `brukervilkar.md` (7 lines), `personvernerklaering.md` (8) and `retningslinjer-for-tvister.md` (3) still contain markers: organisation number, address, e-mail, the data processors and the points for the lawyer. `release:check` lists them. | Eier (details), Lawyer |
 
 ## Legal gate (LEGAL_REVIEW_CHECKLIST.md §3)
 

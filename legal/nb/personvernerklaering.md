@@ -1,14 +1,14 @@
 ---
 doc_key: privacy
 locale: nb
-version: 0.1.0-utkast
+version: 0.1.1-utkast
 status: UTKAST – ikke juridisk gjennomgått
-updated: 25.10.2026
+updated: 01.11.2026
 ---
 
 # Personvernerklæring for Laandet
 
-**Versjon 0.1.0-utkast · Sist oppdatert 25.10.2026**
+**Versjon 0.1.1-utkast · Sist oppdatert 01.11.2026**
 
 > **UTKAST – IKKE JURIDISK GJENNOMGÅTT.** Dette er et førsteutkast laget med hjelp av KI. Det må
 > gjennomgås av en kvalifisert jurist før lansering. Felter merket «MÅ FYLLES UT FØR LANSERING»
@@ -21,7 +21,7 @@ lagrer dem og hvilke rettigheter du har. Vi samler bare inn det vi trenger for �
 
 Behandlingsansvarlig for personopplysningene i Laandet er G-PSI.ai:
 
-- Juridisk navn: **[MÅ FYLLES UT FØR LANSERING]**
+- Juridisk navn: **GPSI GovTech Solution**
 - Organisasjonsnummer: **[MÅ FYLLES UT FØR LANSERING]**
 - Adresse: **[MÅ FYLLES UT FØR LANSERING]**
 - E-post for personvern: **[MÅ FYLLES UT FØR LANSERING]**

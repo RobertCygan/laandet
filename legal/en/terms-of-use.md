@@ -1,9 +1,9 @@
 ---
 doc_key: terms
 locale: en
-version: 0.1.0-utkast
+version: 0.1.1-utkast
 status: DRAFT – not legally reviewed – informational translation
-updated: 25.10.2026
+updated: 01.11.2026
 translation_of: legal/nb/brukervilkar.md
 ---
 
@@ -11,7 +11,7 @@ translation_of: legal/nb/brukervilkar.md
 
 > **Informational translation.** The Norwegian version of this document is the legally binding one. If the two versions differ, the Norwegian text prevails.
 
-**Version 0.1.0-utkast · Last updated 25.10.2026**
+**Version 0.1.1-utkast · Last updated 01.11.2026**
 
 > **DRAFT – NOT LEGALLY REVIEWED.** This is a first draft prepared with the help of AI. It has not
 > been approved by a lawyer, and it must not be used with users until a qualified Norwegian lawyer has
@@ -24,7 +24,7 @@ away physical things to each other. We are starting in Steigen municipality.
 
 1.2 Laandet is run by G-PSI.ai:
 
-- Legal name: **[MUST BE COMPLETED BEFORE LAUNCH]**
+- Legal name: **GPSI GovTech Solution**
 - Organisation number: **[MUST BE COMPLETED BEFORE LAUNCH]**
 - Address: **[MUST BE COMPLETED BEFORE LAUNCH]**
 - Email: **[MUST BE COMPLETED BEFORE LAUNCH]**

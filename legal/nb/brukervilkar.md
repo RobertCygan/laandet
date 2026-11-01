@@ -1,14 +1,14 @@
 ---
 doc_key: terms
 locale: nb
-version: 0.1.0-utkast
+version: 0.1.1-utkast
 status: UTKAST – ikke juridisk gjennomgått
-updated: 25.10.2026
+updated: 01.11.2026
 ---
 
 # Brukervilkår for Laandet
 
-**Versjon 0.1.0-utkast · Sist oppdatert 25.10.2026**
+**Versjon 0.1.1-utkast · Sist oppdatert 01.11.2026**
 
 > **UTKAST – IKKE JURIDISK GJENNOMGÅTT.** Dette er et førsteutkast laget med hjelp av KI. Det er ikke
 > godkjent av advokat, og det skal ikke brukes overfor brukere før en kvalifisert norsk jurist har
@@ -21,7 +21,7 @@ ting til hverandre. Vi starter i Steigen kommune.
 
 1.2 Laandet drives av G-PSI.ai:
 
-- Juridisk navn: **[MÅ FYLLES UT FØR LANSERING]**
+- Juridisk navn: **GPSI GovTech Solution**
 - Organisasjonsnummer: **[MÅ FYLLES UT FØR LANSERING]**
 - Adresse: **[MÅ FYLLES UT FØR LANSERING]**
 - E-post: **[MÅ FYLLES UT FØR LANSERING]**
