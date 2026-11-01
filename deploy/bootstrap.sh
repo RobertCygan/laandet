@@ -282,7 +282,9 @@ cat >/usr/local/bin/laandet-admin <<'EOF'
 set -euo pipefail
 email=${1:?usage: laandet-admin <e-mail> [admin|moderator|user]}
 role=${2:-admin}
-cd /opt/laandet/production/current
+# The real release directory, as deploy.sh uses it: through the "current" link, Compose would see a
+# different bind-mount path for the database and restart it.
+cd "$(readlink -f /opt/laandet/production/current)"
 LAANDET_IMAGE=laandet-app:$(cat /opt/laandet/production/current-tag) LAANDET_SECRETS_DIR=/opt/laandet/production/secrets \
   docker compose -f compose.yaml run --rm tools node scripts/grant-role.mjs \
   --email "$email" --role "$role" --reason "Satt av eieren på serveren $(date +%d.%m.%Y)"
