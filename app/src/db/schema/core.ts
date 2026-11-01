@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  type AnyPgColumn,
   bigint,
   boolean,
   check,
@@ -15,6 +16,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { users } from "./auth";
+import { mediaObjects } from "./catalog";
 
 const ts = (name: string) => timestamp(name, { withTimezone: true });
 
@@ -47,6 +49,8 @@ export const userProfiles = pgTable(
       .references(() => users.id, { onDelete: "cascade" }),
     localityId: uuid("locality_id").references(() => localities.id),
     bio: text("bio"),
+    // Optional profile photo (D-061): shown publicly on the profile and in the header.
+    avatarMediaId: uuid("avatar_media_id").references((): AnyPgColumn => mediaObjects.id, { onDelete: "set null" }),
     locale: text("locale", { enum: LOCALES }).notNull().default("nb"),
     role: text("role", { enum: ROLES }).notNull().default("user"),
     status: text("status", { enum: ACCOUNT_STATUSES }).notNull().default("active"),

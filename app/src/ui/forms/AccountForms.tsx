@@ -9,7 +9,8 @@ import {
   startTwoFactorAction,
 } from "@/modules/auth/actions";
 import { idle } from "@/modules/server/action";
-import { updateProfileAction } from "@/modules/users/actions";
+import { removeAvatarAction, setAvatarAction, updateProfileAction } from "@/modules/users/actions";
+import { Avatar } from "@/ui/Avatar";
 import { Notice } from "@/ui/Notice";
 import { SubmitButton } from "@/ui/SubmitButton";
 import { FieldError, FormError, invalid, prev } from "./FormMessages";
@@ -231,5 +232,44 @@ export function ChangeEmailForm({ locale }: { locale: "nb" | "en" }) {
         {t("changeEmailButton")}
       </SubmitButton>
     </form>
+  );
+}
+
+/** Upload, replace or remove the profile photo (D-061). */
+export function AvatarForm({ name, mediaId }: { name: string; mediaId: string | null }) {
+  const t = useTranslations("account");
+  const [upState, upload] = useActionState(setAvatarAction, idle);
+  const [rmState, remove] = useActionState(removeAvatarAction, idle);
+  return (
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+      <Avatar name={name} mediaId={mediaId} size="lg" />
+      <div className="flex flex-1 flex-col gap-3">
+        <p className="text-sm text-muted">{t("avatarHint")}</p>
+        <FormError state={upState} />
+        <FormError state={rmState} />
+        {upState.status === "ok" && (
+          <Notice tone="success" role="status">
+            {t("avatarSaved")}
+          </Notice>
+        )}
+        {rmState.status === "ok" && (
+          <Notice tone="success" role="status">
+            {t("avatarRemoved")}
+          </Notice>
+        )}
+        <form action={upload} className="flex flex-wrap items-end gap-3">
+          <label className="field">
+            {t("avatarChoose")}
+            <input type="file" name="avatar" accept="image/jpeg,image/png,image/webp" required />
+          </label>
+          <SubmitButton className="button button-primary">{t("avatarUpload")}</SubmitButton>
+        </form>
+        {mediaId && (
+          <form action={remove}>
+            <SubmitButton className="button button-subtle">{t("avatarRemove")}</SubmitButton>
+          </form>
+        )}
+      </div>
+    </div>
   );
 }

@@ -564,3 +564,14 @@ during Phase 01 start as *Proposed* (implementation-level) unless the owner says
   - No closed beta and no mobile usability session before launch (G4-6). Problems are found by real users.
   - 1 vCPU: slower photo uploads and page loads at peaks. The fix is a larger plan (KVM 2).
 - **Status:** Accepted 01.11.2026 (owner decisions in chat).
+
+## D-061 — Account menu in the header and optional profile photos
+- **Context:** The owner, 01.11.2026: the header wrapped «Ønskes leid» and «Gis bort» onto two lines and looked untidy. He asked for a separate section with the user's name and a profile photo, holding «Slik fungerer det», «Meldinger», «Varsler», «Leieforhold», «Mine annonser» and «Min profil».
+- **Decision:**
+  - **Header:** signed in, the main menu holds only Utforsk, Kategorier, Ønskes leid and Gis bort, each on one line. An account button with the photo (or the first letter of the name) and the name opens a menu with the other links, «Administrasjon» for staff and «Logg ut». A dot on the button shows unread messages or notices. Signed out, nothing changes. Phones keep the menu button.
+  - **Profile photo:** optional, set under «Min profil». It goes through the listing-photo pipeline (type sniffing, re-encoding to WebP, EXIF and GPS removed) and needs a verified email, like listing photos. It is public while the profile is visible (active or restricted) and otherwise only for its owner. A replaced or removed photo is deleted by the hourly media cleanup; account erasure removes it too. It is part of the data export and every change is audited.
+  - Migration `0012_avatars`: media scope `avatar`, `user_profiles.avatar_media_id`.
+  - The privacy notice (nb, en) becomes version 1.1.0: the photo in the data table, who sees it, how long it is kept, and erasure.
+- **Not included:** cropping in the browser (the photo is shown cut to a circle), and a staff action to remove one photo; a moderator can still restrict or suspend an account, which hides it.
+- **Status:** Accepted 01.11.2026 (owner request).
+

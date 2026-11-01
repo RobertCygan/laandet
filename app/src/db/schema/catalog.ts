@@ -115,7 +115,7 @@ export const screeningKeywords = pgTable("screening_keywords", {
   createdAt: ts("created_at").notNull().defaultNow(),
 });
 
-export const MEDIA_SCOPES = ["listing", "condition", "dispute"] as const;
+export const MEDIA_SCOPES = ["listing", "condition", "dispute", "avatar"] as const;
 export type MediaScope = (typeof MEDIA_SCOPES)[number];
 
 export const mediaObjects = pgTable(
@@ -135,7 +135,7 @@ export const mediaObjects = pgTable(
     deletedAt: ts("deleted_at"),
   },
   (t) => [
-    check("media_scope_chk", sql`${t.scope} IN ('listing','condition','dispute')`),
+    check("media_scope_chk", sql`${t.scope} IN ('listing','condition','dispute','avatar')`),
     check("media_mime_chk", sql`${t.mimeType} = 'image/webp'`),
     check("media_bytes_chk", sql`${t.bytes} > 0 AND ${t.bytes} <= 5000000`),
     check("media_dims_chk", sql`${t.width} BETWEEN 1 AND 4000 AND ${t.height} BETWEEN 1 AND 4000`),

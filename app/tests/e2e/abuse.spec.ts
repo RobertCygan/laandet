@@ -30,8 +30,9 @@ test("N9: HTML and script in names and listings are shown as text and never run"
 
   await page.goto(`/annonse/${id}`);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(title);
-  await expect(page.getByText(evilName)).toBeVisible();
-  expect(await page.locator('main img[src="x"], main iframe, main b[onmouseover]').count()).toBe(0);
+  // The name is also in the header's account menu now; this checks the one on the listing.
+  await expect(page.getByRole("main").getByText(evilName)).toBeVisible();
+  expect(await page.locator('main img[src="x"], main iframe, b[onmouseover]').count()).toBe(0);
   expect(await page.locator("main script").count()).toBe(0);
   await page.goto("/utforsk?q=Drill");
   await page.waitForLoadState("networkidle");

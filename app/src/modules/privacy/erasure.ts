@@ -12,6 +12,7 @@ import {
   listingImages,
   listings,
   listingUnavailability,
+  mediaObjects,
   notifications,
   savedListings,
   sessions,
@@ -134,6 +135,13 @@ export async function eraseAccount(userId: string): Promise<void> {
     await tx.delete(userBlocks).where(or(eq(userBlocks.blockerId, userId), eq(userBlocks.blockedId, userId)));
     await tx.delete(notifications).where(eq(notifications.userId, userId));
     await tx.delete(feedback).where(eq(feedback.userId, userId));
+    // Profile photos (D-061): marked deleted here; the media cleanup job removes the files.
+    await tx
+      .update(mediaObjects)
+      .set({ deletedAt: now })
+      .where(
+        and(eq(mediaObjects.uploadedBy, userId), eq(mediaObjects.scope, "avatar"), isNull(mediaObjects.deletedAt)),
+      );
     await tx.delete(emailOutbox).where(eq(emailOutbox.toUserId, userId));
 
     // Listings: images always go; the row goes when no rental, claim or conversation refers to it.
@@ -173,6 +181,7 @@ export async function eraseAccount(userId: string): Promise<void> {
         role: "user",
         bio: null,
         localityId: null,
+        avatarMediaId: null,
         deletedAt: now,
         statusChangedAt: now,
         updatedAt: now,

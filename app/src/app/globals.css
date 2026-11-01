@@ -307,6 +307,113 @@
   }
   .desktop-nav a {
     padding-block: 12px;
+    white-space: nowrap;
+  }
+
+  /* Signed-in account menu (UserMenu) and avatars */
+  .user-menu {
+    position: relative;
+  }
+  .user-menu-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px 5px 5px;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-elevated);
+    font-size: 15px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .user-menu-button:hover,
+  .user-menu-button[aria-expanded="true"] {
+    border-color: var(--color-primary);
+  }
+  .user-menu-name {
+    max-width: 14ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .user-menu-avatar-wrap {
+    position: relative;
+    display: inline-flex;
+  }
+  .user-menu-dot {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 12px;
+    height: 12px;
+    border: 2px solid var(--color-elevated);
+    border-radius: 50%;
+    background: var(--color-danger);
+  }
+  .user-menu-panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 40;
+    min-width: 250px;
+    padding: 8px;
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    background: var(--color-elevated);
+    box-shadow: 0 12px 32px rgb(37 59 50 / 0.14);
+  }
+  .user-menu-panel a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 9px;
+    font-size: 16px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .user-menu-panel a:hover,
+  .user-menu-panel a[aria-current="page"] {
+    background: var(--color-secondary);
+    color: var(--color-primary);
+  }
+  .menu-signout {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 9px;
+    color: var(--color-muted);
+    font-size: 16px;
+    font-weight: 600;
+    text-align: left;
+  }
+  .menu-signout:hover {
+    background: var(--color-secondary);
+    color: var(--color-text);
+  }
+  .avatar {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: #fff;
+    font-weight: 700;
+  }
+  .avatar-photo {
+    object-fit: cover;
+    background: var(--color-surface);
+  }
+  .avatar-sm {
+    width: 34px;
+    height: 34px;
+    font-size: 15px;
+  }
+  .avatar-lg {
+    width: 80px;
+    height: 80px;
+    font-size: 30px;
   }
   .desktop-nav a:hover,
   .desktop-nav a[aria-current="page"] {

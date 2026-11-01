@@ -2,16 +2,25 @@ import { sql } from "drizzle-orm";
 import type { DbOrTx } from "@/db/client";
 import { mediaStore } from "./store";
 
-/** Delete listing uploads never attached to a listing within 24 h, and soft-deleted media. */
+/**
+ * Delete listing uploads never attached to a listing within 24 h, and soft-deleted media. Profile photos
+ * (D-061) go as soon as they are replaced or removed, and uploads never set as a photo after 24 h.
+ */
 export async function deleteOrphanMedia(db: DbOrTx): Promise<number> {
   const rows = await db.execute<{ id: string; storage_key: string; thumb_key: string }>(sql`
     DELETE FROM media_objects m
-    WHERE m.scope = 'listing'
-      AND (
-        (m.created_at < now() - interval '24 hours'
-          AND NOT EXISTS (SELECT 1 FROM listing_images li WHERE li.media_id = m.id))
-        OR (m.deleted_at IS NOT NULL AND m.deleted_at < now() - interval '30 days'
-          AND NOT EXISTS (SELECT 1 FROM listing_images li WHERE li.media_id = m.id))
+    WHERE (
+        m.scope = 'listing'
+        AND (
+          (m.created_at < now() - interval '24 hours'
+            AND NOT EXISTS (SELECT 1 FROM listing_images li WHERE li.media_id = m.id))
+          OR (m.deleted_at IS NOT NULL AND m.deleted_at < now() - interval '30 days'
+            AND NOT EXISTS (SELECT 1 FROM listing_images li WHERE li.media_id = m.id))
+        )
+      ) OR (
+        m.scope = 'avatar'
+        AND NOT EXISTS (SELECT 1 FROM user_profiles p WHERE p.avatar_media_id = m.id)
+        AND (m.deleted_at IS NOT NULL OR m.created_at < now() - interval '24 hours')
       )
     RETURNING m.id, m.storage_key, m.thumb_key
   `);
