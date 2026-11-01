@@ -99,6 +99,7 @@ export async function staffWithTotp(page: Page, role: "admin" | "moderator" = "a
   await expect(page).toHaveURL(/\/konto\/tofaktor/);
   await page.getByLabel("Passord").fill("en lang og trygg setning");
   await page.getByRole("button", { name: "Start oppsett" }).click();
+  await expect(page.getByRole("img", { name: "QR-kode for tofaktorinnlogging i Laandet" })).toBeVisible();
   const secret = (await page.locator("code").first().textContent())!.replace(/\s/g, "");
   await page.getByLabel("Kode").fill(totp(secret));
   await page.getByRole("button", { name: "Bekreft med kode" }).click();

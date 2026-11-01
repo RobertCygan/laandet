@@ -536,7 +536,7 @@
     "setup2faTitle": "Sett opp tofaktorinnlogging",
     "setup2faLead": "Skriv inn passordet ditt. Du får en nøkkel som du legger inn i en autentiseringsapp. Bekreft deretter med en kode fra appen.",
     "setup2faStart": "Start oppsett",
-    "setup2faUri": "Legg inn denne nøkkelen i appen (eller bruk lenken på mobilen):",
+    "setup2faUri": "Eller skriv inn nøkkelen i appen (eller bruk lenken på mobilen):",
     "setup2faBackup": "Reservekoder (vises bare nå – lagre dem trygt):",
     "setup2faVerify": "Bekreft med kode",
     "setup2faDone": "Tofaktorinnlogging er slått på.",
@@ -617,7 +617,9 @@
       "review_restored": "Gjenopprettet vurdering",
       "message_redacted": "Skjult melding"
     },
-    "removeReview": "Fjern vurderingen"
+    "removeReview": "Fjern vurderingen",
+    "setup2faQr": "Skann koden med autentiseringsappen (Google Authenticator, Microsoft Authenticator e.l.):",
+    "setup2faQrAlt": "QR-kode for tofaktorinnlogging i Laandet"
   },
   "errors": {
     "auth_required": "Du må logge inn først.",

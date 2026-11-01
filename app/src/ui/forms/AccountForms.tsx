@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useState } from "react";
+import QRCode from "qrcode";
 import { useTranslations } from "next-intl";
 import {
   changeEmailAction,
@@ -102,6 +103,24 @@ export function ProfileForm({
   );
 }
 
+/** The otpauth:// link as a QR code for the authenticator app, made in the browser (no third party). */
+function TotpQr({ uri, label }: { uri: string; label: string }) {
+  const [src, setSrc] = useState<string | null>(null);
+  useEffect(() => {
+    let live = true;
+    QRCode.toString(uri, { type: "svg", margin: 2, errorCorrectionLevel: "M" }).then(
+      (svg) => live && setSrc(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`),
+      () => live && setSrc(null),
+    );
+    return () => {
+      live = false;
+    };
+  }, [uri]);
+  if (!src) return null;
+  // eslint-disable-next-line @next/next/no-img-element -- a generated data: SVG, not a remote image
+  return <img src={src} alt={label} width={220} height={220} className="rounded-md bg-white p-2" />;
+}
+
 /** Staff 2FA setup: password → key + backup codes (shown once) → confirm with a code. */
 export function TwoFactorSetup() {
   const t = useTranslations("admin");
@@ -128,6 +147,10 @@ export function TwoFactorSetup() {
   const { secret, totpURI, backupCodes } = start.data;
   return (
     <div className="flex flex-col gap-6">
+      <div>
+        <p className="mb-2">{t("setup2faQr")}</p>
+        <TotpQr uri={totpURI} label={t("setup2faQrAlt")} />
+      </div>
       <div>
         <p className="mb-2">{t("setup2faUri")}</p>
         <code className="block rounded-md bg-surface p-3 text-lg break-all select-all">
