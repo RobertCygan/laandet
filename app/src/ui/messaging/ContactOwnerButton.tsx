@@ -18,7 +18,7 @@ export async function ContactOwnerButton({
 }: {
   listingId: string;
   ownerId: string;
-  listingType: "rent_out" | "wanted" | "give_away";
+  listingType: "rent_out" | "wanted" | "give_away" | "service_offer" | "service_wanted";
   available: boolean;
   locale: "nb" | "en";
 }) {

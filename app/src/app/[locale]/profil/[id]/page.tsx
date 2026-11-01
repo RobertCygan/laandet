@@ -48,9 +48,17 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
             </span>
           )}
         </p>
+        {p.business && (
+          <p className="flex flex-wrap items-center gap-2">
+            <span className="badge badge-business">{t("businessBadge")}</span>
+            <span>
+              {p.business.name} · {t("orgNumber", { number: p.business.orgNumber ?? "" })}
+            </span>
+          </p>
+        )}
         {p.completedRentals > 0 && <p>{t("completedRentals", { count: p.completedRentals })}</p>}
         {p.bio && <p className="whitespace-pre-line">{p.bio}</p>}
-        <p className="fine-print">{t("notVerified")}</p>
+        <p className="fine-print">{p.business ? t("businessVerified") : t("notVerified")}</p>
       </header>
 
       <section aria-labelledby="active-h">

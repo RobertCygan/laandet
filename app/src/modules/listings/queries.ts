@@ -8,6 +8,7 @@ import {
   savedListings,
   userProfiles,
   users,
+  SERVICE_TYPES,
   type ListingType,
   type LocalizedText,
   type PriceUnit,
@@ -30,11 +31,14 @@ export type ListingSummary = {
   localityName: string;
   thumbId: string | null;
   imageAlt: string | null;
+  /** Set when a business account posted it (D-063). */
+  businessName: string | null;
 };
 
 export type SearchFilters = {
   q?: string;
-  type?: ListingType;
+  /** "services" = both service types (the «Tjenester» tab). */
+  type?: ListingType | "services";
   category?: string; // slug
   locality?: string; // slug
   minPriceOre?: number;
@@ -81,13 +85,17 @@ const summaryColumns = {
   localityName: localities.name,
   thumbId: firstImage,
   imageAlt: firstAlt,
+  businessName: sql<
+    string | null
+  >`CASE WHEN ${userProfiles.accountType} = 'business' THEN ${userProfiles.businessName} END`,
 };
 
 /** Explore page search (D-019). Ranking: newest first, or lowest price (stated publicly, L-03). */
 export async function searchListings(f: SearchFilters): Promise<{ items: ListingSummary[]; hasMore: boolean }> {
   const showDemo = await isFlagEnabled(db, "show_demo_listings");
   const where = visibleConditions(showDemo);
-  if (f.type) where.push(eq(listings.type, f.type));
+  if (f.type === "services") where.push(inArray(listings.type, [...SERVICE_TYPES]));
+  else if (f.type) where.push(eq(listings.type, f.type));
   if (f.category) {
     where.push(
       sql`${listings.categoryId} IN (SELECT id FROM categories WHERE slug = ${f.category} OR parent_id = (SELECT id FROM categories WHERE slug = ${f.category}))`,
@@ -134,7 +142,7 @@ export async function searchListings(f: SearchFilters): Promise<{ items: Listing
   return { items: rows.slice(0, PAGE_SIZE), hasMore: rows.length > PAGE_SIZE };
 }
 
-export async function latestListings(type: ListingType, limit: number): Promise<ListingSummary[]> {
+export async function latestListings(type: ListingType | "services", limit: number): Promise<ListingSummary[]> {
   const showDemo = await isFlagEnabled(db, "show_demo_listings");
   return db
     .select(summaryColumns)
@@ -142,7 +150,12 @@ export async function latestListings(type: ListingType, limit: number): Promise<
     .innerJoin(categories, eq(categories.id, listings.categoryId))
     .innerJoin(localities, eq(localities.id, listings.localityId))
     .innerJoin(userProfiles, eq(userProfiles.userId, listings.ownerId))
-    .where(and(...visibleConditions(showDemo), eq(listings.type, type)))
+    .where(
+      and(
+        ...visibleConditions(showDemo),
+        type === "services" ? inArray(listings.type, [...SERVICE_TYPES]) : eq(listings.type, type),
+      ),
+    )
     .orderBy(sql`${listings.isDemo} ASC`, desc(listings.publishedAt))
     .limit(limit);
 }
@@ -199,7 +212,15 @@ async function loadDetail(id: string) {
         allowPaidRental: categories.allowPaidRental,
       },
       locality: { name: localities.name, slug: localities.slug },
-      owner: { id: users.id, name: users.name, createdAt: users.createdAt, status: userProfiles.status },
+      owner: {
+        id: users.id,
+        name: users.name,
+        createdAt: users.createdAt,
+        status: userProfiles.status,
+        accountType: userProfiles.accountType,
+        businessName: userProfiles.businessName,
+        orgNumber: userProfiles.orgNumber,
+      },
     })
     .from(listings)
     .innerJoin(categories, eq(categories.id, listings.categoryId))

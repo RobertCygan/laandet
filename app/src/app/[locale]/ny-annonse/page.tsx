@@ -7,6 +7,7 @@ import { can } from "@/modules/authz/policy";
 import { flagEnabled } from "@/modules/flags/flags";
 import { pendingAcceptances } from "@/modules/legal/acceptance";
 import { emptyInitial, wizardOptions } from "@/modules/listings/wizard";
+import { getAccountType } from "@/modules/users/service";
 import { ResendVerificationForm } from "@/ui/forms/AuthForms";
 import { PageHeader } from "@/ui/layout/PageHeader";
 import { ListingWizard } from "@/ui/listings/ListingWizard";
@@ -17,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("titleNew") };
 }
 
-const TYPES = ["rent_out", "wanted", "give_away"] as const;
+const TYPES = ["rent_out", "wanted", "give_away", "service_offer", "service_wanted"] as const;
 
 export default async function NewListingPage({ params, searchParams }: PageProps<"/[locale]/ny-annonse">) {
   const locale = await pageLocale(params);
@@ -29,7 +30,8 @@ export default async function NewListingPage({ params, searchParams }: PageProps
   const ta = await getTranslations("auth");
   const te = await getTranslations("errors");
   const typeParam = param((await searchParams).type);
-  const type = TYPES.find((x) => x === typeParam);
+  const business = (await getAccountType(actor.id)) === "business";
+  const type = TYPES.find((x) => x === typeParam && (!business || x.startsWith("service_")));
   const decision = can(actor, "listing.create");
   const open = await flagEnabled("listings_open");
 
@@ -52,7 +54,12 @@ export default async function NewListingPage({ params, searchParams }: PageProps
       <PageHeader title={t("titleNew")} lead={t("lead")} />
       {blocker ?? (
         <div className="card p-5 sm:p-8">
-          <ListingWizard locale={locale} {...await wizardOptions()} initial={emptyInitial(type)} />
+          <ListingWizard
+            locale={locale}
+            {...await wizardOptions()}
+            initial={emptyInitial(type)}
+            servicesOnly={business}
+          />
         </div>
       )}
     </div>

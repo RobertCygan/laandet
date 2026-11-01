@@ -1,10 +1,10 @@
-import type { PriceUnit } from "@/db/schema";
+import type { RentalPriceUnit } from "@/db/schema";
 
 /** Rental price arithmetic (pure; used by the request form preview and by the server). */
 const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
 /** A «helg» covers up to three days (for example Friday afternoon to Sunday evening). */
-const UNIT_MS: Record<PriceUnit, number> = { hour: HOUR, day: DAY, weekend: 3 * DAY, week: 7 * DAY };
+const UNIT_MS: Record<RentalPriceUnit, number> = { hour: HOUR, day: DAY, weekend: 3 * DAY, week: 7 * DAY };
 
 export const MAX_UNITS = 366;
 export const MAX_PERIOD_DAYS = 60;
@@ -13,7 +13,7 @@ export const MAX_START_AHEAD_DAYS = 180;
 export type PeriodError =
   "period_order" | "period_in_past" | "period_too_long" | "period_too_far_ahead" | "too_many_units";
 
-export function units(start: Date, end: Date, unit: PriceUnit): number {
+export function units(start: Date, end: Date, unit: RentalPriceUnit): number {
   return Math.max(1, Math.ceil((end.getTime() - start.getTime()) / UNIT_MS[unit]));
 }
 
@@ -24,7 +24,7 @@ export function totalOre(priceOre: number, n: number): number {
 }
 
 /** Validates a requested period; `now` is injectable for tests. */
-export function periodError(start: Date, end: Date, unit: PriceUnit, now = new Date()): PeriodError | null {
+export function periodError(start: Date, end: Date, unit: RentalPriceUnit, now = new Date()): PeriodError | null {
   if (!(end.getTime() > start.getTime())) return "period_order";
   if (start.getTime() < now.getTime() - 15 * 60 * 1000) return "period_in_past";
   if (end.getTime() - start.getTime() > MAX_PERIOD_DAYS * DAY) return "period_too_long";

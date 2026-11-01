@@ -53,7 +53,8 @@
     "otherLanguage": "Norsk",
     "rentals": "Rentals",
     "accountMenu": "Account menu",
-    "unreadSomething": "something unread"
+    "unreadSomething": "something unread",
+    "services": "Services"
   },
   "footer": {
     "tagline": "More use. Less buying. A little closer to each other.",
@@ -107,7 +108,8 @@
     "rentalsSoon": "Requests, rental agreements and condition reports open soon. You can already post listings.",
     "introTitle": "GPSI GovTech Solutions – logo animation",
     "introOpening": "Opening Laandet",
-    "introSkip": "Skip intro"
+    "introSkip": "Skip intro",
+    "servicesHeading": "Services nearby"
   },
   "listing": {
     "demoBadge": "Example",
@@ -122,13 +124,17 @@
     "type": {
       "rent_out": "For rent",
       "wanted": "Wanted",
-      "give_away": "Giving away"
+      "give_away": "Giving away",
+      "service_offer": "Service offered",
+      "service_wanted": "Service wanted"
     },
     "unit": {
       "hour": "hour",
       "day": "day",
       "weekend": "weekend",
-      "week": "week"
+      "week": "week",
+      "sqm": "m²",
+      "job": "whole job"
     },
     "condition": {
       "new": "New",
@@ -147,7 +153,15 @@
       "archived": "Archived",
       "removed": "Hidden by Laandet",
       "deleted": "Deleted"
-    }
+    },
+    "perUnit": {
+      "hour": "per hour",
+      "sqm": "per m²",
+      "job": "for the whole job"
+    },
+    "byAgreement": "Price by agreement",
+    "services": "Services",
+    "businessBadge": "Business"
   },
   "detail": {
     "back": "All listings",
@@ -192,7 +206,11 @@
     "removedNotice": "This listing has been hidden by Laandet.",
     "seeDecision": "See the reasons and appeal",
     "sendRequest": "Send request",
-    "ownerRequestsLink": "See requests and rentals"
+    "ownerRequestsLink": "See requests and rentals",
+    "aboutService": "About the service",
+    "serviceNote": "You agree on time, price and payment directly. No payment goes through Laandet.",
+    "orgNumber": "org. no. {number}",
+    "businessNote": "The business is registered in the Central Coordinating Register and is itself responsible for the service and its prices (including any VAT)."
   },
   "explore": {
     "title": "Explore nearby",
@@ -297,7 +315,16 @@
     "warnContact": "The description seems to contain contact details. It is better to share contact details in messages once you have agreed.",
     "typeLocked": "The type cannot be changed after the listing has been created.",
     "giveFreeNote": "Free – Laandet charges no fee.",
-    "warnKeywords": "This listing may concern a prohibited or restricted item. Please check the rules. If you publish, a moderator will review it."
+    "warnKeywords": "This listing may concern a prohibited or restricted item. Please check the rules. If you publish, a moderator will review it.",
+    "typeServiceOffer": "Offer a service",
+    "typeServiceOfferHint": "Gardening, snow clearing, pet sitting, classes – paid or free.",
+    "typeServiceWanted": "Need help",
+    "typeServiceWantedHint": "Ask for help with a job, e.g. mowing the lawn.",
+    "businessServicesOnly": "Business accounts can post services. Renting out and giving away are for private people.",
+    "serviceFreeLabel": "Free (e.g. volunteering or community work)",
+    "serviceBudgetLabel": "What can you pay?",
+    "servicePriceHint": "Leave empty for «price by agreement».",
+    "serviceNote": "Laandet only puts you in touch. You agree on time, price and payment directly – no payment goes through Laandet."
   },
   "myListings": {
     "title": "My listings",
@@ -352,7 +379,16 @@
     "verifiedBanner": "Your email address is confirmed. Welcome to Laandet!",
     "unverifiedBanner": "Confirm your email address to post listings.",
     "resendForMe": "Send the confirmation link again",
-    "website": "Website (leave empty)"
+    "website": "Website (leave empty)",
+    "accountType": "Who is creating the account?",
+    "accountPrivate": "Private person",
+    "accountPrivateHint": "Borrow, rent out, give away and help each other.",
+    "accountBusiness": "Business or association",
+    "accountBusinessHint": "Offer services with an organisation number.",
+    "orgNumber": "Organisation number",
+    "orgNumberHint": "9 digits. We check it in the Central Coordinating Register (Brønnøysund) and show the registered name.",
+    "nameHintBusiness": "The name others see, e.g. the contact person «Kari N.».",
+    "businessTermsNote": "Business accounts can only post services. Renting out and giving away are for private people."
   },
   "account": {
     "title": "My profile",
@@ -413,7 +449,10 @@
     "report": "Report profile",
     "completedRentals": "{count, plural, one {# completed rental} other {# completed rentals}}",
     "reviews": "Reviews",
-    "noReviews": "No reviews yet."
+    "noReviews": "No reviews yet.",
+    "businessBadge": "Business",
+    "orgNumber": "org. no. {number}",
+    "businessVerified": "The organisation number has been checked against the Central Coordinating Register. The email address is confirmed."
   },
   "report": {
     "title": "Report",
@@ -659,7 +698,9 @@
     "errorTitle": "Something went wrong",
     "errorText": "We are sorry. Please try again in a moment. If it keeps happening, contact us and quote the reference.",
     "errorReference": "Reference",
-    "tryAgain": "Try again"
+    "tryAgain": "Try again",
+    "brreg_unavailable": "We could not reach the register. Please try again shortly.",
+    "business_private_only": "Business accounts can offer and ask for services. Renting and giving away are for private people."
   },
   "validation": {
     "required": "Required.",
@@ -724,7 +765,14 @@
     "slug_taken": "This address is already in use.",
     "month_invalid": "Choose a month.",
     "month_in_future": "You cannot record figures for a month that has not started.",
-    "parts_exceed_total": "The parts add up to more than the total."
+    "parts_exceed_total": "The parts add up to more than the total.",
+    "org_number_invalid": "Enter a valid organisation number (9 digits).",
+    "org_not_found": "The organisation number was not found in the register.",
+    "org_not_active": "The entity is deleted, bankrupt or being wound up.",
+    "brreg_unavailable": "We could not reach the register. Please try again shortly.",
+    "org_number_taken": "This organisation number already has an account.",
+    "business_services_only": "Business accounts can only post services.",
+    "unit_not_allowed": "Choose a valid unit."
   },
   "pages": {
     "howTitle": "How Laandet works",

@@ -9,7 +9,7 @@ import { Notice } from "@/ui/Notice";
 import { FieldError, FormError, invalid } from "@/ui/forms/FormMessages";
 
 type Loc = "nb" | "en";
-type ListingType = "rent_out" | "wanted" | "give_away";
+type ListingType = "rent_out" | "wanted" | "give_away" | "service_offer" | "service_wanted";
 
 export type WizardCategory = {
   id: string;
@@ -39,6 +39,7 @@ const MAX_IMAGES = 8;
 const MAX_BYTES = 10 * 1024 * 1024;
 const CONDITIONS = ["new", "as_new", "good", "fair", "worn", "defective"] as const;
 const UNITS = ["hour", "day", "weekend", "week"] as const;
+const SERVICE_UNITS = ["hour", "sqm", "job"] as const;
 
 /** Which step shows which field, so a server error can open the right step. */
 const FIELD_STEP: Record<string, number> = {
@@ -75,12 +76,15 @@ export function ListingWizard({
   localities,
   initial,
   initialStep,
+  servicesOnly = false,
 }: {
   locale: Loc;
   categories: WizardCategory[];
   localities: { id: string; name: string }[];
   initial: WizardInitial;
   initialStep?: number;
+  /** Business accounts post services only (D-063). */
+  servicesOnly?: boolean;
 }) {
   const t = useTranslations("wizard");
   const tl = useTranslations("listing");
@@ -112,7 +116,8 @@ export function ListingWizard({
   const category = categories.find((c) => c.id === categoryId);
   const forType = categories.filter((c) => !type || c.allowedListingTypes.includes(type));
   const paidAllowed = category?.allowPaidRental ?? true;
-  const offer = type !== "wanted";
+  const offer = type === "rent_out" || type === "give_away";
+  const service = type === "service_offer" || type === "service_wanted";
   const v = (name: string) => initial.text[name] ?? "";
   const titles = [t("stepType"), t("stepDetails"), t("stepPrice"), t("stepPlace"), t("stepPreview")];
 
@@ -160,30 +165,35 @@ export function ListingWizard({
         <fieldset className="border-0 p-0">
           <legend className="mb-3 font-bold">{t("stepType")}</legend>
           {editing && <p className="field-hint mb-3">{t("typeLocked")}</p>}
+          {servicesOnly && !editing && <p className="field-hint mb-3">{t("businessServicesOnly")}</p>}
           <div className="radio-cards">
             {(
               [
                 ["rent_out", t("typeRent"), t("typeRentHint")],
                 ["wanted", t("typeWanted"), t("typeWantedHint")],
                 ["give_away", t("typeGive"), t("typeGiveHint")],
+                ["service_offer", t("typeServiceOffer"), t("typeServiceOfferHint")],
+                ["service_wanted", t("typeServiceWanted"), t("typeServiceWantedHint")],
               ] as const
-            ).map(([value, label, hint]) => (
-              <label key={value} className="radio-card">
-                <input
-                  type="radio"
-                  name="type"
-                  value={value}
-                  checked={type === value}
-                  disabled={editing && type !== value}
-                  onChange={() => {
-                    setType(value);
-                    if (category && !category.allowedListingTypes.includes(value)) setCategoryId("");
-                  }}
-                />
-                <strong>{label}</strong>
-                <span>{hint}</span>
-              </label>
-            ))}
+            )
+              .filter(([value]) => !servicesOnly || value.startsWith("service_"))
+              .map(([value, label, hint]) => (
+                <label key={value} className="radio-card">
+                  <input
+                    type="radio"
+                    name="type"
+                    value={value}
+                    checked={type === value}
+                    disabled={editing && type !== value}
+                    onChange={() => {
+                      setType(value);
+                      if (category && !category.allowedListingTypes.includes(value)) setCategoryId("");
+                    }}
+                  />
+                  <strong>{label}</strong>
+                  <span>{hint}</span>
+                </label>
+              ))}
           </div>
           <FieldError state={state} name="type" />
         </fieldset>
@@ -391,6 +401,51 @@ export function ListingWizard({
             </label>
           </>
         )}
+        {service && (
+          <>
+            <label className="check">
+              <input
+                type="checkbox"
+                name="freeLoan"
+                checked={freeLoan}
+                onChange={(e) => setFreeLoan(e.target.checked)}
+              />
+              <span>{t("serviceFreeLabel")}</span>
+            </label>
+            {!freeLoan && (
+              <div className="grid gap-4 sm:grid-cols-2 sm:items-end">
+                <label className="field">
+                  {type === "service_wanted" ? t("serviceBudgetLabel") : t("priceLabel")}{" "}
+                  <span className="field-hint">({tc("optional")})</span>
+                  <span className="field-hint">{t("servicePriceHint")}</span>
+                  <input
+                    name="price"
+                    inputMode="decimal"
+                    defaultValue={v("price")}
+                    aria-invalid={invalid(state, "price")}
+                  />
+                  <FieldError state={state} name="price" />
+                </label>
+                <label className="field">
+                  {t("unitLabel")}
+                  <select
+                    name="priceUnit"
+                    defaultValue={v("priceUnit") || "hour"}
+                    aria-invalid={invalid(state, "priceUnit")}
+                  >
+                    {SERVICE_UNITS.map((u) => (
+                      <option key={u} value={u}>
+                        {tl(`unit.${u}`)}
+                      </option>
+                    ))}
+                  </select>
+                  <FieldError state={state} name="priceUnit" />
+                </label>
+              </div>
+            )}
+            <Notice>{t("serviceNote")}</Notice>
+          </>
+        )}
         {type === "give_away" && <Notice>{t("giveFreeNote")}</Notice>}
         {!type && <Notice tone="warning">{t("stepType")}</Notice>}
       </div>
@@ -415,7 +470,7 @@ export function ListingWizard({
           <input name="areaNote" maxLength={80} defaultValue={v("areaNote")} />
           <FieldError state={state} name="areaNote" />
         </label>
-        <fieldset className="flex flex-col gap-3 border-0 p-0">
+        <fieldset className="flex flex-col gap-3 border-0 p-0" hidden={service}>
           <legend className="mb-2 font-bold">
             {type === "wanted" ? t("handoverWantedLabel") : t("handoverLabel")}
           </legend>
@@ -508,6 +563,18 @@ export function ListingWizard({
                 </dd>
                 <dt className="font-bold">{t("depositLabel")}</dt>
                 <dd>{preview.deposit ? `${preview.deposit} kr` : "–"}</dd>
+              </>
+            )}
+            {service && (
+              <>
+                <dt className="font-bold">{t("priceLabel")}</dt>
+                <dd>
+                  {preview.freeLoan === "on"
+                    ? tl("free")
+                    : preview.price
+                      ? `${preview.price} kr ${tl(`perUnit.${(preview.priceUnit as (typeof SERVICE_UNITS)[number]) || "hour"}`)}`
+                      : tl("byAgreement")}
+                </dd>
               </>
             )}
             {offer && preview.itemCondition && (

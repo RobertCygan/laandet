@@ -1,14 +1,14 @@
 ---
 doc_key: prohibited_items
 locale: nb
-version: 1.0.0
+version: 1.1.0
 status: Gjeldende – ikke juridisk gjennomgått
 updated: 01.11.2026
 ---
 
 # Forbudte og begrensede gjenstander
 
-**Versjon 1.0.0 · Sist oppdatert 01.11.2026**
+**Versjon 1.1.0 · Sist oppdatert 01.11.2026**
 
 > Teksten er skrevet med hjelp av KI og er ikke gjennomgått av jurist.
 
@@ -16,7 +16,7 @@ Laandet er laget for vanlige ting som folk har hjemme, i boden og i garasjen. Fo
 trygg og lovlig er noen ting ikke tillatt. Andre ting krever ekstra forsiktighet.
 
 Kategorien **«Annet» betyr ikke at alt er lov.** Reglene under gjelder alle annonser: «Leies ut»,
-«Ønskes leid» og «Gis bort».
+«Ønskes leid», «Gis bort» og tjenester.
 
 ## 1. Dette er ikke tillatt på Laandet
 
@@ -34,11 +34,21 @@ Kategorien **«Annet» betyr ikke at alt er lov.** Reglene under gjelder alle an
 | Levende dyr | Alle dyr |
 | Utrygge eller tilbakekalte produkter | Produkter som er tilbakekalt av sikkerhetsgrunner, elektrisk utstyr med skadet ledning eller isolasjon, sikkerhetsutstyr som ikke virker |
 | Ting du ikke har rett til å leie ut, låne ut eller gi bort | Stjålne ting, ting du selv leier eller leaser, arbeidsgiverens utstyr, kopivarer |
-| Ting som ikke er fysiske gjenstander | Tjenester, oppdrag, bolig, hytte, rom, båtplass, parkeringsplass |
+| Utleie av steder | Bolig, hytte, rom, båtplass, parkeringsplass |
 | Personlige dokumenter og data | Pass, ID-kort, kjennemerker, lagringsmedier med andres opplysninger |
 | Støtende innhold | Pornografi og innhold som er hatefullt eller ulovlig |
 
 Hvis du er usikker, spør oss før du legger ut annonsen.
+
+### Tjenester som ikke er tillatt
+
+| Gruppe | Eksempler |
+|---|---|
+| Arbeid som krever autorisasjon eller godkjenning | Elektrisk arbeid (også i sikringsskap), arbeid på gassanlegg, feiing og arbeid på pipe og ildsted, rørleggerarbeid på vann og avløp i bygget |
+| Arbeid med stor fare for fall | Snømåking og annet arbeid på tak |
+| Barn, helse og omsorg | Barnepass, pleie, helsetjenester, behandling og massasje |
+| Transport av personer mot betaling | Skyss og taxi |
+| Annet ulovlig eller farlig arbeid | Riving med asbest, felling av store trær nær hus eller ledninger, svart arbeid |
 
 ## 2. Dette krever ekstra forsiktighet
 
@@ -51,6 +61,8 @@ Disse kategoriene er tillatt, men begge parter må bekrefte at de har lest sikke
 | **Tilhengere** | Leietakeren må ha riktig førerkortklasse (B eller BE), og bilen må tåle vekten av hengeren. Sjekk lys, dekk og eventuell EU-kontroll. |
 | **Kajakk, kano og SUP** | Alle må ha flytevest. Ta hensyn til vær, vind og kaldt vann. Padle aldri alene i kaldt vann. |
 | **Grill og gassutstyr** | Sjekk slange og regulator, og test for lekkasje. Bruk utstyret bare utendørs. Transporter gassflasker stående. |
+| **Tjenester: småreparasjoner** | Bare enkle jobber uten elektrisk arbeid, gass eller arbeid på pipe. Bruk riktig verktøy og verneutstyr. |
+| **Tjenester: snømåking** | Bare på bakken – aldri på tak. Pass på biler og folk når du bruker snøfreser. |
 | **Bilseter for barn** | Skriv om setet har vært med i en kollisjon, og når det er produsert eller går ut på dato. Gi aldri bort et bilsete som har vært med i en kollisjon. |
 
 ## 3. Kan i pilotfasen bare lånes ut gratis eller gis bort

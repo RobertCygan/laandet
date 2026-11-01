@@ -1,7 +1,7 @@
 ---
 doc_key: terms
 locale: en
-version: 1.0.0
+version: 1.1.0
 status: Current – not legally reviewed – informational translation
 updated: 01.11.2026
 translation_of: legal/nb/brukervilkar.md
@@ -11,14 +11,15 @@ translation_of: legal/nb/brukervilkar.md
 
 > **Informational translation.** The Norwegian version of this document is the legally binding one. If the two versions differ, the Norwegian text prevails.
 
-**Version 1.0.0 · Last updated 01.11.2026**
+**Version 1.1.0 · Last updated 01.11.2026**
 
 > This text was written with the help of AI and has not been reviewed by a lawyer.
 
 ## 1. About Laandet and these terms
 
 1.1 Laandet is a digital meeting place where people can rent out, lend, look for things to rent and give
-away physical things to each other. We are starting in Steigen municipality.
+away physical things to each other, and offer or ask for help (services). We are starting in Steigen
+municipality.
 
 1.2 Laandet is run by **Robert Cygan**
 under the name GPSI GovTech Solutions. GPSI GovTech Solutions is not a registered business and has no
@@ -43,13 +44,15 @@ planned, and we never describe a planned feature as if it already exists.
 2.1 Laandet makes it easier to find each other, make arrangements, communicate and document agreements
 about lending, renting and handing over things.
 
-2.2 **Agreements to rent, lend or give things are made directly between the users.** Laandet is not a
-party to these agreements. Laandet
+2.2 **Agreements to rent, lend or give things, or about services, are made directly between the
+users.** Laandet is not a party to these agreements. Laandet
 
 - does not own the things that are listed,
 - is not an insurance company,
 - is not a payment institution and does not receive, hold or pay out money,
 - does not hold deposits,
+- does not perform the services, is not the client or employer and does not check the skills of the
+  person offering a service,
 - does not guarantee the things, the users or that agreements will be fulfilled,
 - does not decide disputes between users with binding effect.
 
@@ -60,9 +63,15 @@ party to these agreements. Laandet
 3.1 You must be **at least 18 years old** to create an account. You confirm this yourself when you
 register. Laandet does not check your age, and we never state that your age has been checked.
 
-3.2 During the pilot phase, Laandet is **only for private persons**. You cannot use Laandet for business
-purposes, for example as a rental company, a shop or a tradesperson who rents out equipment as part of
-their work. See section 8.
+3.2 There are two kinds of account:
+
+- **Private person:** for you if you use Laandet privately. You can use all listing types.
+- **Business or association:** for an entity with an organisation number in the Central Coordinating
+  Register for Legal Entities (Enhetsregisteret). Such an account can **only offer and ask for
+  services**. Renting, lending and giving away are for private persons.
+
+You cannot use a private account for business purposes, for example as a rental company, a shop or a
+tradesperson who rents out equipment as part of their work. See section 8.
 
 3.3 Each person may have one account. The account is personal, and you cannot transfer it to anyone
 else.
@@ -86,11 +95,15 @@ messages or by phone.
 
 ## 5. Listings
 
-5.1 You can post three types of listing:
+5.1 You can post these types of listing:
 
 - **For rent:** You offer a thing for rent against payment, or you lend it out for free.
 - **Wanted:** You say what you need.
 - **Giving away:** You give a thing away for good, free of charge.
+- **Service offered:** You offer help, for example gardening, clearing snow on the ground or a class.
+- **Service wanted:** You ask for help with a job.
+
+See section 11a on services.
 
 5.2 When you post a listing, you confirm that
 
@@ -99,6 +112,9 @@ messages or by phone.
 - you have stated known faults and defects,
 - the thing is legal and safe to use in the way the listing describes,
 - the declared value is your honest estimate of what it would cost to get an equivalent thing.
+
+For a service, you confirm that the description and price are correct, and that you can perform the
+service properly and lawfully.
 
 5.3 Only give an **approximate location**, for example a village or an area. Do not write your home
 address, your phone number or links in the listing. You agree the exact place for collection or for
@@ -133,15 +149,27 @@ If this changes, we will clearly mark such listings and update the terms.
 
 ## 8. Private persons and businesses (traders)
 
-8.1 All users have themselves confirmed that they use Laandet as private persons. Listings are marked
-"Private person" on the basis of this declaration.
+8.1 Users with a private account have themselves confirmed that they use Laandet as private persons.
+Their listings are marked "Private person" on the basis of this declaration.
 
 8.2 **Agreements between two private persons are not consumer agreements.** Consumer legislation, for
 example the rules on the right of withdrawal and on consumer purchases, therefore does not usually apply
 between you. The agreement you make, and the general rules of Norwegian law, apply.
 
-8.3 If you act as a business (trader), you must not use Laandet during the pilot phase. We may close
-accounts that are used for business purposes.
+8.3 If you act as a business (trader), you must not use a private account. We may close private accounts
+that are used for business purposes.
+
+8.4 **Business accounts.** When a business or association creates an account, we look up the
+organisation number in the Central Coordinating Register (Brønnøysund Register Centre). Entities that are
+deleted, bankrupt or being wound up cannot register. Their listings are marked "Business" with the
+registered name and organisation number. We do not check anything else, for example whether the entity
+holds the approvals it needs.
+
+8.5 A business that offers services to consumers must itself follow the rules that apply to traders, for
+example consumer legislation, the price information rules and the VAT rules. Prices in the listing must be
+total prices **including VAT** when the business is VAT-registered.
+
+8.6 Using Laandet is free for businesses. Laandet has no paid or promoted listings, see section 7.3.
 
 ## 9. Renting and lending
 
@@ -192,10 +220,29 @@ listings.
 11.2 The rental itself always takes place through a "For rent" listing. The usual rules for requests,
 agreements and condition reports then apply.
 
+## 11a. Services
+
+11a.1 A service listing says what you can help with, or what you need help with. The price can be given
+per hour, per m² or for the whole job. A service can also be **free**, or have a **price by agreement**.
+
+11a.2 Laandet **only puts you in touch** through messages. You agree on time, place, scope, price and
+payment directly. Laandet has no booking, agreement or payment for services.
+
+11a.3 The person performing the service is responsible for doing the job properly, and for their own
+safety and tools. Work that requires authorisation or special skills is not allowed on Laandet, for
+example electrical work, work on gas, chimneys and fireplaces, and clearing snow from roofs. See
+[Prohibited and restricted items](prohibited-and-restricted-items.md).
+
+11a.4 Income from services may be taxable. Each user is responsible for their own tax, duties and any
+reporting. Laandet must not be used for undeclared work.
+
+11a.5 If something goes wrong, first try to sort it out between you. You can report a listing or a user,
+see section 19.
+
 ## 12. Payment takes place outside Laandet
 
-12.1 Laandet does not handle money. You pay rent, delivery fees and deposits **directly to each
-other**, for example in cash, with Vipps or by bank transfer.
+12.1 Laandet does not handle money. You pay rent, payment for services, delivery fees and deposits
+**directly to each other**, for example in cash, with Vipps or by bank transfer.
 
 12.2 Payments outside Laandet have **no protection from Laandet**. Laandet cannot reclaim, withhold
 or pay out money on your behalf.
@@ -266,6 +313,7 @@ works. During the pilot phase, errors and interruptions may still occur.
 
 - the agreements between users, or whether they are fulfilled,
 - the things that are listed,
+- the services that are offered or performed,
 - losses that arise because users act in breach of the terms or the law.
 
 This does not apply to losses caused by us having acted negligently or having breached these terms

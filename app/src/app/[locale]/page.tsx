@@ -14,15 +14,16 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const locale = isLocale(raw) ? raw : "nb";
   setRequestLocale(locale);
   const t = await getTranslations("home");
-  const [rent, wanted, give, cats, locs, rentalsOpen] = await Promise.all([
+  const [rent, wanted, give, services, cats, locs, rentalsOpen] = await Promise.all([
     latestListings("rent_out", 8),
     latestListings("wanted", 4),
     latestListings("give_away", 4),
+    latestListings("services", 4),
     listCategories(),
     listLocalities(),
     flagEnabled("rentals_open"),
   ]);
-  const anyDemo = [...rent, ...wanted, ...give].some((l) => l.isDemo);
+  const anyDemo = [...rent, ...wanted, ...give, ...services].some((l) => l.isDemo);
   const prefix = locale === "en" ? "/en" : "";
 
   return (
@@ -154,6 +155,20 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         >
           <div className="listing-grid">
             {give.map((l) => (
+              <ListingCard key={l.id} listing={l} locale={locale} />
+            ))}
+          </div>
+        </Section>
+      )}
+
+      {services.length > 0 && (
+        <Section
+          title={t("servicesHeading")}
+          href={{ pathname: "/utforsk", query: { type: "tjenester" } }}
+          linkLabel={t("seeAll")}
+        >
+          <div className="listing-grid">
+            {services.map((l) => (
               <ListingCard key={l.id} listing={l} locale={locale} />
             ))}
           </div>

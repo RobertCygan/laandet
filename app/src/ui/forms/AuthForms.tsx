@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   deleteAccountAction,
@@ -33,11 +33,53 @@ export function SignUpForm({
   const t = useTranslations("auth");
   const tc = useTranslations("common");
   const [state, action] = useActionState(signUpAction, idle);
+  const [accountType, setAccountType] = useState<"private" | "business">("private");
+  const business = accountType === "business";
   return (
     <form action={action} className="flex flex-col gap-5" noValidate>
       <FormError state={state} />
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="startedAt" value={startedAt} />
+      <fieldset className="border-0 p-0">
+        <legend className="mb-2 font-bold">{t("accountType")}</legend>
+        <div className="radio-cards">
+          {(
+            [
+              ["private", t("accountPrivate"), t("accountPrivateHint")],
+              ["business", t("accountBusiness"), t("accountBusinessHint")],
+            ] as const
+          ).map(([value, label, hint]) => (
+            <label key={value} className="radio-card">
+              <input
+                type="radio"
+                name="accountType"
+                value={value}
+                checked={accountType === value}
+                onChange={() => setAccountType(value)}
+              />
+              <strong>{label}</strong>
+              <span>{hint}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+      {business && (
+        <label className="field">
+          {t("orgNumber")}
+          <span className="field-hint">{t("orgNumberHint")}</span>
+          <input
+            name="orgNumber"
+            inputMode="numeric"
+            autoComplete="off"
+            required
+            maxLength={20}
+            defaultValue={prev(state, "orgNumber")}
+            aria-invalid={invalid(state, "orgNumber")}
+            aria-describedby="orgNumber-error"
+          />
+          <FieldError state={state} name="orgNumber" />
+        </label>
+      )}
       <div aria-hidden="true" className="visually-hidden">
         <label>
           {t("website")}
@@ -46,7 +88,7 @@ export function SignUpForm({
       </div>
       <label className="field">
         {t("name")}
-        <span className="field-hint">{t("nameHint")}</span>
+        <span className="field-hint">{business ? t("nameHintBusiness") : t("nameHint")}</span>
         <input
           name="name"
           autoComplete="nickname"
@@ -96,11 +138,16 @@ export function SignUpForm({
           <span>{t("age18")}</span>
         </label>
         <FieldError state={state} name="age18" />
-        <label className="check">
-          <input type="checkbox" name="privateUse" required defaultChecked={prev(state, "privateUse") === "on"} />
-          <span>{t("privateUse")}</span>
-        </label>
-        <FieldError state={state} name="privateUse" />
+        {!business && (
+          <>
+            <label className="check">
+              <input type="checkbox" name="privateUse" required defaultChecked={prev(state, "privateUse") === "on"} />
+              <span>{t("privateUse")}</span>
+            </label>
+            <FieldError state={state} name="privateUse" />
+          </>
+        )}
+        {business && <p className="field-hint">{t("businessTermsNote")}</p>}
         <label className="check">
           <input type="checkbox" name="terms" required defaultChecked={prev(state, "terms") === "on"} />
           <span>

@@ -63,7 +63,7 @@ export function initialFromListing(d: NonNullable<ListingDetail>): WizardInitial
       deliveryRadiusKm: str(l.deliveryRadiusKm),
       meetingAreaNote: str(l.meetingAreaNote),
     },
-    freeLoan: l.type === "rent_out" && l.priceOre === 0,
+    freeLoan: l.priceOre === 0,
     handoverPickup: l.handoverPickup,
     handoverOwnerDelivery: l.handoverOwnerDelivery,
     handoverMeet: l.handoverMeet,

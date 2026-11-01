@@ -1,14 +1,14 @@
 ---
 doc_key: privacy
 locale: nb
-version: 1.1.0
+version: 1.2.0
 status: Gjeldende – ikke juridisk gjennomgått
 updated: 01.11.2026
 ---
 
 # Personvernerklæring for Laandet
 
-**Versjon 1.1.0 · Sist oppdatert 01.11.2026**
+**Versjon 1.2.0 · Sist oppdatert 01.11.2026**
 
 > Teksten er skrevet med hjelp av KI og er ikke gjennomgått av jurist.
 
@@ -42,6 +42,7 @@ organisasjonsnummer (01.11.2026). Behandlingsansvarlig er derfor personen som dr
 | Hva | Hvorfor | Rettslig grunnlag |
 |---|---|---|
 | **Konto:** e-post, passord (lagret som kryptografisk hash), visningsnavn, bekreftelse av e-post, bekreftelse på at du er over 18 år og privatperson, språkvalg | Opprette og drive kontoen din | Avtale (personvernforordningen art. 6 nr. 1 b) |
+| **Bedriftskonto:** organisasjonsnummer, registrert navn fra Enhetsregisteret og tidspunktet vi sjekket det. Vi slår opp nummeret i Brønnøysundregistrenes åpne API når kontoen opprettes. | Kontrollere at enheten finnes og er aktiv, og vise andre hvem som tilbyr tjenesten | Avtale (art. 6 nr. 1 b) |
 | **Profilbilde (valgfritt):** bildet du laster opp, uten posisjonsdata og andre metadata | Vise hvem du er på profilen din og ved navnet ditt | Avtale (art. 6 nr. 1 b) |
 | **Innlogging:** økter, IP-adresse og nettlesertype mens økten varer, og tofaktorkode for ansatte | Holde deg innlogget og beskytte kontoen | Avtale og berettiget interesse i sikkerhet (art. 6 nr. 1 b og f) |
 | **Profil:** område, kort presentasjon, medlemsdato, antall fullførte leieforhold, vurderinger | Gjøre det lettere å stole på hverandre | Avtale (art. 6 nr. 1 b) |
@@ -64,7 +65,8 @@ som er nødvendig for saken.
 ## 4. Hvem kan se opplysningene
 
 - **Alle som besøker Laandet:** publiserte annonser og bilder, visningsnavnet ditt, profilbildet ditt,
-  området ditt, medlemsdato, faktisk statistikk og publiserte vurderinger.
+  området ditt, medlemsdato, faktisk statistikk og publiserte vurderinger. For bedriftskontoer også
+  det registrerte navnet og organisasjonsnummeret.
 - **Den andre parten i en samtale, et leieforhold eller en overlevering:** meldingene, avtalen,
   tilstandsrapportene, bildene og det avtalte møtestedet.
 - **Laandets moderatorer:**
@@ -86,6 +88,10 @@ dem.
 | Sikkerhetskopier (krypterte) | Hostinger, på samme server | Datasenter i EU |
 | Utsending av e-post | Hostinger (e-posttjeneste) | Overføringer utenfor EU/EØS skjer etter EUs standardkontraktsklausuler i Hostingers databehandleravtale |
 | Feillogging | Ikke i bruk | – |
+
+Ved oppretting av bedriftskonto sender vi **bare organisasjonsnummeret** til Brønnøysundregistrenes
+åpne API (data.brreg.no). Brønnøysundregistrene er en offentlig myndighet og ikke en databehandler
+for Laandet.
 
 Vi oppdaterer denne listen før vi tar i bruk nye leverandører. Hvis opplysninger overføres til land
 utenfor EU/EØS, skjer det bare med et gyldig overføringsgrunnlag, for eksempel EUs

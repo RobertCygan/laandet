@@ -3,6 +3,9 @@
 All notable changes to Laandet. Dates are DD.MM.YYYY.
 
 ## Unreleased — 01.11.2026
+- **Tjenester (D-063):** new listing types «Tjeneste tilbys» and «Tjeneste ønskes» with eight service categories; price per hour, per m² or for the whole job, free, or by agreement; contact through messages only (no booking, no payment). A «Tjenester» tab in «Utforsk», a header link and a section on the front page. Migration `0013_services_and_business` (new types and units, checks that services carry no item terms or handover, rentals keep rental units).
+- **Business accounts (D-063):** «Bedrift eller forening» at sign-up; the org number is looked up in Enhetsregisteret (Brønnøysund) and the registered name is shown with a «Bedrift» badge on listings and the profile. Business accounts post services only and cannot request rentals or claim give-aways. Business data is in the data export and removed when the account is erased. New optional setting `BRREG_API_URL`.
+- Terms 1.1.0, prohibited items 1.1.0 and privacy notice 1.2.0 (nb and en) cover services and business accounts.
 - **Front page (D-062):** the owner's logo intro on first load (double speed, skippable, off for reduced motion); hero caption removed; main menu spread evenly; darker section background behind tiles.
 - **Header (D-061):** an account menu with the user's photo or initial and name holds «Slik fungerer det», messages, notices, rentals, own listings, profile, admin and «Logg ut»; the main menu stays on one line. A dot shows unread messages or notices.
 - **Profile photos (D-061):** optional, under «Min profil»; public on the profile and in the header, removed within an hour when replaced, removed or the account is erased. Migration `0012_avatars`. Privacy notice 1.1.0.

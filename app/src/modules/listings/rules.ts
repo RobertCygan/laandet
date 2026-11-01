@@ -1,5 +1,11 @@
 import type { ItemCondition, ListingType, PriceUnit } from "@/db/schema";
 
+const SERVICE_UNITS: readonly string[] = ["hour", "sqm", "job"];
+const RENTAL_UNITS: readonly string[] = ["hour", "day", "weekend", "week"];
+
+/** Tjenester (D-063): help offered or wanted, contact through messages, no booking. */
+export const isServiceType = (t: string): boolean => t === "service_offer" || t === "service_wanted";
+
 /** Internal platform threshold (master spec §10): declared value ≤ 5 000 kr → A, above → B. */
 export const CATEGORY_A_MAX_ORE = 500_000;
 export const MAX_DECLARED_VALUE_ORE = 100_000_000; // 1 000 000 kr sanity cap
@@ -125,6 +131,12 @@ export function publishViolations(
     }
     if (category && !category.allowPaidRental && (d.priceOre ?? 0) > 0) add("price", "paid_rental_not_allowed");
   }
+  if (d.type === "rent_out" && d.priceUnit && !RENTAL_UNITS.includes(d.priceUnit)) add("priceUnit", "unit_not_allowed");
+  if (isServiceType(d.type)) {
+    // No price = «etter avtale», 0 = free; a paid service names its unit.
+    if (d.priceOre !== null && d.priceOre > 0 && !d.priceUnit) add("priceUnit", "required");
+    if (d.priceUnit && !SERVICE_UNITS.includes(d.priceUnit)) add("priceUnit", "unit_not_allowed");
+  }
   if (d.type === "give_away") {
     if (!d.itemCondition) add("itemCondition", "required");
     if (!d.knownDefects || d.knownDefects.trim().length < 2) add("knownDefects", "known_defects_required");
@@ -132,7 +144,12 @@ export function publishViolations(
   if (d.type === "wanted" && d.wantedFrom && d.wantedTo && d.wantedTo < d.wantedFrom) {
     add("wantedTo", "dates_order");
   }
-  if (d.type !== "wanted" && !d.handoverPickup && !d.handoverOwnerDelivery && !d.handoverMeet) {
+  if (
+    (d.type === "rent_out" || d.type === "give_away") &&
+    !d.handoverPickup &&
+    !d.handoverOwnerDelivery &&
+    !d.handoverMeet
+  ) {
     add("handover", "handover_required");
   }
   if (d.deliveryRadiusKm !== null && (d.deliveryRadiusKm < 1 || d.deliveryRadiusKm > 300)) {

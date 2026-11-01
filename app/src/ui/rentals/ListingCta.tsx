@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import type { PriceUnit } from "@/db/schema";
+import { isRentalPriceUnit, type ListingType, type PriceUnit } from "@/db/schema";
 import { formatDate } from "@/i18n/format";
 import type { Actor } from "@/modules/authz/actor-types";
 import { claimStepAction } from "@/modules/giveaways/actions";
@@ -12,7 +12,7 @@ import { RequestForm, StepForm } from "./RentalForms";
 type Method = "pickup" | "owner_delivery" | "meet";
 export type CtaListing = {
   id: string;
-  type: "rent_out" | "wanted" | "give_away";
+  type: ListingType;
   priceOre: number | null;
   priceUnit: PriceUnit | null;
   depositOre: number | null;
@@ -63,7 +63,7 @@ export async function ListingCta({
         </div>
       );
     }
-    if (!requestable || l.priceOre === null || !l.priceUnit) return null;
+    if (!requestable || l.priceOre === null || !isRentalPriceUnit(l.priceUnit)) return null;
     if (actor.kind !== "user") return signIn(tr("signInToRequest"));
     const open = await myOpenBookingOn(actor, l.id);
     if (open) {

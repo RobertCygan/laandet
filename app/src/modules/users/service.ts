@@ -79,6 +79,15 @@ export async function removeAvatar(actor: Actor): Promise<void> {
   await replaceAvatar(actor.id, null);
 }
 
+/** Private person or business (D-063); business accounts post services only. */
+export async function getAccountType(userId: string): Promise<"private" | "business"> {
+  const [p] = await db
+    .select({ t: userProfiles.accountType })
+    .from(userProfiles)
+    .where(eq(userProfiles.userId, userId));
+  return p?.t ?? "private";
+}
+
 /** The current profile photo of a person, for the header. */
 export async function getAvatarMediaId(userId: string): Promise<string | null> {
   const [p] = await db
@@ -128,6 +137,9 @@ export async function getOwnProfile(actor: Actor) {
       status: userProfiles.status,
       role: userProfiles.role,
       avatarMediaId: userProfiles.avatarMediaId,
+      accountType: userProfiles.accountType,
+      businessName: userProfiles.businessName,
+      orgNumber: userProfiles.orgNumber,
       localitySlug: localities.slug,
     })
     .from(users)
@@ -148,6 +160,9 @@ export async function getPublicProfile(userId: string) {
       bio: userProfiles.bio,
       status: userProfiles.status,
       avatarMediaId: userProfiles.avatarMediaId,
+      accountType: userProfiles.accountType,
+      businessName: userProfiles.businessName,
+      orgNumber: userProfiles.orgNumber,
       localityName: localities.name,
     })
     .from(users)
@@ -188,6 +203,8 @@ export async function getPublicProfile(userId: string) {
     createdAt: p.createdAt,
     bio: p.bio,
     avatarMediaId: p.avatarMediaId,
+    // A business is shown with its registered name and org number (D-063).
+    business: p.accountType === "business" && p.businessName ? { name: p.businessName, orgNumber: p.orgNumber } : null,
     localityName: p.localityName,
     activeListings: active,
     completedRentals,

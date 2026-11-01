@@ -1,7 +1,7 @@
 ---
 doc_key: privacy
 locale: en
-version: 1.1.0
+version: 1.2.0
 status: Current – not legally reviewed – informational translation
 updated: 01.11.2026
 translation_of: legal/nb/personvernerklaering.md
@@ -11,7 +11,7 @@ translation_of: legal/nb/personvernerklaering.md
 
 > **Informational translation.** The Norwegian version of this document is the legally binding one. If the two versions differ, the Norwegian text prevails.
 
-**Version 1.1.0 · Last updated 01.11.2026**
+**Version 1.2.0 · Last updated 01.11.2026**
 
 > This text was written with the help of AI and has not been reviewed by a lawyer.
 
@@ -45,6 +45,7 @@ organisation number (01.11.2026). The controller is therefore the person who run
 | What | Why | Legal basis |
 |---|---|---|
 | **Account:** email, password (stored as a cryptographic hash), display name, email confirmation, confirmation that you are over 18 and a private person, language choice | Creating and running your account | Contract (Art. 6(1)(b) of the GDPR) |
+| **Business account:** organisation number, registered name from the Central Coordinating Register and when we checked it. We look the number up in the Brønnøysund Register Centre's open API when the account is created. | Checking that the entity exists and is active, and showing others who offers the service | Contract (Art. 6(1)(b)) |
 | **Profile photo (optional):** the photo you upload, without location data and other metadata | Showing who you are on your profile and next to your name | Contract (Art. 6(1)(b)) |
 | **Login:** sessions, IP address and browser type while the session lasts, and two-factor code for staff | Keeping you logged in and protecting the account | Contract and legitimate interest in security (Art. 6(1)(b) and (f)) |
 | **Profile:** area, short introduction, membership date, number of completed rentals, reviews | Making it easier to trust each other | Contract (Art. 6(1)(b)) |
@@ -67,7 +68,8 @@ is necessary for the case.
 ## 4. Who can see the data
 
 - **Everyone who visits Laandet:** published listings and photos, your display name, your profile photo,
-  your area, membership date, actual statistics and published reviews.
+  your area, membership date, actual statistics and published reviews. For business accounts also the
+  registered name and the organisation number.
 - **The other party in a conversation, a rental or a handover:** the messages, the agreement,
   the condition reports, the photos and the agreed meeting place.
 - **Laandet's moderators:**
@@ -89,6 +91,10 @@ them.
 | Backups (encrypted) | Hostinger, on the same server | Data centre in the EU |
 | Sending email | Hostinger (email service) | Transfers outside the EU/EEA follow the EU Standard Contractual Clauses in Hostinger's data processing agreement |
 | Error logging | Not used | – |
+
+When a business account is created, we send **only the organisation number** to the Brønnøysund
+Register Centre's open API (data.brreg.no). The Brønnøysund Register Centre is a public authority and
+not a data processor for Laandet.
 
 We update this list before we start using new suppliers. If data is transferred to countries
 outside the EU/EEA, this only happens on a valid transfer basis, for example the EU's

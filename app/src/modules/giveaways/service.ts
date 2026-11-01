@@ -1,4 +1,5 @@
 import { and, eq, inArray, ne } from "drizzle-orm";
+import { assertPrivateAccount } from "@/modules/business/account";
 import { z } from "zod";
 import { db, type Tx } from "@/db/client";
 import { contracts, giveawayClaims, HANDOVER_METHODS, listings, messages, userProfiles } from "@/db/schema";
@@ -87,6 +88,7 @@ export async function createClaim(actor: Actor, input: z.infer<typeof claimSchem
     if (!allowed[input.handoverMethod])
       throw new AppError("validation", "request_invalid", { fieldErrors: { handoverMethod: "method_not_offered" } });
   }
+  await assertPrivateAccount(actor.id);
   const [existing] = await db
     .select({ id: giveawayClaims.id })
     .from(giveawayClaims)

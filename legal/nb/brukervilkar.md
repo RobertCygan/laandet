@@ -1,21 +1,21 @@
 ---
 doc_key: terms
 locale: nb
-version: 1.0.0
+version: 1.1.0
 status: Gjeldende – ikke juridisk gjennomgått
 updated: 01.11.2026
 ---
 
 # Brukervilkår for Laandet
 
-**Versjon 1.0.0 · Sist oppdatert 01.11.2026**
+**Versjon 1.1.0 · Sist oppdatert 01.11.2026**
 
 > Teksten er skrevet med hjelp av KI og er ikke gjennomgått av jurist.
 
 ## 1. Om Laandet og disse vilkårene
 
 1.1 Laandet er en digital møteplass der folk kan leie ut, låne ut, ønske å leie og gi bort fysiske
-ting til hverandre. Vi starter i Steigen kommune.
+ting til hverandre, og tilby eller be om hjelp (tjenester). Vi starter i Steigen kommune.
 
 1.2 Laandet drives av **Robert Cygan** under
 navnet GPSI GovTech Solutions. GPSI GovTech Solutions er ikke et registrert foretak og har ikke
@@ -40,13 +40,15 @@ planlagt, og vi beskriver aldri en planlagt funksjon som om den allerede finnes.
 2.1 Laandet gjør det enklere å finne hverandre, avtale, kommunisere og dokumentere avtaler om lån,
 leie og overlevering av ting.
 
-2.2 **Avtaler om leie, lån eller gave inngås direkte mellom brukerne.** Laandet er ikke part i disse
-avtalene. Laandet
+2.2 **Avtaler om leie, lån, gave eller tjenester inngås direkte mellom brukerne.** Laandet er ikke part
+i disse avtalene. Laandet
 
 - eier ikke tingene som legges ut,
 - er ikke forsikringsselskap,
 - er ikke betalingsforetak og tar ikke imot, oppbevarer eller betaler ut penger,
 - tar ikke vare på depositum,
+- utfører ikke tjenestene, er ikke oppdragsgiver eller arbeidsgiver og kontrollerer ikke kompetansen til
+  den som tilbyr en tjeneste,
 - garanterer ikke for tingene, for brukerne eller for at avtaler blir oppfylt,
 - avgjør ikke tvister mellom brukere med bindende virkning.
 
@@ -57,8 +59,14 @@ avtalene. Laandet
 3.1 Du må være **minst 18 år** for å opprette konto. Du bekrefter dette selv når du registrerer deg.
 Laandet kontrollerer ikke alderen din, og vi skriver aldri at alderen er kontrollert.
 
-3.2 I pilotfasen er Laandet **bare for privatpersoner**. Du kan ikke bruke Laandet i næringsvirksomhet,
-for eksempel som utleiefirma, butikk eller håndverker som leier ut utstyr i jobben. Se punkt 8.
+3.2 Det finnes to typer konto:
+
+- **Privatperson:** for deg som bruker Laandet privat. Du kan bruke alle annonsetypene.
+- **Bedrift eller forening:** for en enhet med organisasjonsnummer i Enhetsregisteret. En slik konto kan
+  **bare tilby og be om tjenester**. Utleie, utlån og bortgiving er for privatpersoner.
+
+Du kan ikke bruke en privatkonto i næringsvirksomhet, for eksempel som utleiefirma, butikk eller håndverker
+som leier ut utstyr i jobben. Se punkt 8.
 
 3.3 Hver person kan ha én konto. Kontoen er personlig, og du kan ikke overføre den til andre.
 
@@ -81,11 +89,15 @@ eller på telefon.
 
 ## 5. Annonser
 
-5.1 Du kan legge ut tre typer annonser:
+5.1 Du kan legge ut disse typene annonser:
 
 - **Leies ut:** Du tilbyr en ting til leie mot betaling, eller du låner den ut gratis.
 - **Ønskes leid:** Du forteller hva du trenger.
 - **Gis bort:** Du gir bort en ting for godt, gratis.
+- **Tjeneste tilbys:** Du tilbyr hjelp, for eksempel hagearbeid, snømåking på bakken eller et kurs.
+- **Tjeneste ønskes:** Du ber om hjelp til en jobb.
+
+Se punkt 11a om tjenester.
 
 5.2 Når du legger ut en annonse, bekrefter du at
 
@@ -94,6 +106,9 @@ eller på telefon.
 - du har oppgitt kjente feil og mangler,
 - tingen er lovlig og trygg å bruke på den måten annonsen beskriver,
 - den oppgitte verdien er ditt ærlige anslag over hva det vil koste å skaffe en tilsvarende ting.
+
+For en tjeneste bekrefter du at beskrivelsen og prisen er riktige, og at du kan utføre tjenesten
+forsvarlig og lovlig.
 
 5.3 Oppgi bare **omtrentlig sted**, for eksempel bygd eller område. Skriv ikke hjemmeadressen din,
 telefonnummeret ditt eller lenker i annonsen. Eksakt sted for henting eller møte avtaler dere privat
@@ -128,15 +143,27 @@ Hvis dette endres, merker vi slike annonser tydelig og oppdaterer vilkårene.
 
 ## 8. Privatpersoner og næringsdrivende
 
-8.1 Alle brukere har selv bekreftet at de bruker Laandet som privatpersoner. Annonsene er merket
-«Privatperson» på grunnlag av denne erklæringen.
+8.1 Brukere med privatkonto har selv bekreftet at de bruker Laandet som privatpersoner. Annonsene deres er
+merket «Privatperson» på grunnlag av denne erklæringen.
 
 8.2 **Avtaler mellom to privatpersoner er ikke forbrukeravtaler.** Forbrukerlovgivningen, for eksempel
 reglene om angrerett og forbrukerkjøp, gjelder derfor vanligvis ikke mellom dere. Avtalen dere inngår, og de
 alminnelige reglene i norsk rett, gjelder.
 
-8.3 Hvis du opptrer som næringsdrivende, må du ikke bruke Laandet i pilotfasen. Vi kan stenge kontoer
-som brukes i næringsvirksomhet.
+8.3 Hvis du opptrer som næringsdrivende, må du ikke bruke en privatkonto. Vi kan stenge privatkontoer som
+brukes i næringsvirksomhet.
+
+8.4 **Bedriftskontoer.** Når en bedrift eller forening oppretter konto, slår vi opp organisasjonsnummeret i
+Enhetsregisteret (Brønnøysundregistrene). Enheter som er slettet, konkurs eller under avvikling, kan ikke
+registreres. Annonsene er merket «Bedrift» med det registrerte navnet og organisasjonsnummeret. Vi
+kontrollerer ikke noe annet, for eksempel om enheten har nødvendige godkjenninger.
+
+8.5 En bedrift som tilbyr tjenester til forbrukere, må selv følge reglene som gjelder for næringsdrivende,
+for eksempel forbrukerlovgivningen, prisopplysningsreglene og reglene om merverdiavgift. Prisene i
+annonsen skal være totalpriser **inkludert mva.** når bedriften er mva-registrert.
+
+8.6 Det er gratis for bedrifter å bruke Laandet. Laandet har ikke betalte eller fremhevede annonser, se
+punkt 7.3.
 
 ## 9. Leie og utlån
 
@@ -185,10 +212,30 @@ annonser.
 11.2 Selve leien skjer alltid gjennom en «Leies ut»-annonse. Da gjelder de vanlige reglene for
 forespørsel, avtale og tilstandsrapport.
 
+## 11a. Tjenester
+
+11a.1 En tjenesteannonse forteller hva du kan hjelpe med, eller hva du trenger hjelp til. Prisen kan
+oppgis per time, per m² eller for hele jobben. Tjenesten kan også være **gratis**, eller ha **pris etter
+avtale**.
+
+11a.2 Laandet **formidler bare kontakten** gjennom meldinger. Dere avtaler selv tid, sted, omfang, pris og
+betaling direkte. Laandet har ingen bestilling, avtale eller betaling for tjenester.
+
+11a.3 Den som utfører tjenesten, er selv ansvarlig for å gjøre jobben forsvarlig, og for egen sikkerhet
+og eget verktøy. Arbeid som krever autorisasjon eller særlig kompetanse, er ikke tillatt på Laandet,
+for eksempel elektrisk arbeid, arbeid med gass, pipe og ildsted, og snømåking på tak. Se [Forbudte og
+begrensede gjenstander](forbudte-og-begrensede-gjenstander.md).
+
+11a.4 Inntekt fra tjenester kan være skattepliktig. Hver bruker er selv ansvarlig for skatt, avgifter og
+eventuell rapportering. Laandet skal ikke brukes til svart arbeid.
+
+11a.5 Hvis noe går galt, prøver dere først å løse det dere imellom. Du kan rapportere en annonse eller en
+bruker, se punkt 19.
+
 ## 12. Betaling skjer utenfor Laandet
 
-12.1 Laandet håndterer ikke penger. Leie, leveringsgebyr og depositum betaler dere **direkte til
-hverandre**, for eksempel kontant, med Vipps eller med bankoverføring.
+12.1 Laandet håndterer ikke penger. Leie, betaling for tjenester, leveringsgebyr og depositum betaler dere
+**direkte til hverandre**, for eksempel kontant, med Vipps eller med bankoverføring.
 
 12.2 Betalinger utenfor Laandet har **ingen beskyttelse fra Laandet**. Laandet kan ikke kreve tilbake,
 holde tilbake eller betale ut penger for deg.
@@ -259,6 +306,7 @@ I pilotfasen kan det likevel oppstå feil og avbrudd.
 
 - avtalene mellom brukerne, eller for om de blir oppfylt,
 - tingene som legges ut,
+- tjenestene som tilbys eller utføres,
 - tap som oppstår fordi brukere opptrer i strid med vilkårene eller loven.
 
 Dette gjelder ikke tap som skyldes at vi selv har opptrådt uaktsomt eller brutt disse vilkårene.

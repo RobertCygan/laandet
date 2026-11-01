@@ -1,7 +1,7 @@
 ---
 doc_key: prohibited_items
 locale: en
-version: 1.0.0
+version: 1.1.0
 status: Current – not legally reviewed – informational translation
 updated: 01.11.2026
 translation_of: legal/nb/forbudte-og-begrensede-gjenstander.md
@@ -11,7 +11,7 @@ translation_of: legal/nb/forbudte-og-begrensede-gjenstander.md
 
 > **Informational translation.** The Norwegian version of this document is the legally binding one. If the two versions differ, the Norwegian text prevails.
 
-**Version 1.0.0 · Last updated 01.11.2026**
+**Version 1.1.0 · Last updated 01.11.2026**
 
 > This text was written with the help of AI and has not been reviewed by a lawyer.
 
@@ -19,7 +19,7 @@ Laandet is made for ordinary things that people have at home, in the shed and in
 service safe and legal, some things are not allowed. Other things require extra care.
 
 The **"Other" category does not mean that anything goes.** The rules below apply to all listings: "For rent",
-"Wanted" and "Giving away".
+"Wanted", "Giving away" and services.
 
 ## 1. Not allowed on Laandet
 
@@ -37,11 +37,21 @@ The **"Other" category does not mean that anything goes.** The rules below apply
 | Live animals | All animals |
 | Unsafe or recalled products | Products recalled for safety reasons, electrical equipment with damaged cables or insulation, safety equipment that does not work |
 | Things you have no right to rent out, lend out or give away | Stolen things, things you rent or lease yourself, your employer's equipment, counterfeit goods |
-| Things that are not physical objects | Services, jobs, homes, cabins, rooms, boat moorings, parking spaces |
+| Renting out places | Homes, cabins, rooms, boat moorings, parking spaces |
 | Personal documents and data | Passports, ID cards, number plates, storage media containing other people's data |
 | Offensive content | Pornography and content that is hateful or illegal |
 
 If you are unsure, ask us before you post the listing.
+
+### Services that are not allowed
+
+| Group | Examples |
+|---|---|
+| Work that requires authorisation or approval | Electrical work (including in fuse boxes), work on gas installations, chimney sweeping and work on chimneys and fireplaces, plumbing on water and drainage in the building |
+| Work with a high risk of falling | Clearing snow and other work on roofs |
+| Children, health and care | Childminding, nursing, health services, treatment and massage |
+| Paid transport of people | Lifts and taxi |
+| Other illegal or dangerous work | Demolition involving asbestos, felling large trees near houses or power lines, undeclared work |
 
 ## 2. Requires extra care
 
@@ -54,6 +64,8 @@ These categories are allowed, but both parties must confirm that they have read 
 | **Trailers** | The renter must have the right driving licence class (B or BE), and the car must be able to handle the weight of the trailer. Check the lights, the tyres and any periodic roadworthiness test (EU-kontroll). |
 | **Kayaks, canoes and SUP** | Everyone must have a life jacket. Take the weather, wind and cold water into account. Never paddle alone in cold water. |
 | **Barbecues and gas equipment** | Check the hose and regulator, and test for leaks. Only use the equipment outdoors. Transport gas cylinders upright. |
+| **Services: small repairs** | Simple jobs only, without electrical work, gas or work on chimneys. Use the right tools and protective equipment. |
+| **Services: snow clearing** | On the ground only – never on roofs. Watch out for cars and people when using a snow blower. |
 | **Child car seats** | State whether the seat has been in a collision, and when it was made or when it expires. Never give away a car seat that has been in a collision. |
 
 ## 3. Can only be lent for free or given away during the pilot phase

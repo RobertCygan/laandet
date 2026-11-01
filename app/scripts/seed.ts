@@ -44,6 +44,7 @@ async function seedReferenceData() {
       policy: c.policy,
       safetyNotice: c.safetyNotice ?? null,
       allowPaidRental: c.allowPaidRental ?? true,
+      ...(c.allowedListingTypes ? { allowedListingTypes: c.allowedListingTypes } : {}),
       sortOrder: i,
     };
     // Only insert: admins may have changed policy or labels since the first seed.
