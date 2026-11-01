@@ -553,7 +553,9 @@ during Phase 01 start as *Proposed* (implementation-level) unless the owner says
 - **Decision:**
   - **Server:** Hostinger KVM 1, Ubuntu 24.04, EU data centre. This is below D-005's 2 vCPU, accepted for the pilot. Production only: no staging on this server.
   - **Address:** `https://laandet.gpsi.ai` (A record in the gpsi.ai DNS zone at Hostinger).
-  - **Email (replaces the provider choice in D-008):** SMTP through the existing mailbox `laandet.steigen@gpsi.ai` (smtp.hostinger.com:465). The same address is the public contact, the sender and the address for worker alerts and certificate notices.
+  - **Email (replaces the provider choice in D-008):** SMTP through the existing Hostinger mailbox `kontakt@gpsi.ai` (smtp.hostinger.com:465). It is the sender («Laandet <kontakt@gpsi.ai>») and gets worker alerts and certificate notices.
+  - The public contact stays `laandet.steigen@gpsi.ai`, an alias of that mailbox. An alias cannot log in, which the first set-up run found on 01.11.2026 («Login denied»).
+  - `bootstrap.sh` reads the domain, sender and login from the server's `app.env` on later runs, so `laandet-update` keeps them.
   - **Set-up:** `deploy/bootstrap.sh`, run once by the owner as root. It builds the image on the server, generates every secret there, asks for the mailbox password on the server and tests it, then runs `deploy.sh`, Caddy and the nightly backup timer. The GitHub deploy workflow and GHCR are not used for now. `deploy.sh` uses an image that is already on the server instead of pulling it.
   - **Backups:** nightly restic backups (encrypted; 7 daily, 4 weekly, 6 monthly) in `/var/backups/laandet` **on the same server**. The privacy notice says so.
   - **Legal texts:** final version 1.0.0, marked as not reviewed by a lawyer (D-058). The extended rental agreement stays a draft; it is not in use.

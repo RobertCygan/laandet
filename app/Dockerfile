@@ -67,8 +67,12 @@ COPY --from=legal . ./legal
 
 # The only writable paths at runtime are /data/media (volume) and /tmp (tmpfs); see deploy/compose.yaml.
 # Next.js may write a cache under .next/cache, which is redirected into /tmp.
+# Files from the build context keep the host's modes. A checkout made with a strict umask (0640/0750)
+# would leave public/, the migrations, the seed data and the legal texts unreadable for `node`, so
+# everything under /app is made readable here (only entries that lack it, to keep the layer small).
 RUN mkdir -p /data/media && chown node:node /data/media \
- && ln -s /tmp/next-cache /app/.next/cache
+ && ln -s /tmp/next-cache /app/.next/cache \
+ && find /app \( \( -type f ! -perm -o=r \) -o \( -type d ! -perm -o=rx \) \) -exec chmod a+rX {} +
 
 USER node
 EXPOSE 3000
