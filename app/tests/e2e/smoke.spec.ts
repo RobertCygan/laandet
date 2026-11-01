@@ -152,3 +152,30 @@ test("a profile photo can be added, is shown to others and can be removed (D-061
   await expect(page.getByText("Profilbildet er fjernet.")).toBeVisible();
   expect((await visitor.request.get(`/media/${row!.avatar}/thumb`)).status()).toBe(404);
 });
+
+test.describe("front-page logo intro (D-062)", () => {
+  test.use({ reducedMotion: "no-preference" });
+
+  test("plays at double speed, can be skipped, and does not come back inside the site", async ({ page }) => {
+    await page.goto("/");
+    const intro = page.getByTestId("logo-intro");
+    await expect(intro).toBeVisible();
+    await expect(page.getByRole("button", { name: "Hopp over intro" })).toBeFocused();
+    await expect
+      .poll(() => page.locator(".logo-intro-video").evaluate((v: HTMLVideoElement) => v.playbackRate))
+      .toBe(2);
+    await page.keyboard.press("Escape");
+    await expect(intro).toHaveCount(0);
+    await page.getByRole("main").getByRole("link", { name: "Finn noe å leie" }).first().click();
+    await expect(page).toHaveURL(/\/utforsk/);
+    await page.getByRole("link", { name: /Laandet – til forsiden/ }).click();
+    await expect(page).toHaveURL(/\/$/);
+    await expect(intro).toHaveCount(0);
+  });
+
+  test("ends by itself after a few seconds", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.getByTestId("logo-intro")).toBeVisible();
+    await expect(page.getByTestId("logo-intro")).toHaveCount(0, { timeout: 8000 });
+  });
+});

@@ -19,6 +19,8 @@ export default defineConfig({
     baseURL: `http://localhost:${PORT}`,
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
+    // The front-page logo intro (D-062) is skipped for reduced motion; smoke.spec.ts tests it on its own.
+    reducedMotion: "reduce",
   },
   // Every journey runs at a phone viewport; the main journey and smoke checks also on desktop (TEST_STRATEGY §5).
   projects: [
