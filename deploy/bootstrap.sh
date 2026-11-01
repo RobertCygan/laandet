@@ -6,7 +6,9 @@
 #   bash bootstrap.sh
 #
 # It asks one question, the password of the mailbox that sends Laandet's e-mail, and tests it at once
-# by sending a test e-mail to that mailbox. Everything else runs unattended (about 15–25 minutes):
+# by sending a test e-mail to that mailbox (kontakt@gpsi.ai; laandet.steigen@gpsi.ai is only an alias of
+# it and cannot log in). To send as another address, give both, e.g.
+#   LAANDET_MAILBOX=other@gpsi.ai LAANDET_SMTP_USER=kontakt@gpsi.ai bash bootstrap.sh Everything else runs unattended (about 15–25 minutes):
 #   1. system updates, automatic security updates, fail2ban, firewall (22, 80, 443), 2 GB swap;
 #   2. Docker Engine and the Compose plugin from Docker's apt repository;
 #   3. the repository in /opt/laandet/src and the application image, built on this server;
@@ -21,17 +23,50 @@
 set -Eeuo pipefail
 umask 027
 
-REPO_URL=${LAANDET_REPO_URL:-https://github.com/RobertCygan/laandet.git}
-REF=${LAANDET_REF:-main}
-DOMAIN=${LAANDET_DOMAIN:-laandet.gpsi.ai}
-MAILBOX=${LAANDET_MAILBOX:-laandet.steigen@gpsi.ai}
-SMTP_HOST=${LAANDET_SMTP_HOST:-smtp.hostinger.com}
 IMAGE_REPO=laandet-app
 ROOT=/opt/laandet
 SRC=$ROOT/src
 ENV_DIR=$ROOT/production
 SECRETS=$ENV_DIR/secrets
 EDGE=$ROOT/edge/secrets
+
+# On a server that is already set up, the current app.env is the memory: the domain, the sender and
+# the mailbox login are read from it, so `laandet-update` keeps them. A value given on the command
+# line wins; the built-in defaults are only for the first run.
+previous() { # previous <domain|mailbox|smtp_user|smtp_host>
+  [[ -r $SECRETS/app.env ]] || return 0
+  PREVIOUS_WHAT=$1 python3 - "$SECRETS/app.env" <<'PY'
+import os, re, sys, urllib.parse
+env = {}
+for line in open(sys.argv[1], encoding="utf-8"):
+    m = re.match(r'^([A-Z0-9_]+)=(.*)$', line.rstrip("\n"))
+    if m:
+        env[m.group(1)] = m.group(2).strip().strip('"')
+what = os.environ["PREVIOUS_WHAT"]
+smtp = urllib.parse.urlsplit(env.get("SMTP_URL", ""))
+if what == "domain" and env.get("APP_URL", "").startswith("https://"):
+    print(urllib.parse.urlsplit(env["APP_URL"]).hostname or "")
+elif what == "mailbox":
+    m = re.search(r"<([^>]+)>", env.get("MAIL_FROM", ""))
+    print(m.group(1) if m else "")
+elif what == "smtp_user" and smtp.username:
+    print(urllib.parse.unquote(smtp.username))
+elif what == "smtp_host" and smtp.hostname:
+    print(smtp.hostname)
+PY
+}
+PREV_DOMAIN=$(previous domain)
+PREV_MAILBOX=$(previous mailbox)
+PREV_SMTP_USER=$(previous smtp_user)
+PREV_SMTP_HOST=$(previous smtp_host)
+
+REPO_URL=${LAANDET_REPO_URL:-https://github.com/RobertCygan/laandet.git}
+REF=${LAANDET_REF:-main}
+DOMAIN=${LAANDET_DOMAIN:-${PREV_DOMAIN:-laandet.gpsi.ai}}
+# MAILBOX is the sender address; SMTP_USER is the mailbox that logs in (an alias cannot log in).
+MAILBOX=${LAANDET_MAILBOX:-${PREV_MAILBOX:-kontakt@gpsi.ai}}
+SMTP_USER=${LAANDET_SMTP_USER:-${PREV_SMTP_USER:-$MAILBOX}}
+SMTP_HOST=${LAANDET_SMTP_HOST:-${PREV_SMTP_HOST:-smtp.hostinger.com}}
 
 step() { printf '\n\033[1m==> %s\033[0m\n' "$*"; }
 die() {
@@ -46,13 +81,13 @@ trap 'die "przerwano w linii $LINENO. Skopiuj ostatnie 30 linii z tego okna i wy
 [[ ${ID:-} == ubuntu ]] || die "this script expects Ubuntu 24.04 (found ${PRETTY_NAME:-unknown})"
 
 # ---- 0. The one question, asked first so the rest can run unattended ---------------------------
-smtp_test() { # smtp_test <password>: send a test e-mail from the mailbox to itself
+smtp_test() { # smtp_test <password>: log in as SMTP_USER and send a test e-mail from MAILBOX to MAILBOX
   local cfg msg rc=0 esc
   cfg=$(mktemp) msg=$(mktemp)
   chmod 600 "$cfg"
   esc=${1//\\/\\\\}
   esc=${esc//\"/\\\"}
-  printf 'user = "%s:%s"\n' "$MAILBOX" "$esc" >"$cfg"
+  printf 'user = "%s:%s"\n' "$SMTP_USER" "$esc" >"$cfg"
   printf 'From: Laandet <%s>\r\nTo: <%s>\r\nSubject: Laandet: test fra serveren\r\n\r\nServeren kan sende e-post. Denne meldingen kan slettes.\r\n' \
     "$MAILBOX" "$MAILBOX" >"$msg"
   curl -sS --max-time 30 --ssl-reqd --url "smtps://$SMTP_HOST:465" -K "$cfg" \
@@ -62,8 +97,15 @@ smtp_test() { # smtp_test <password>: send a test e-mail from the mailbox to its
 }
 
 SMTP_PASSWORD=
-if [[ ! -s $SECRETS/app.env ]] || ! grep -q '^SMTP_URL=smtps://' "$SECRETS/app.env"; then
-  step "Hasło do skrzynki $MAILBOX (strona wysyła z niej e-maile)"
+# The password is asked for (and tested) on the first run, and again whenever the login, the server or
+# the sender changes; otherwise the stored SMTP_URL is kept.
+if [[ ! -s $SECRETS/app.env ]] || ! grep -q '^SMTP_URL=smtps://' "$SECRETS/app.env" ||
+  [[ $SMTP_USER != "$PREV_SMTP_USER" || $SMTP_HOST != "$PREV_SMTP_HOST" || $MAILBOX != "$PREV_MAILBOX" ]]; then
+  if [[ $SMTP_USER == "$MAILBOX" ]]; then
+    step "Hasło do skrzynki $SMTP_USER (strona wysyła z niej e-maile)"
+  else
+    step "Hasło do skrzynki $SMTP_USER (strona wysyła e-maile jako $MAILBOX)"
+  fi
   for attempt in 1 2 3; do
     read -rsp "Wpisz hasło (nie widać go przy wpisywaniu) i naciśnij Enter: " SMTP_PASSWORD </dev/tty
     echo
@@ -182,7 +224,7 @@ set_env "$SECRETS/app.env" MAIL_FROM "\"Laandet <$MAILBOX>\""
 set_env "$SECRETS/app.env" OPS_ALERT_EMAIL "$MAILBOX"
 if [[ -n $SMTP_PASSWORD ]]; then
   # URL-encoded, so it contains no "$" (Compose would read "$" as a variable).
-  set_env "$SECRETS/app.env" SMTP_URL "smtps://$(urlencode "$MAILBOX"):$(urlencode "$SMTP_PASSWORD")@$SMTP_HOST:465"
+  set_env "$SECRETS/app.env" SMTP_URL "smtps://$(urlencode "$SMTP_USER"):$(urlencode "$SMTP_PASSWORD")@$SMTP_HOST:465"
   SMTP_PASSWORD=
 fi
 printf 'APP_ENV=production\nDATABASE_MIGRATION_URL=postgres://laandet_owner:%s@db:5432/laandet\n' \
