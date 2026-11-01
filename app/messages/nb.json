@@ -86,7 +86,6 @@
     "ctaFind": "Finn noe å leie",
     "ctaOffer": "Legg ut noe du har",
     "heroAlt": "Illustrasjonsbilde av fjord og naust i Nordland",
-    "heroCaption": "Illustrasjonsbilde · KI-generert",
     "searchLabel": "Hva trenger du?",
     "searchPlaceholder": "Prøv «tilhenger» eller «høytrykksspyler»",
     "areaLabel": "I nærheten av",
@@ -105,7 +104,10 @@
     "howStep2": "Ta kontakt og avtal det praktiske.",
     "howStep3": "Hent, få levert eller møtes på et avtalt sted.",
     "howStep4": "Lever tilbake i like god stand – eller gi bort for godt.",
-    "rentalsSoon": "Forespørsler, leieavtaler og tilstandsrapporter åpner snart. Du kan allerede legge ut annonser."
+    "rentalsSoon": "Forespørsler, leieavtaler og tilstandsrapporter åpner snart. Du kan allerede legge ut annonser.",
+    "introTitle": "GPSI GovTech Solutions – logoanimasjon",
+    "introOpening": "Åpner Laandet",
+    "introSkip": "Hopp over intro"
   },
   "listing": {
     "demoBadge": "Eksempel",

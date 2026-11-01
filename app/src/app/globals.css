@@ -9,7 +9,7 @@
 @theme {
   --font-sans: "Manrope Variable", Manrope, Arial, sans-serif;
   --color-background: #fcfbf8;
-  --color-surface: #f2f3ed;
+  --color-surface: #e7eadf;
   --color-elevated: #ffffff;
   --color-primary: #174d3c;
   --color-primary-hover: #103c2e;
@@ -300,6 +300,10 @@
   }
   .desktop-nav {
     display: none;
+    flex: 1 1 auto;
+    justify-content: space-evenly;
+    max-width: 640px;
+    margin-inline: auto;
     gap: 26px;
     align-items: center;
     font-weight: 600;
@@ -853,5 +857,71 @@
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
+  }
+}
+
+/* Logo intro on the front page (IntroGate, D-062) */
+.logo-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #020609;
+  isolation: isolate;
+  transition: opacity 200ms ease;
+}
+.logo-intro-leaving {
+  opacity: 0;
+  pointer-events: none;
+}
+.logo-intro-video {
+  display: block;
+  width: min(86vmin, 820px);
+  height: min(86vmin, 820px);
+  max-width: 100vw;
+  max-height: calc(100dvh - 95px);
+  object-fit: contain;
+  /* The animation is drawn on its own dark square: screen blending drops it into the background,
+     and the faded edges hide its border. */
+  mix-blend-mode: screen;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent, #000 8%, #000 92%, transparent),
+    linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent, #000 8%, #000 92%, transparent),
+    linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent);
+  mask-composite: intersect;
+}
+.logo-intro-footer {
+  position: absolute;
+  right: clamp(20px, 4vw, 60px);
+  bottom: max(22px, env(safe-area-inset-bottom));
+  left: clamp(20px, 4vw, 60px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  color: #c1cbd0;
+  font-size: 15px;
+}
+.logo-intro-skip {
+  min-height: 44px;
+  padding: 10px 17px;
+  border: 1px solid #445660;
+  border-radius: 30px;
+  background: #0d171dbf;
+  color: #eef5f8;
+  font-size: 15px;
+}
+.logo-intro-skip:hover {
+  background: #1c303a;
+}
+@media (prefers-reduced-motion: reduce) {
+  .logo-intro {
+    transition: none;
   }
 }

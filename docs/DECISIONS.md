@@ -575,3 +575,11 @@ during Phase 01 start as *Proposed* (implementation-level) unless the owner says
 - **Not included:** cropping in the browser (the photo is shown cut to a circle), and a staff action to remove one photo; a moderator can still restrict or suspend an account, which hides it.
 - **Status:** Accepted 01.11.2026 (owner request).
 
+## D-062 — Logo intro on the front page; no caption on the hero picture
+- **Context:** The owner, 01.11.2026: the live site did not open with his logo intro (only the earlier demo had it); he also asked to remove the caption «Illustrasjonsbilde · KI-generert» from the front-page picture, to spread the main menu evenly and to darken the background of the tile sections.
+- **Decision:**
+  - The owner's logo animation plays over the front page on the first page load, at double speed (about 3.5 s), blended into a dark background. Escape or «Hopp over intro» ends it; it is skipped for «reduced motion» and after an error, and it does not replay when someone comes back to the front page inside the site. Nothing is stored in the browser. Deep links (a listing shared on Facebook) open without it.
+  - The hero caption is removed at the owner's request. The picture is still AI-generated; its alt text stays «Illustrasjonsbilde av fjord og naust i Nordland». Demo listings keep their own «KI-generert» notice.
+  - The main menu is spread evenly; `--color-surface` is darker (#e7eadf) for more contrast with the tiles.
+- **Status:** Accepted 01.11.2026 (owner request).
+

@@ -86,7 +86,6 @@
     "ctaFind": "Find something to rent",
     "ctaOffer": "Post something you have",
     "heroAlt": "Illustration of a fjord and boathouse in Nordland",
-    "heroCaption": "Illustration · AI-generated",
     "searchLabel": "What do you need?",
     "searchPlaceholder": "Try «trailer» or «pressure washer»",
     "areaLabel": "Near",
@@ -105,7 +104,10 @@
     "howStep2": "Get in touch and agree on the practical details.",
     "howStep3": "Collect it, have it delivered or meet at an agreed place.",
     "howStep4": "Return it in the same condition – or give it away for good.",
-    "rentalsSoon": "Requests, rental agreements and condition reports open soon. You can already post listings."
+    "rentalsSoon": "Requests, rental agreements and condition reports open soon. You can already post listings.",
+    "introTitle": "GPSI GovTech Solutions – logo animation",
+    "introOpening": "Opening Laandet",
+    "introSkip": "Skip intro"
   },
   "listing": {
     "demoBadge": "Example",

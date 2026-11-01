@@ -5,6 +5,7 @@ import { isLocale } from "@/i18n/routing";
 import { flagEnabled } from "@/modules/flags/flags";
 import { latestListings, listCategories, listLocalities } from "@/modules/listings/queries";
 import { CategoryIcon } from "@/ui/Icon";
+import { IntroGate } from "@/ui/IntroGate";
 import { ListingCard } from "@/ui/ListingCard";
 import { Notice } from "@/ui/Notice";
 
@@ -26,6 +27,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
 
   return (
     <>
+      <IntroGate title={t("introTitle")} opening={t("introOpening")} skip={t("introSkip")} />
       <section className="wrap grid items-center gap-8 pt-10 pb-8 lg:grid-cols-2">
         <div>
           <p className="pill mb-5 uppercase tracking-wider">{t("eyebrow")}</p>
@@ -54,9 +56,6 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
             height={950}
             className="h-auto w-full object-cover"
           />
-          <figcaption className="absolute right-3 bottom-2 rounded bg-black/45 px-2 py-0.5 text-xs text-white">
-            {t("heroCaption")}
-          </figcaption>
         </figure>
       </section>
 

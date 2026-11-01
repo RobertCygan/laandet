@@ -60,6 +60,6 @@ function buildCsp(nonce: string): string {
 export const config = {
   matcher: [
     // Pages only: not API routes, Next.js internals, media, health check or static files.
-    "/((?!api/|_next/|media/|healthz|favicon\\.svg|robots\\.txt|images/|.*\\.(?:png|jpg|jpeg|webp|svg|ico|txt|xml|woff2?)$).*)",
+    "/((?!api/|_next/|media/|healthz|favicon\\.svg|robots\\.txt|images/|videos/|.*\\.(?:png|jpg|jpeg|webp|svg|ico|txt|xml|woff2?|webm|mp4)$).*)",
   ],
 };

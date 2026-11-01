@@ -3,6 +3,7 @@
 All notable changes to Laandet. Dates are DD.MM.YYYY.
 
 ## Unreleased — 01.11.2026
+- **Front page (D-062):** the owner's logo intro on first load (double speed, skippable, off for reduced motion); hero caption removed; main menu spread evenly; darker section background behind tiles.
 - **Header (D-061):** an account menu with the user's photo or initial and name holds «Slik fungerer det», messages, notices, rentals, own listings, profile, admin and «Logg ut»; the main menu stays on one line. A dot shows unread messages or notices.
 - **Profile photos (D-061):** optional, under «Min profil»; public on the profile and in the header, removed within an hour when replaced, removed or the account is erased. Migration `0012_avatars`. Privacy notice 1.1.0.
 - **Launch set-up (D-060):** one Hostinger VPS (KVM 1), `https://laandet.gpsi.ai`, email through the mailbox laandet.steigen@gpsi.ai. New `deploy/bootstrap.sh` sets up or updates the server in one go (secrets generated on the server; the mailbox password is asked for and tested there) and installs `laandet-admin` and `laandet-update`. `deploy.sh` uses an image already on the server instead of pulling it.
