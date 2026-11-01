@@ -33,7 +33,7 @@ test("every footer and content page answers in both languages", async ({ request
 test("legal pages show version and the draft label; English shows that Norwegian prevails", async ({ page }) => {
   await page.goto("/vilkar");
   await expect(page.getByText("Utkast – ikke juridisk gjennomgått").first()).toBeVisible();
-  await expect(page.getByText(/Versjon 0\.1\.0/).first()).toBeVisible();
+  await expect(page.getByText(/Versjon \d+\.\d+\.\d+/).first()).toBeVisible();
   await expect(page.locator("#rangering")).toHaveCount(1);
   await page.goto("/en/vilkar");
   await expect(page.getByText("Informational translation. The Norwegian version is the binding one.")).toBeVisible();
