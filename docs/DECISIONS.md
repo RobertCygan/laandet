@@ -583,3 +583,13 @@ during Phase 01 start as *Proposed* (implementation-level) unless the owner says
   - The main menu is spread evenly; `--color-surface` is darker (#e7eadf) for more contrast with the tiles.
 - **Status:** Accepted 01.11.2026 (owner request).
 
+
+## D-063 — Tjenester (services) and business accounts, step 1
+- **Context:** The owner, 01.11.2026: people in Steigen ask for help such as lawn mowing and snow clearing; they should be able to post that they offer or need such a service, paid (per hour, per m² or for the whole job) or free. Businesses should be allowed too, so that small local businesses are seen (example: a friend's business offers free yoga for people over 60). Paid promotion (step 2) waits until a business asks for it.
+- **Decision:**
+  - Two new listing types, «Tjeneste tilbys» (`service_offer`) and «Tjeneste ønskes» (`service_wanted`), in eight new service categories (garden, snow clearing on the ground, moving help, cleaning, small repairs, pet sitting, classes, other). Price per hour, per m² or for the whole job, or free (0), or by agreement (no price). No item condition, value, deposit or handover; contact only through messages. **No booking and no payment** through Laandet.
+  - Not allowed as services: work that needs authorisation (electrical work, gas, chimneys, plumbing in buildings), work on roofs (incl. snow on roofs), childminding, health and care, paid transport of people. Small repairs and snow clearing are restricted categories with a safety notice; keywords flag the rest for moderation.
+  - Business accounts: «Bedrift eller forening» at sign-up with an organisation number. It is checked (mod 11) and looked up in Enhetsregisteret's open API (`data.brreg.no`, no key); deleted (410), bankrupt, dissolving or compulsorily dissolved entities are refused; one account per org number. Only the registered name, the number and the time of the check are stored; they are public on the profile and the listings («Bedrift»). The private-use confirmation is not asked for.
+  - Business accounts can only post services and send messages; rental requests, give-away claims and item listings stay between private people. Business accounts are free; there are still no paid or promoted listings.
+  - Terms 1.1.0 (account types, section 8.4–8.6 on businesses incl. prices with VAT, new section 11a on services, tax is each user's responsibility), prohibited items 1.1.0, privacy 1.2.0 (business data, the Brønnøysund lookup). Not marked as a material change: nothing is taken away from existing users.
+- **Status:** Accepted 01.11.2026 (owner: «Na razie robimy krok 1»). Step 2 (paid ads, registering an ENK, VAT) is not started.

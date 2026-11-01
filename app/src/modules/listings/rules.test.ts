@@ -130,3 +130,52 @@ describe("storageViolations (apply to drafts too)", () => {
     expect(c(rental({ type: "wanted", wantedFrom: "2026-12-10", wantedTo: "2026-12-01" }))).toContain("dates_order");
   });
 });
+
+describe("services (D-063)", () => {
+  const serviceCategory = category({ allowedListingTypes: ["service_offer", "service_wanted"] });
+  const service = (o: Partial<ListingDraft> = {}): ListingDraft =>
+    rental({
+      type: "service_offer",
+      title: "Plenklipping",
+      description: "Jeg klipper plenen din med egen klipper.",
+      itemCondition: null,
+      priceOre: 30000,
+      priceUnit: "hour",
+      declaredValueOre: null,
+      handoverPickup: false,
+      imageCount: 0,
+      ...o,
+    });
+  const noPreview = { highValuePreview: false };
+
+  it("publishes a paid, a free and a «by agreement» service without condition, value or handover", () => {
+    expect(publishViolations(service(), serviceCategory, noPreview)).toEqual([]);
+    expect(publishViolations(service({ priceOre: 0, priceUnit: null }), serviceCategory, noPreview)).toEqual([]);
+    expect(publishViolations(service({ priceOre: null, priceUnit: null }), serviceCategory, noPreview)).toEqual([]);
+    expect(
+      publishViolations(service({ type: "service_wanted", priceUnit: "sqm" }), serviceCategory, noPreview),
+    ).toEqual([]);
+  });
+
+  it("needs a service unit when a price is given", () => {
+    expect(publishViolations(service({ priceUnit: null }), serviceCategory, noPreview)).toContainEqual({
+      field: "priceUnit",
+      code: "required",
+    });
+    expect(publishViolations(service({ priceUnit: "day" }), serviceCategory, noPreview)).toContainEqual({
+      field: "priceUnit",
+      code: "unit_not_allowed",
+    });
+  });
+
+  it("keeps rentals to rental units, and services out of item categories", () => {
+    expect(publishViolations(rental({ priceUnit: "sqm" }), category(), noPreview)).toContainEqual({
+      field: "priceUnit",
+      code: "unit_not_allowed",
+    });
+    expect(publishViolations(service(), category(), noPreview)).toContainEqual({
+      field: "categoryId",
+      code: "category_type_not_allowed",
+    });
+  });
+});

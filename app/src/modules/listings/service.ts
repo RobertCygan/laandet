@@ -9,6 +9,7 @@ import {
   reports,
   savedListings,
   screeningKeywords,
+  userProfiles,
   type ListingStatus,
 } from "@/db/schema";
 import { recordAudit } from "@/modules/audit/audit";
@@ -23,6 +24,7 @@ import { releaseListingBookings } from "@/modules/rentals/service";
 import { getRequestMeta } from "@/modules/server/request-meta";
 import {
   containsContactInfo,
+  isServiceType,
   matchScreeningKeywords,
   MAX_IMAGES,
   publishViolations,
@@ -104,6 +106,14 @@ export async function saveListing(
   }
   const user = actor as UserActor;
   if (existing && existing.type !== draft.type) throw violationsError([{ field: "type", code: "type_locked" }]);
+  if (!isServiceType(draft.type)) {
+    // Business accounts post services only; rentals and give-aways stay between private people (D-063).
+    const [profile] = await db
+      .select({ accountType: userProfiles.accountType })
+      .from(userProfiles)
+      .where(eq(userProfiles.userId, user.id));
+    if (profile?.accountType === "business") throw violationsError([{ field: "type", code: "business_services_only" }]);
+  }
 
   const [category] = await db.select().from(categories).where(eq(categories.id, draft.categoryId));
   const [locality] = await db.select().from(localities).where(eq(localities.id, draft.localityId));

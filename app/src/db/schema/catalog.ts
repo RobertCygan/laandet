@@ -35,7 +35,9 @@ const tstzrange = customType<{ data: string }>({
   },
 });
 
-export const LISTING_TYPES = ["rent_out", "wanted", "give_away"] as const;
+export const LISTING_TYPES = ["rent_out", "wanted", "give_away", "service_offer", "service_wanted"] as const;
+/** Tjenester (D-063): offered or wanted help, paid or free; contact through messages, no booking. */
+export const SERVICE_TYPES = ["service_offer", "service_wanted"] as const;
 export type ListingType = (typeof LISTING_TYPES)[number];
 
 export const LISTING_STATUSES = [
@@ -53,7 +55,14 @@ export type ListingStatus = (typeof LISTING_STATUSES)[number];
 export const ITEM_CONDITIONS = ["new", "as_new", "good", "fair", "worn", "defective"] as const;
 export type ItemCondition = (typeof ITEM_CONDITIONS)[number];
 
-export const PRICE_UNITS = ["hour", "day", "weekend", "week"] as const;
+export const PRICE_UNITS = ["hour", "day", "weekend", "week", "sqm", "job"] as const;
+/** Units a rental can be priced in (bookings use only these). */
+export const RENTAL_PRICE_UNITS = ["hour", "day", "weekend", "week"] as const;
+export type RentalPriceUnit = (typeof RENTAL_PRICE_UNITS)[number];
+export const isRentalPriceUnit = (u: string | null): u is RentalPriceUnit =>
+  (RENTAL_PRICE_UNITS as readonly string[]).includes(u ?? "");
+/** Units a service can be priced in (D-063). */
+export const SERVICE_PRICE_UNITS = ["hour", "sqm", "job"] as const;
 export type PriceUnit = (typeof PRICE_UNITS)[number];
 
 export const CATEGORY_POLICIES = ["allowed", "restricted", "prohibited"] as const;
@@ -87,7 +96,10 @@ export const categories = pgTable(
     check("categories_labels_chk", sql`${t.labels} ? 'nb' AND ${t.labels} ? 'en'`),
     check("categories_policy_chk", sql`${t.policy} IN ('allowed','restricted','prohibited')`),
     check("categories_restricted_has_notice", sql`${t.policy} <> 'restricted' OR ${t.safetyNotice} IS NOT NULL`),
-    check("categories_types_chk", sql`${t.allowedListingTypes} <@ ARRAY['rent_out','wanted','give_away']`),
+    check(
+      "categories_types_chk",
+      sql`${t.allowedListingTypes} <@ ARRAY['rent_out','wanted','give_away','service_offer','service_wanted']`,
+    ),
   ],
 );
 
@@ -203,7 +215,7 @@ export const listings = pgTable(
     index("listings_owner_idx").on(t.ownerId, t.status),
     index("listings_search_idx").using("gin", t.searchVector),
     index("listings_title_trgm_idx").using("gin", t.title.op("gin_trgm_ops")),
-    check("listings_type_chk", sql`${t.type} IN ('rent_out','wanted','give_away')`),
+    check("listings_type_chk", sql`${t.type} IN ('rent_out','wanted','give_away','service_offer','service_wanted')`),
     check(
       "listings_status_chk",
       sql`${t.status} IN ('draft','published','paused','reserved','given_away','archived','removed','deleted')`,
@@ -219,7 +231,7 @@ export const listings = pgTable(
     check("listings_restrictions_len", sql`char_length(${t.usageRestrictions}) <= 1000`),
     check("listings_instructions_len", sql`char_length(${t.operatingInstructions}) <= 2000`),
     check("listings_condition_chk", sql`${t.itemCondition} IN ('new','as_new','good','fair','worn','defective')`),
-    check("listings_price_unit_chk", sql`${t.priceUnit} IN ('hour','day','weekend','week')`),
+    check("listings_price_unit_chk", sql`${t.priceUnit} IN ('hour','day','weekend','week','sqm','job')`),
     check(
       "listings_money_nonneg",
       sql`coalesce(${t.priceOre}, 0) >= 0 AND coalesce(${t.depositOre}, 0) >= 0 AND coalesce(${t.budgetOre}, 0) >= 0 AND coalesce(${t.deliveryFeeOre}, 0) >= 0 AND coalesce(${t.declaredValueOre}, 1) > 0`,
@@ -259,7 +271,24 @@ export const listings = pgTable(
     ),
     check(
       "published_offer_has_handover",
-      sql`${t.type} = 'wanted' OR ${t.status} = 'draft' OR ${t.handoverPickup} OR ${t.handoverOwnerDelivery} OR ${t.handoverMeet}`,
+      sql`${t.type} IN ('wanted','service_offer','service_wanted') OR ${t.status} = 'draft' OR ${t.handoverPickup} OR ${t.handoverOwnerDelivery} OR ${t.handoverMeet}`,
+    ),
+    // Tjenester (D-063): no item terms, no handover; a price needs a service unit (hour, m², whole job).
+    check(
+      "service_has_no_item_terms",
+      sql`${t.type} NOT IN ('service_offer','service_wanted') OR (${t.declaredValueOre} IS NULL AND ${t.depositOre} IS NULL AND ${t.itemCondition} IS NULL AND ${t.knownDefects} IS NULL AND NOT ${t.handoverPickup} AND NOT ${t.handoverOwnerDelivery} AND NOT ${t.handoverMeet})`,
+    ),
+    check(
+      "rent_out_price_unit_chk",
+      sql`${t.type} <> 'rent_out' OR ${t.priceUnit} IS NULL OR ${t.priceUnit} IN ('hour','day','weekend','week')`,
+    ),
+    check(
+      "service_price_unit_chk",
+      sql`${t.type} NOT IN ('service_offer','service_wanted') OR ${t.priceUnit} IS NULL OR ${t.priceUnit} IN ('hour','sqm','job')`,
+    ),
+    check(
+      "service_paid_has_unit",
+      sql`${t.type} NOT IN ('service_offer','service_wanted') OR ${t.status} = 'draft' OR coalesce(${t.priceOre}, 0) = 0 OR ${t.priceUnit} IS NOT NULL`,
     ),
     check("reserved_only_for_give_away", sql`${t.status} NOT IN ('reserved','given_away') OR ${t.type} = 'give_away'`),
   ],

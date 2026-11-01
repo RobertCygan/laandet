@@ -243,6 +243,16 @@
     border-color: #d8e3d6;
     color: var(--color-primary);
   }
+  .badge-service {
+    background: #eef3f8;
+    border-color: #d5e0ea;
+    color: #1f4566;
+  }
+  .badge-business {
+    background: #174d3c;
+    border-color: #174d3c;
+    color: #ffffff;
+  }
   .badge-delivery {
     background: #f8faf1;
     border-color: #e1e8d4;

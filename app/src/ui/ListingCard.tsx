@@ -24,6 +24,9 @@ export async function ListingCard({ listing, locale }: { listing: ListingSummary
           {listing.isDemo && <span className="badge badge-demo">{t("demoBadge")}</span>}
           {listing.type === "wanted" && <span className="badge">{t("type.wanted")}</span>}
           {listing.type === "give_away" && <span className="badge badge-private">{t("type.give_away")}</span>}
+          {listing.type === "service_offer" && <span className="badge badge-service">{t("type.service_offer")}</span>}
+          {listing.type === "service_wanted" && <span className="badge">{t("type.service_wanted")}</span>}
+          {listing.businessName && <span className="badge badge-business">{t("businessBadge")}</span>}
           {listing.handoverOwnerDelivery && (
             <span className="badge badge-delivery">
               <Truck size={13} aria-hidden="true" />
@@ -43,6 +46,7 @@ export async function ListingCard({ listing, locale }: { listing: ListingSummary
           <MapPin size={14} aria-hidden="true" />
           {listing.localityName}, Steigen
         </span>
+        {listing.businessName && <span className="text-sm text-muted">{listing.businessName}</span>}
         <div className="listing-bottom">
           <span className="price">
             {listing.type === "rent_out" && listing.priceOre !== null && listing.priceOre > 0 && (
@@ -53,6 +57,17 @@ export async function ListingCard({ listing, locale }: { listing: ListingSummary
             )}
             {listing.type === "rent_out" && listing.priceOre === 0 && <strong>{t("freeLoan")}</strong>}
             {listing.type === "give_away" && <strong>{t("free")}</strong>}
+            {(listing.type === "service_offer" || listing.type === "service_wanted") &&
+              (listing.priceOre === 0 ? (
+                <strong>{t("free")}</strong>
+              ) : listing.priceOre !== null && listing.priceUnit ? (
+                <>
+                  <strong>{formatKr(listing.priceOre)}</strong>
+                  <span>{t(`perUnit.${listing.priceUnit as "hour" | "sqm" | "job"}`)}</span>
+                </>
+              ) : (
+                <span>{t("byAgreement")}</span>
+              ))}
             {listing.type === "wanted" && (
               <span>{listing.budgetOre ? t("budget", { amount: formatKr(listing.budgetOre) }) : t("budgetOpen")}</span>
             )}

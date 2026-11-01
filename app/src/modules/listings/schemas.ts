@@ -99,8 +99,11 @@ export type ListingFormValues = z.infer<typeof listingFormSchema>;
 
 /** Keep only the fields that belong to the listing type (DB checks forbid the others). */
 export function toDraft(v: ListingFormValues, imageCount: number): ListingDraft {
-  const offer = v.type !== "wanted";
+  const service = v.type === "service_offer" || v.type === "service_wanted";
+  const offer = v.type === "rent_out" || v.type === "give_away";
   const rent = v.type === "rent_out";
+  // Services: free → 0, no amount → «etter avtale» (null); a unit only goes with a price.
+  const servicePrice = service ? (v.freeLoan ? 0 : v.price) : null;
   const accessories = v.accessories
     .split("\n")
     .map((s) => s.trim())
@@ -116,8 +119,12 @@ export function toDraft(v: ListingFormValues, imageCount: number): ListingDraft 
     areaNote: v.areaNote,
     itemCondition: offer ? v.itemCondition : null,
     knownDefects: offer ? v.knownDefects : null,
-    priceOre: rent ? (v.freeLoan ? 0 : v.price) : null,
-    priceUnit: rent ? (v.priceUnit ?? (v.freeLoan ? "day" : null)) : null,
+    priceOre: rent ? (v.freeLoan ? 0 : v.price) : servicePrice,
+    priceUnit: rent
+      ? (v.priceUnit ?? (v.freeLoan ? "day" : null))
+      : service && servicePrice !== null && servicePrice > 0
+        ? v.priceUnit
+        : null,
     declaredValueOre: rent ? v.declaredValue : null,
     depositOre: rent ? (v.deposit && v.deposit > 0 ? v.deposit : null) : null,
     usageRestrictions: rent ? v.usageRestrictions : null,
@@ -126,12 +133,12 @@ export function toDraft(v: ListingFormValues, imageCount: number): ListingDraft 
     wantedFrom: v.type === "wanted" ? v.wantedFrom : null,
     wantedTo: v.type === "wanted" ? v.wantedTo : null,
     budgetOre: v.type === "wanted" ? v.budget : null,
-    handoverPickup: v.handoverPickup,
-    handoverOwnerDelivery: v.handoverOwnerDelivery,
-    deliveryFeeOre: v.handoverOwnerDelivery ? v.deliveryFee : null,
-    deliveryRadiusKm: v.handoverOwnerDelivery ? v.deliveryRadiusKm : null,
-    handoverMeet: v.handoverMeet,
-    meetingAreaNote: v.handoverMeet ? v.meetingAreaNote : null,
+    handoverPickup: !service && v.handoverPickup,
+    handoverOwnerDelivery: !service && v.handoverOwnerDelivery,
+    deliveryFeeOre: !service && v.handoverOwnerDelivery ? v.deliveryFee : null,
+    deliveryRadiusKm: !service && v.handoverOwnerDelivery ? v.deliveryRadiusKm : null,
+    handoverMeet: !service && v.handoverMeet,
+    meetingAreaNote: !service && v.handoverMeet ? v.meetingAreaNote : null,
     restrictedAck: v.restrictedAck,
     imageCount,
   };

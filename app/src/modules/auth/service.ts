@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import { db } from "@/db/client";
 import { legalAcceptances, listings, localities, sessions, userProfiles, users } from "@/db/schema";
 import { recordAudit } from "@/modules/audit/audit";
+import { lookupOrganisation } from "@/modules/business/brreg";
 import { isFlagEnabled } from "@/modules/flags/flags";
 import { currentLegalDoc } from "@/modules/legal/repo";
 import { queueEmail } from "@/modules/notifications/outbox";
@@ -39,6 +40,22 @@ export async function signUp(input: SignUpInput, now = Date.now()): Promise<void
   if (now - input.startedAt < MIN_FILL_MS) throw new AppError("validation", "too_fast");
   if (!(await isFlagEnabled(db, "registrations_open"))) throw new AppError("feature_disabled");
   await enforceRateLimits(db, [{ bucket: `signup:ip:${hashIp(meta.ip) ?? "none"}`, rule: LIMITS.signUpPerIp }]);
+
+  // Business accounts (D-063): the org number must be active in Enhetsregisteret and not in use yet.
+  let business: { orgNumber: string; name: string } | null = null;
+  if (input.accountType === "business") {
+    const orgNumber = input.orgNumber ?? "";
+    const found = await lookupOrganisation(orgNumber);
+    if (!found.ok) throw new AppError("validation", found.reason, { fieldErrors: { orgNumber: found.reason } });
+    const [taken] = await db
+      .select({ id: userProfiles.userId })
+      .from(userProfiles)
+      .where(eq(userProfiles.orgNumber, orgNumber));
+    if (taken) {
+      throw new AppError("validation", "org_number_taken", { fieldErrors: { orgNumber: "org_number_taken" } });
+    }
+    business = { orgNumber, name: found.name };
+  }
 
   const [existing] = await db
     .select({ id: users.id, verified: users.emailVerified, profile: userProfiles.userId })
@@ -81,7 +98,15 @@ export async function signUp(input: SignUpInput, now = Date.now()): Promise<void
       localityId,
       locale: input.locale,
       age18ConfirmedAt: confirmedAt,
-      privateUseConfirmedAt: confirmedAt,
+      ...(business
+        ? {
+            accountType: "business" as const,
+            orgNumber: business.orgNumber,
+            businessName: business.name,
+            businessVerifiedAt: confirmedAt,
+            privateUseConfirmedAt: null,
+          }
+        : { privateUseConfirmedAt: confirmedAt }),
     });
     for (const key of ["terms", "privacy"] as const) {
       const doc = await currentLegalDoc(tx, key, "nb");
@@ -93,6 +118,7 @@ export async function signUp(input: SignUpInput, now = Date.now()): Promise<void
       action: "auth.sign_up",
       targetType: "user",
       targetId: created.id,
+      ...(business ? { metadata: { accountType: "business", orgNumber: business.orgNumber } } : {}),
       meta,
     });
   });

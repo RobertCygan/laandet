@@ -53,7 +53,8 @@
     "otherLanguage": "English",
     "rentals": "Leieforhold",
     "accountMenu": "Kontomeny",
-    "unreadSomething": "noe ulest"
+    "unreadSomething": "noe ulest",
+    "services": "Tjenester"
   },
   "footer": {
     "tagline": "Mer bruk. Mindre kjøp. Litt nærmere hverandre.",
@@ -107,7 +108,8 @@
     "rentalsSoon": "Forespørsler, leieavtaler og tilstandsrapporter åpner snart. Du kan allerede legge ut annonser.",
     "introTitle": "GPSI GovTech Solutions – logoanimasjon",
     "introOpening": "Åpner Laandet",
-    "introSkip": "Hopp over intro"
+    "introSkip": "Hopp over intro",
+    "servicesHeading": "Tjenester i nabolaget"
   },
   "listing": {
     "demoBadge": "Eksempel",
@@ -122,13 +124,17 @@
     "type": {
       "rent_out": "Leies ut",
       "wanted": "Ønskes leid",
-      "give_away": "Gis bort"
+      "give_away": "Gis bort",
+      "service_offer": "Tjeneste tilbys",
+      "service_wanted": "Tjeneste ønskes"
     },
     "unit": {
       "hour": "time",
       "day": "dag",
       "weekend": "helg",
-      "week": "uke"
+      "week": "uke",
+      "sqm": "m²",
+      "job": "hele jobben"
     },
     "condition": {
       "new": "Ny",
@@ -147,7 +153,15 @@
       "archived": "Arkivert",
       "removed": "Skjult av Laandet",
       "deleted": "Slettet"
-    }
+    },
+    "perUnit": {
+      "hour": "per time",
+      "sqm": "per m²",
+      "job": "for hele jobben"
+    },
+    "byAgreement": "Pris etter avtale",
+    "services": "Tjenester",
+    "businessBadge": "Bedrift"
   },
   "detail": {
     "back": "Alle annonser",
@@ -192,7 +206,11 @@
     "removedNotice": "Annonsen er skjult av Laandet.",
     "seeDecision": "Se begrunnelsen og klag",
     "sendRequest": "Send forespørsel",
-    "ownerRequestsLink": "Se forespørsler og leieforhold"
+    "ownerRequestsLink": "Se forespørsler og leieforhold",
+    "aboutService": "Om tjenesten",
+    "serviceNote": "Dere avtaler tid, pris og betaling direkte. Ingen betaling går gjennom Laandet.",
+    "orgNumber": "org.nr. {number}",
+    "businessNote": "Bedriften er registrert i Enhetsregisteret og er selv ansvarlig for tjenesten og prisene (inkludert eventuell mva.)."
   },
   "explore": {
     "title": "Utforsk nabolaget",
@@ -297,7 +315,16 @@
     "warnContact": "Beskrivelsen ser ut til å inneholde kontaktinformasjon. Del heller kontaktinfo i meldinger når dere har avtalt.",
     "typeLocked": "Typen kan ikke endres etter at annonsen er laget.",
     "giveFreeNote": "Gratis – Laandet tar ingen gebyr.",
-    "warnKeywords": "Annonsen kan handle om en forbudt eller begrenset gjenstand. Sjekk reglene. Hvis du publiserer, ser en moderator på annonsen."
+    "warnKeywords": "Annonsen kan handle om en forbudt eller begrenset gjenstand. Sjekk reglene. Hvis du publiserer, ser en moderator på annonsen.",
+    "typeServiceOffer": "Tilby en tjeneste",
+    "typeServiceOfferHint": "Hagearbeid, snømåking, dyrepass, kurs – betalt eller gratis.",
+    "typeServiceWanted": "Trenger hjelp",
+    "typeServiceWantedHint": "Be om hjelp til en jobb, f.eks. plenklipping.",
+    "businessServicesOnly": "Bedriftskontoer kan legge ut tjenester. Utleie og bortgiving er for privatpersoner.",
+    "serviceFreeLabel": "Gratis (f.eks. frivillig eller dugnad)",
+    "serviceBudgetLabel": "Hva kan du betale?",
+    "servicePriceHint": "La feltet stå tomt for «pris etter avtale».",
+    "serviceNote": "Laandet formidler bare kontakten. Dere avtaler tid, pris og betaling direkte – ingen betaling går gjennom Laandet."
   },
   "myListings": {
     "title": "Mine annonser",
@@ -352,7 +379,16 @@
     "verifiedBanner": "E-postadressen er bekreftet. Velkommen til Laandet!",
     "unverifiedBanner": "Bekreft e-postadressen din for å legge ut annonser.",
     "resendForMe": "Send bekreftelseslenken på nytt",
-    "website": "Nettsted (la stå tomt)"
+    "website": "Nettsted (la stå tomt)",
+    "accountType": "Hvem oppretter kontoen?",
+    "accountPrivate": "Privatperson",
+    "accountPrivateHint": "Lån, lei ut, gi bort og hjelp hverandre.",
+    "accountBusiness": "Bedrift eller forening",
+    "accountBusinessHint": "Tilby tjenester med organisasjonsnummer.",
+    "orgNumber": "Organisasjonsnummer",
+    "orgNumberHint": "9 siffer. Vi sjekker det i Enhetsregisteret (Brønnøysund) og viser det registrerte navnet.",
+    "nameHintBusiness": "Navnet andre ser, f.eks. kontaktpersonen «Kari N.».",
+    "businessTermsNote": "Bedriftskontoer kan bare legge ut tjenester. Utleie og bortgiving er for privatpersoner."
   },
   "account": {
     "title": "Min profil",
@@ -413,7 +449,10 @@
     "report": "Rapporter profil",
     "completedRentals": "{count, plural, one {# fullført leieforhold} other {# fullførte leieforhold}}",
     "reviews": "Vurderinger",
-    "noReviews": "Ingen vurderinger ennå."
+    "noReviews": "Ingen vurderinger ennå.",
+    "businessBadge": "Bedrift",
+    "orgNumber": "org.nr. {number}",
+    "businessVerified": "Organisasjonsnummeret er kontrollert mot Enhetsregisteret. E-postadressen er bekreftet."
   },
   "report": {
     "title": "Rapporter",
@@ -659,7 +698,9 @@
     "errorTitle": "Noe gikk galt",
     "errorText": "Vi beklager. Prøv igjen om litt. Hvis feilen fortsetter, kontakt oss og oppgi referansen.",
     "errorReference": "Referanse",
-    "tryAgain": "Prøv igjen"
+    "tryAgain": "Prøv igjen",
+    "brreg_unavailable": "Vi fikk ikke kontakt med Enhetsregisteret. Prøv igjen om litt.",
+    "business_private_only": "Bedriftskontoer kan tilby og etterspørre tjenester. Leie og bortgiving er for privatpersoner."
   },
   "validation": {
     "required": "Må fylles ut.",
@@ -724,7 +765,14 @@
     "slug_taken": "Denne adressen er allerede i bruk.",
     "month_invalid": "Velg en måned.",
     "month_in_future": "Du kan ikke registrere tall for en måned som ikke har begynt.",
-    "parts_exceed_total": "Delbeløpene er til sammen større enn totalen."
+    "parts_exceed_total": "Delbeløpene er til sammen større enn totalen.",
+    "org_number_invalid": "Skriv et gyldig organisasjonsnummer (9 siffer).",
+    "org_not_found": "Fant ikke organisasjonsnummeret i Enhetsregisteret.",
+    "org_not_active": "Enheten er slettet, konkurs eller under avvikling.",
+    "brreg_unavailable": "Vi fikk ikke kontakt med Enhetsregisteret. Prøv igjen om litt.",
+    "org_number_taken": "Dette organisasjonsnummeret har allerede en konto.",
+    "business_services_only": "Bedriftskontoer kan bare legge ut tjenester.",
+    "unit_not_allowed": "Velg en gyldig enhet."
   },
   "pages": {
     "howTitle": "Slik fungerer Laandet",

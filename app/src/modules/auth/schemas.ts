@@ -20,24 +20,43 @@ export const displayNameSchema = z
 
 const checked = z.literal("on", { error: "must_confirm" });
 
-export const signUpSchema = z.object({
-  name: displayNameSchema,
-  email: emailSchema,
-  password: passwordSchema,
-  locality: z
-    .string()
-    .max(60)
-    .optional()
-    .transform((v) => (v ? v : undefined)),
-  age18: checked,
-  privateUse: checked,
-  terms: checked,
-  locale: z.enum(["nb", "en"]),
-  // Bot protection: honeypot must stay empty; form must not be submitted faster than 3 s.
-  website: z.string().max(0, { error: "bot" }).optional().default(""),
-  startedAt: z.coerce.number().int().positive(),
-});
-export type SignUpInput = z.infer<typeof signUpSchema>;
+export const signUpSchema = z
+  .object({
+    accountType: z.enum(["private", "business"]).default("private"),
+    orgNumber: z
+      .string()
+      .max(20)
+      .optional()
+      .transform((v) => (v ? v.replace(/[\s.]/g, "") : undefined)),
+    name: displayNameSchema,
+    email: emailSchema,
+    password: passwordSchema,
+    locality: z
+      .string()
+      .max(60)
+      .optional()
+      .transform((v) => (v ? v : undefined)),
+    age18: checked,
+    // Private people confirm private use; businesses give an org number instead (D-063).
+    privateUse: z.string().optional(),
+    terms: checked,
+    locale: z.enum(["nb", "en"]),
+    // Bot protection: honeypot must stay empty; form must not be submitted faster than 3 s.
+    website: z.string().max(0, { error: "bot" }).optional().default(""),
+    startedAt: z.coerce.number().int().positive(),
+  })
+  .superRefine((v, ctx) => {
+    if (v.accountType === "private" && v.privateUse !== "on") {
+      ctx.addIssue({ code: "custom", path: ["privateUse"], message: "must_confirm" });
+    }
+    if (v.accountType === "business" && !/^\d{9}$/.test(v.orgNumber ?? "")) {
+      ctx.addIssue({ code: "custom", path: ["orgNumber"], message: "org_number_invalid" });
+    }
+  });
+type ParsedSignUp = z.infer<typeof signUpSchema>;
+/** Parsed sign-up values; a private account needs no account type or org number. */
+export type SignUpInput = Omit<ParsedSignUp, "accountType" | "orgNumber"> &
+  Partial<Pick<ParsedSignUp, "accountType" | "orgNumber">>;
 
 export const signInSchema = z.object({
   email: emailSchema,

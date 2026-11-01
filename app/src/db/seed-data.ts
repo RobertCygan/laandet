@@ -19,7 +19,11 @@ type CategorySeed = {
   policy: CategoryPolicy;
   allowPaidRental?: boolean;
   safetyNotice?: LocalizedText;
+  /** Default: the three item types. Service categories (D-063) take only the two service types. */
+  allowedListingTypes?: string[];
 };
+
+const SERVICE = ["service_offer", "service_wanted"];
 
 // Initial taxonomy from docs/PROHIBITED_ITEMS.md §2. Editable by admins afterwards.
 export const CATEGORIES: CategorySeed[] = [
@@ -152,6 +156,72 @@ export const CATEGORIES: CategorySeed[] = [
     },
   },
   { slug: "annet", labels: { nb: "Annet", en: "Other" }, icon: "box", policy: "allowed" },
+  // Tjenester (D-063). Electrical work, work on roofs and gas, chimney or fireplace work may not be
+  // offered (PROHIBITED_ITEMS.md, terms); the screening keywords below flag such listings for review.
+  {
+    slug: "tjeneste-hage",
+    labels: { nb: "Hagearbeid og plenklipping", en: "Garden work and lawn mowing" },
+    icon: "trees",
+    policy: "allowed",
+    allowedListingTypes: SERVICE,
+  },
+  {
+    slug: "tjeneste-snomaking",
+    labels: { nb: "Snømåking på bakken", en: "Snow clearing on the ground" },
+    icon: "snowflake",
+    policy: "restricted",
+    allowedListingTypes: SERVICE,
+    safetyNotice: {
+      nb: "Bare snømåking på bakken: innkjørsel, gårdsplass, trapp. Snømåking på tak er ikke tillatt på Laandet.",
+      en: "Only clearing snow on the ground: driveway, yard, steps. Clearing snow from roofs is not allowed on Laandet.",
+    },
+  },
+  {
+    slug: "tjeneste-flytting",
+    labels: { nb: "Flytting og transport", en: "Moving and transport" },
+    icon: "truck",
+    policy: "allowed",
+    allowedListingTypes: SERVICE,
+  },
+  {
+    slug: "tjeneste-rengjoring",
+    labels: { nb: "Vask og rengjøring", en: "Washing and cleaning" },
+    icon: "sparkles",
+    policy: "allowed",
+    allowedListingTypes: SERVICE,
+  },
+  {
+    slug: "tjeneste-smaareparasjoner",
+    labels: { nb: "Småreparasjoner og montering", en: "Small repairs and assembly" },
+    icon: "hammer",
+    policy: "restricted",
+    allowedListingTypes: SERVICE,
+    safetyNotice: {
+      nb: "Ikke elektrisk arbeid, rørlegging i vegg, gass, pipe eller ildsted. Slikt arbeid krever autorisasjon.",
+      en: "No electrical work, plumbing inside walls, gas, chimney or fireplace work. Such work requires authorisation.",
+    },
+  },
+  {
+    slug: "tjeneste-dyrepass",
+    labels: { nb: "Dyrepass og lufting", en: "Pet care and walking" },
+    icon: "paw-print",
+    policy: "allowed",
+    allowedListingTypes: SERVICE,
+  },
+  {
+    slug: "tjeneste-kurs",
+    labels: { nb: "Kurs og aktiviteter", en: "Courses and activities" },
+    icon: "dumbbell",
+    policy: "allowed",
+    allowedListingTypes: SERVICE,
+  },
+  {
+    slug: "tjeneste-annet",
+    labels: { nb: "Annen hjelp", en: "Other help" },
+    icon: "box",
+    policy: "allowed",
+    allowedListingTypes: SERVICE,
+  },
 ];
 
 // Hints only (PROHIBITED_ITEMS.md §4): a match queues an automatic report, never auto-removal.
@@ -192,4 +262,19 @@ export const SCREENING_KEYWORDS = [
   "hytte til leie",
   "parkeringsplass",
   "båtplass",
+  // Services that may not be offered (D-063)
+  "elektriker",
+  "elektrisk arbeid",
+  "el-arbeid",
+  "sikringsskap",
+  "takmåking",
+  "måke tak",
+  "snø på taket",
+  "feiing",
+  "barnepass",
+  "barnevakt",
+  "taxi",
+  "skyss mot betaling",
+  "pipe",
+  "gassinstallasjon",
 ];

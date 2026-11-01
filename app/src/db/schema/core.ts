@@ -21,6 +21,9 @@ import { mediaObjects } from "./catalog";
 const ts = (name: string) => timestamp(name, { withTimezone: true });
 
 export const ACCOUNT_STATUSES = ["active", "restricted", "suspended", "deletion_pending", "deleted"] as const;
+/** D-063: a private person, or a business registered in Enhetsregisteret (services only). */
+export const ACCOUNT_TYPES = ["private", "business"] as const;
+export type AccountType = (typeof ACCOUNT_TYPES)[number];
 export type AccountStatus = (typeof ACCOUNT_STATUSES)[number];
 
 export const ROLES = ["user", "moderator", "admin"] as const;
@@ -58,7 +61,12 @@ export const userProfiles = pgTable(
     statusChangedAt: ts("status_changed_at"),
     // Sign-up self-declarations (never displayed as "verified")
     age18ConfirmedAt: ts("age_18_confirmed_at").notNull(),
-    privateUseConfirmedAt: ts("private_use_confirmed_at").notNull(),
+    // Private accounts confirm private use; business accounts give a verified organisation number instead.
+    privateUseConfirmedAt: ts("private_use_confirmed_at"),
+    accountType: text("account_type", { enum: ACCOUNT_TYPES }).notNull().default("private"),
+    orgNumber: text("org_number"),
+    businessName: text("business_name"),
+    businessVerifiedAt: ts("business_verified_at"),
     emailNotifications: boolean("email_notifications").notNull().default(true),
     deletionRequestedAt: ts("deletion_requested_at"),
     deletedAt: ts("deleted_at"),
@@ -73,6 +81,14 @@ export const userProfiles = pgTable(
     check("user_profiles_bio_len", sql`char_length(${t.bio}) <= 500`),
     check("user_profiles_locale_chk", sql`${t.locale} IN ('nb','en')`),
     check("user_profiles_role_chk", sql`${t.role} IN ('user','moderator','admin')`),
+    check("user_profiles_account_type_chk", sql`${t.accountType} IN ('private','business')`),
+    check(
+      "user_profiles_account_kind_chk",
+      sql`(${t.accountType} = 'private' AND (${t.privateUseConfirmedAt} IS NOT NULL OR ${t.status} = 'deleted')) OR (${t.accountType} = 'business' AND ((${t.orgNumber} IS NOT NULL AND ${t.businessName} IS NOT NULL AND ${t.businessVerifiedAt} IS NOT NULL) OR ${t.status} = 'deleted'))`,
+    ),
+    check("user_profiles_org_number_chk", sql`${t.orgNumber} ~ '^[0-9]{9}$'`),
+    check("user_profiles_business_name_len", sql`char_length(${t.businessName}) BETWEEN 1 AND 200`),
+    uniqueIndex("user_profiles_org_number_uq").on(t.orgNumber),
     check(
       "user_profiles_status_chk",
       sql`${t.status} IN ('active','restricted','suspended','deletion_pending','deleted')`,

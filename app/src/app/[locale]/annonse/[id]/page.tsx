@@ -38,6 +38,11 @@ export default async function ListingPage({ params, searchParams }: PageProps<"/
   if (!d) notFound();
   const l = d.listing;
   const isOwner = actor.kind === "user" && actor.id === l.ownerId;
+  const service = l.type === "service_offer" || l.type === "service_wanted";
+  const business =
+    d.owner.accountType === "business" && d.owner.businessName
+      ? { name: d.owner.businessName, orgNumber: d.owner.orgNumber }
+      : null;
   const [saved, rentalsOpen, decisionId] = await Promise.all([
     isSaved(actor, l.id),
     flagEnabled("rentals_open"),
@@ -147,7 +152,7 @@ export default async function ListingPage({ params, searchParams }: PageProps<"/
           </section>
 
           <section className="flex flex-col gap-4">
-            <h2 className="text-xl">{t("aboutItem")}</h2>
+            <h2 className="text-xl">{service ? t("aboutService") : t("aboutItem")}</h2>
             <p className="whitespace-pre-line">{l.description}</p>
             {l.type !== "wanted" && l.itemCondition && (
               <p>
@@ -196,7 +201,11 @@ export default async function ListingPage({ params, searchParams }: PageProps<"/
             <div className="flex flex-wrap gap-2">
               {l.isDemo && <span className="badge badge-demo">{tl("demoBadge")}</span>}
               <span className="badge">{tl(`type.${l.type}`)}</span>
-              <span className="badge badge-private">{tl("privateBadge")}</span>
+              {business ? (
+                <span className="badge badge-business">{tl("businessBadge")}</span>
+              ) : (
+                <span className="badge badge-private">{tl("privateBadge")}</span>
+              )}
             </div>
             <p className="category-label">{d.category.labels[locale]}</p>
             <h1 className="text-[clamp(26px,3.5vw,36px)] leading-tight">{l.title}</h1>
@@ -223,6 +232,21 @@ export default async function ListingPage({ params, searchParams }: PageProps<"/
                 {l.depositOre ? <p className="fine-print">{t("depositNote")}</p> : null}
               </div>
             )}
+            {service && (
+              <p className="price text-2xl">
+                {l.priceOre === 0 ? (
+                  <strong>{tl("free")}</strong>
+                ) : l.priceOre !== null && l.priceUnit ? (
+                  <>
+                    <strong>{formatKr(l.priceOre)}</strong>{" "}
+                    <span>{tl(`perUnit.${l.priceUnit as "hour" | "sqm" | "job"}`)}</span>
+                  </>
+                ) : (
+                  <span>{tl("byAgreement")}</span>
+                )}
+              </p>
+            )}
+            {service && <p className="fine-print">{t("serviceNote")}</p>}
             {l.type === "give_away" && (
               <p className="price text-2xl">
                 <strong>{tl("free")}</strong>
@@ -241,7 +265,7 @@ export default async function ListingPage({ params, searchParams }: PageProps<"/
               </dl>
             )}
 
-            <div>
+            <div hidden={service}>
               <h2 className="mb-2 text-base">{t("handover")}</h2>
               <ul className="flex flex-col gap-1.5">
                 {l.handoverPickup && (
@@ -332,7 +356,16 @@ export default async function ListingPage({ params, searchParams }: PageProps<"/
             <p className="text-sm text-muted">
               {t("memberSince", { date: formatMonthYear(d.owner.createdAt, locale) })}
             </p>
-            <p className="fine-print">{t("privateNote")}</p>
+            {business ? (
+              <>
+                <p>
+                  {business.name} · {t("orgNumber", { number: business.orgNumber ?? "" })}
+                </p>
+                <p className="fine-print">{t("businessNote")}</p>
+              </>
+            ) : (
+              <p className="fine-print">{t("privateNote")}</p>
+            )}
           </div>
 
           <Notice tone="warning">{t("paymentWarning")}</Notice>

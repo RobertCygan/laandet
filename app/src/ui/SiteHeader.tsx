@@ -25,6 +25,7 @@ export async function SiteHeader({ actor, locale }: { actor: Actor; locale: "nb"
       <Link href="/kategorier">{t("categories")}</Link>
       <Link href={{ pathname: "/utforsk", query: { type: "wanted" } }}>{t("wanted")}</Link>
       <Link href={{ pathname: "/utforsk", query: { type: "give_away" } }}>{t("giveAway")}</Link>
+      <Link href={{ pathname: "/utforsk", query: { type: "tjenester" } }}>{t("services")}</Link>
     </>
   );
   const howItWorks = <Link href="/slik-fungerer-det">{t("howItWorks")}</Link>;

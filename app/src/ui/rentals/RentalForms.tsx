@@ -2,7 +2,7 @@
 
 import { useActionState, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
-import type { PriceUnit } from "@/db/schema";
+import type { RentalPriceUnit } from "@/db/schema";
 import { formatKr, osloLocalToDate } from "@/i18n/format";
 import {
   acceptAgreementAction,
@@ -159,7 +159,7 @@ export function RequestForm({
   listingId: string;
   locale: Loc;
   priceOre: number;
-  priceUnit: PriceUnit;
+  priceUnit: RentalPriceUnit;
   depositOre: number;
   methods: Method[];
 }) {

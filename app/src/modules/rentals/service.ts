@@ -1,4 +1,5 @@
 import { and, eq, sql } from "drizzle-orm";
+import { assertPrivateAccount } from "@/modules/business/account";
 import { z } from "zod";
 import { db, type Tx } from "@/db/client";
 import {
@@ -11,6 +12,7 @@ import {
   messages,
   userProfiles,
   type BookingStatus,
+  isRentalPriceUnit,
 } from "@/db/schema";
 import { recordAudit } from "@/modules/audit/audit";
 import type { Actor, UserActor } from "@/modules/authz/actor-types";
@@ -149,7 +151,7 @@ export async function requestBooking(
   if (await isBlockedBetween(db, actor.id, l.ownerId)) throw new AppError("forbidden", "blocked");
 
   // Category A only in the MVP (D-011); free lending only where paid rental is paused (D-028).
-  if (l.declaredValueOre === null || l.priceOre === null || l.priceUnit === null)
+  if (l.declaredValueOre === null || l.priceOre === null || !isRentalPriceUnit(l.priceUnit))
     throw new AppError("conflict", "listing_incomplete");
   if (classifyValue(l.declaredValueOre) !== "A") throw new AppError("forbidden", "high_value_blocked");
   if (!cat?.allowPaidRental && l.priceOre > 0) throw new AppError("forbidden", "paid_rental_not_allowed");
@@ -160,15 +162,17 @@ export async function requestBooking(
   if (!allowed[input.returnMethod]) fieldErrors.returnMethod = "method_not_offered";
   const start = new Date(input.start);
   const end = new Date(input.end);
-  const perr = periodError(start, end, l.priceUnit, now);
+  const unit = l.priceUnit;
+  const perr = periodError(start, end, unit, now);
   if (perr) fieldErrors.start = perr;
   if (Object.keys(fieldErrors).length) throw new AppError("validation", "request_invalid", { fieldErrors });
+  await assertPrivateAccount(actor.id);
 
   await enforceRateLimits(db, [
     { bucket: `request:user:${actor.id}`, rule: actor.isNewAccount ? LIMITS.requestsNew : LIMITS.requestsEstablished },
   ]);
 
-  const n = units(start, end, l.priceUnit);
+  const n = units(start, end, unit);
   const meta = await getRequestMeta();
   return db.transaction(async (tx) => {
     const conversationId = await getOrCreateConversation(tx, {
@@ -187,7 +191,7 @@ export async function requestBooking(
         valueCategory: "A",
         declaredValueOre: l.declaredValueOre!,
         priceOre: l.priceOre!,
-        priceUnit: l.priceUnit!,
+        priceUnit: unit,
         units: n,
         totalPriceOre: totalOre(l.priceOre!, n),
         depositOre: l.depositOre ?? 0,

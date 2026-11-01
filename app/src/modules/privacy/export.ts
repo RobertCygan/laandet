@@ -68,6 +68,10 @@ export async function buildDataExport(actor: Actor, now = new Date()) {
       emailNotifications: userProfiles.emailNotifications,
       age18ConfirmedAt: userProfiles.age18ConfirmedAt,
       privateUseConfirmedAt: userProfiles.privateUseConfirmedAt,
+      accountType: userProfiles.accountType,
+      orgNumber: userProfiles.orgNumber,
+      businessName: userProfiles.businessName,
+      businessVerifiedAt: userProfiles.businessVerifiedAt,
       deletionRequestedAt: userProfiles.deletionRequestedAt,
     })
     .from(users)

@@ -20,6 +20,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const TYPES = ["rent_out", "wanted", "give_away"] as const;
+/** The «Tjenester» tab shows offered and wanted services together (D-063). */
+const SERVICES_PARAM = "tjenester";
 const DELIVERY = ["pickup", "owner_delivery", "meet"] as const;
 const SLUG = /^[a-z0-9-]{1,60}$/;
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -38,7 +40,7 @@ function parseFilters(sp: SP): SearchFilters {
   const page = Number(str("side"));
   return {
     q: str("q")?.slice(0, 100),
-    type: TYPES.find((x) => x === str("type")),
+    type: str("type") === SERVICES_PARAM ? "services" : TYPES.find((x) => x === str("type")),
     category: SLUG.test(str("kategori") ?? "") ? str("kategori") : undefined,
     locality: SLUG.test(str("sted") ?? "") ? str("sted") : undefined,
     minPriceOre: kr("min"),
@@ -90,20 +92,23 @@ export default async function ExplorePage({ params, searchParams }: PageProps<"/
       <PageHeader title={t("title")} lead={t("lead")} />
 
       <nav aria-label={t("tabs")} className="mb-5 flex flex-wrap gap-2">
-        {[undefined, ...TYPES].map((type) => (
+        {[undefined, ...TYPES, "services" as const].map((type) => (
           <Link
             key={type ?? "all"}
-            href={{ pathname: "/utforsk", query: withParams(sp, { type, side: undefined }) }}
+            href={{
+              pathname: "/utforsk",
+              query: withParams(sp, { type: type === "services" ? SERVICES_PARAM : type, side: undefined }),
+            }}
             className={`button button-sm ${f.type === type ? "button-primary" : "button-subtle"}`}
             aria-current={f.type === type ? "page" : undefined}
           >
-            {type ? tl(`type.${type}`) : tc("all")}
+            {type === "services" ? tl("services") : type ? tl(`type.${type}`) : tc("all")}
           </Link>
         ))}
       </nav>
 
       <form action={`${prefix}/utforsk`} method="get" className="mb-8 flex flex-col gap-4">
-        {f.type && <input type="hidden" name="type" value={f.type} />}
+        {f.type && <input type="hidden" name="type" value={f.type === "services" ? SERVICES_PARAM : f.type} />}
         <div className="card flex flex-col gap-3 p-3 md:flex-row md:items-end">
           <label className="field flex-1">
             {t("searchLabel")}
@@ -191,7 +196,10 @@ export default async function ExplorePage({ params, searchParams }: PageProps<"/
               {t("applyFilters")}
             </button>
             <Link
-              href={{ pathname: "/utforsk", query: f.type ? { type: f.type } : {} }}
+              href={{
+                pathname: "/utforsk",
+                query: f.type ? { type: f.type === "services" ? SERVICES_PARAM : f.type } : {},
+              }}
               className="button button-subtle"
             >
               {t("reset")}
