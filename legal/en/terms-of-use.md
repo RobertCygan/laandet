@@ -1,7 +1,7 @@
 ---
 doc_key: terms
 locale: en
-version: 0.1.1-utkast
+version: 0.1.2-utkast
 status: DRAFT – not legally reviewed – informational translation
 updated: 01.11.2026
 translation_of: legal/nb/brukervilkar.md
@@ -11,7 +11,7 @@ translation_of: legal/nb/brukervilkar.md
 
 > **Informational translation.** The Norwegian version of this document is the legally binding one. If the two versions differ, the Norwegian text prevails.
 
-**Version 0.1.1-utkast · Last updated 01.11.2026**
+**Version 0.1.2-utkast · Last updated 01.11.2026**
 
 > **DRAFT – NOT LEGALLY REVIEWED.** This is a first draft prepared with the help of AI. It has not
 > been approved by a lawyer, and it must not be used with users until a qualified Norwegian lawyer has
@@ -22,10 +22,10 @@ translation_of: legal/nb/brukervilkar.md
 1.1 Laandet is a digital meeting place where people can rent out, lend, look for things to rent and give
 away physical things to each other. We are starting in Steigen municipality.
 
-1.2 Laandet is run by G-PSI.ai:
+1.2 Laandet is run by **[MUST BE COMPLETED BEFORE LAUNCH: the name of the person who runs the service]**
+under the name GPSI GovTech Solution. GPSI GovTech Solution is not a registered business and has no
+organisation number (01.11.2026).
 
-- Legal name: **GPSI GovTech Solution**
-- Organisation number: **[MUST BE COMPLETED BEFORE LAUNCH]**
 - Address: **[MUST BE COMPLETED BEFORE LAUNCH]**
 - Email: **[MUST BE COMPLETED BEFORE LAUNCH]**
 

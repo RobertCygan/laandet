@@ -32,7 +32,7 @@ evidence for some of the rows below, not for all of them.
 | G4-1 | End-to-end journeys 1–7 (`TEST_STRATEGY.md` §5) pass in CI on the release commit | 🟡 | CI was green with 40 Playwright tests on `ecf610e`. Journey 3 («Ønskes leid» → reply with a link to the replier's own listing → request) and journey 2 with two claimants are being added in P04-02. The run must be repeated on the release commit. | Developer |
 | G4-2 | All negative tests N1–N15 pass | ✅ (re-check on the release commit) | [`SECURITY_VERIFICATION.md`](SECURITY_VERIFICATION.md), section «Negative tests N1–N15». Green in CI on `ecf610e`. | Developer |
 | G4-3 | Security gate met, no open high or critical vulnerabilities | 🟡 | See the security gate below. The independent review in Phase 03 found 1 high, 4 medium and 7 low issues; all are fixed with tests (`CHANGELOG.md`, Phase 03). | Developer, Eier |
-| G4-4 | Legal gate met for the documents in use, no `MÅ FYLLES UT` markers | ❌ | See the legal gate below. | Lawyer, Eier |
+| G4-4 | Legal gate met for the documents in use, no `MÅ FYLLES UT` markers | ❌ | See the legal gate below. No lawyer review (owner, 01.11.2026, D-058). | Eier, Developer |
 | G4-5 | Backup restore test within the last 7 days, logged | ⏳ ❌ | [`runbooks/RESTORE.md`](runbooks/RESTORE.md) was only rehearsed locally. No real backup exists yet. The test goes in [`runbooks/RESTORE_LOG.md`](runbooks/RESTORE_LOG.md). | Eier (server), Developer |
 | G4-6 | Mobile usability session done, no open blocker findings | ❌ | Script: [`beta/BRUKERTEST.md`](beta/BRUKERTEST.md). Needs residents and staging (week 50, [`BETA_PLAN.md`](BETA_PLAN.md)). | Eier, Developer |
 | G4-7 | Owner has 2FA on every operational account, and at least one moderator besides the owner is named (or sole moderation with a weekly review plan is accepted) | ❌ | No operational accounts exist yet ([`runbooks/BILLING.md`](runbooks/BILLING.md)). Moderator names go into [`PILOT_SUPPORT.md`](PILOT_SUPPORT.md). | Eier |
@@ -49,16 +49,16 @@ evidence for some of the rows below, not for all of them.
 | S-3 | Backup restore test performed and logged | ⏳ ❌ | Same as G4-5. | Eier, Developer |
 | S-4 | Negative authorisation tests green | ✅ (re-check on the release commit) | 79 policy unit tests and the negative integration tests per area ([`SECURITY_VERIFICATION.md`](SECURITY_VERIFICATION.md), SEC-20). | Developer |
 | S-5 | Owner account 2FA confirmed | ❌ | The owner confirms 2FA on GitHub, the hosting provider, the domain registrar, the email provider, backup storage and the Laandet admin account. | Eier |
-| S-6 | Privacy notice and terms published with real controller details, no `MÅ FYLLES UT` markers | ❌ | On 01.11.2026 the legal name is filled in (GPSI GovTech Solution); `brukervilkar.md` (7 lines), `personvernerklaering.md` (8) and `retningslinjer-for-tvister.md` (3) still contain markers: organisation number, address, e-mail, the data processors and the points for the lawyer. `release:check` lists them. | Eier (details), Lawyer |
+| S-6 | Privacy notice and terms published with real controller details, no `MÅ FYLLES UT` markers | ❌ | Since 01.11.2026 the texts say Laandet is run under the unregistered name GPSI GovTech Solution, with no organisation number (D-059). `brukervilkar.md` (7 lines), `personvernerklaering.md` (8) and `retningslinjer-for-tvister.md` (3) still contain markers: the name of the person who runs Laandet, address, e-mail, the data processors, and three facts to check in the dispute guidelines. `release:check` lists them. | Eier (details), Developer |
 
 ## Legal gate (LEGAL_REVIEW_CHECKLIST.md §3)
 
 | # | Gate | Status today | Evidence | Who acts |
 |---|---|---|---|---|
-| L-1 | All documents in use marked "reviewed" by a qualified Norwegian lawyer (the extended rental agreement is not used) | ❌ | [`LEGAL_REVIEW_CHECKLIST.md`](LEGAL_REVIEW_CHECKLIST.md) §1: every document is "not reviewed". No lawyer is engaged yet. | Eier, Lawyer |
-| L-2 | No `MÅ FYLLES UT FØR LANSERING` or `KONTROLLERES FØR LANSERING` markers in published texts | ❌ | Same as S-6. The production deploy refuses texts with markers (`load-legal`). | Eier, Lawyer |
-| L-3 | Written answers to L-01, L-03, L-04, L-05, L-06, L-07, L-08 and L-09, stored in `docs/legal-review/` | ❌ | No answers yet. | Lawyer |
-| L-4 | Every published legal text has `is_draft = false` | ❌ | All texts are version `0.1.0-utkast` with status «UTKAST – ikke juridisk gjennomgått». `release:check` reports drafts in the database. | Lawyer, Developer |
+| L-1 | All documents in use marked "reviewed" by a qualified Norwegian lawyer (the extended rental agreement is not used) | ✅ owner exception | The owner decided on 01.11.2026 that no lawyer reviews the texts and accepts the risk (D-058). The texts stay marked as not legally reviewed. | Eier |
+| L-2 | No `MÅ FYLLES UT FØR LANSERING` or `KONTROLLERES FØR LANSERING` markers in published texts | ❌ | Same as S-6. The production deploy refuses texts with markers (`load-legal`). | Eier (details), Developer |
+| L-3 | Written answers to L-01, L-03, L-04, L-05, L-06, L-07, L-08 and L-09, stored in `docs/legal-review/` | ✅ owner exception | No lawyer (D-058): the texts keep their current wording on these points, at the owner's risk. | Eier |
+| L-4 | Every published legal text has `is_draft = false` | ❌ | All texts are drafts (`0.1.0-utkast`; terms and privacy notice `0.1.2-utkast`) with status «UTKAST – ikke juridisk gjennomgått». Once L-2 is met, they become non-draft versions that still say they are not reviewed by a lawyer (D-058). `release:check` reports drafts in the database. | Developer, Eier |
 
 **If only the rental agreement is not cleared in time:** the fallback launch
 ([`DEVELOPMENT_ROADMAP.md`](DEVELOPMENT_ROADMAP.md) §5) opens without rentals (`rentals_open` stays off). The terms,

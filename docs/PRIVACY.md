@@ -5,7 +5,7 @@
   [`../legal/nb/personvernerklaering.md`](../legal/nb/personvernerklaering.md).
 - All legal bases and retention periods are **proposals for legal review**.
 
-**Data controller:** G-PSI.ai. The exact legal entity name, organisation number, address and contact email are **MÅ FYLLES UT FØR LANSERING**.
+**Data controller:** the person who runs Laandet under the working name GPSI GovTech Solution, which is not a registered business (D-059). The person's name, address and contact email are **MÅ FYLLES UT FØR LANSERING**.
 
 ## 1. Principles applied
 

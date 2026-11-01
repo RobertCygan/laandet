@@ -522,3 +522,28 @@ during Phase 01 start as *Proposed* (implementation-level) unless the owner says
   - Added: «Vis passord», so a password can be checked while typing (P04-02).
 - **Trade-off:** A 6-character password is much easier to guess offline if the password hashes ever leak. Online guessing is slowed by the limits. Raising the minimum again is a one-line change (`PASSWORD_MIN`).
 - **Status:** Accepted 25.10.2026 (owner decision). Recorded in `ASVS_L1.md` 2.1.1 as an accepted exception.
+
+## D-057 — No Vercel deployments from this repository
+- **Context:** The Vercel project `gpsi2/laandet` builds every push to this repository (its preview comments are on PR #1). Laandet needs a server with PostgreSQL, the background worker and photo storage (D-005), so it cannot run on Vercel. On 01.11.2026 the owner asked the developer to disconnect Vercel: «Czy ty możesz odłączyć Vercel? Ja nie potrafię». The developer has no access to the Vercel account.
+- **Decision:** `vercel.json` in the repository root sets `git.deploymentEnabled` to `false`. Vercel then builds nothing from any branch of this repository that contains the file, `main` included once PR #1 is merged.
+- **Not covered:** Deployments that already exist stay online until they are removed in Vercel. To disconnect fully, the owner opens the project in Vercel, then Settings → Git → Disconnect, or deletes the project.
+- **Status:** Carried out 01.11.2026 (owner request).
+
+## D-058 — Legal texts without a lawyer's review
+- **Context:** The owner, 01.11.2026: «Uważam, że prawnik jest zbędny. Biorę ryzyko nieścisłości w opublikowanych tekstach prawnych.» (A lawyer is unnecessary; the owner takes the risk of inaccuracies in the published legal texts.)
+- **Decision:**
+  - The lawyer gates L-1 and L-3 (`RELEASE_GATES.md`) become owner exceptions.
+  - The texts never claim to be legally reviewed. When they leave draft status, they say they were written with AI help and not reviewed by a lawyer.
+  - Still required before launch: every `MÅ FYLLES UT` and `KONTROLLERES` marker resolved (L-2, `load-legal` refuses texts with markers in production), then the texts loaded as non-draft versions (L-4).
+- **Risk, accepted by the owner:** Mistakes in the terms, the privacy notice or the agreement templates are not caught by anyone before launch. A clause can turn out to be invalid under Norwegian law, or information the GDPR asks for can be missing.
+- **Status:** Accepted 01.11.2026 (owner decision).
+
+## D-059 — GPSI GovTech Solution is a working name, not a registered business
+- **Context:** The owner, 01.11.2026: the right name is «GPSI GovTech Solution»; it is not registered yet and is used as a hobby name. The terms and the privacy notice said «drives av G-PSI.ai» and gave «GPSI GovTech Solution» as the legal name.
+- **Decision:**
+  - The texts say Laandet is run under the name GPSI GovTech Solution, which is not a registered business and has no organisation number (01.11.2026).
+  - Without a registered business, the person who runs Laandet is the operator and the data controller. The terms and the privacy notice therefore name that person: a `MÅ FYLLES UT` marker until the owner provides the name. Address and e-mail are still required.
+  - On `/kontakt`, `OPERATOR_LEGAL_NAME` is the person's name with the working name, and `OPERATOR_ORGNR` is «ikke registrert» (`deploy/env/app.env.example`).
+  - When the business is registered, its name and organisation number replace this, as a new text version.
+- **Texts:** `brukervilkar.md`, `personvernerklaering.md`, `terms-of-use.md`, `privacy-notice.md` version 0.1.2-utkast.
+- **Status:** Accepted 01.11.2026.

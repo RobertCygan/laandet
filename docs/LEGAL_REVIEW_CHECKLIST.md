@@ -47,6 +47,7 @@ Legend:
   Preparatory works recommend a link from every page.
 - **Action:** Fill in all `MÅ FYLLES UT FØR LANSERING` fields. Put a footer link «Om Laandet / Kontakt» on every page.
 - **Q:** Which G-PSI.ai legal entity operates Laandet (AS / ENK)? Is it registered in Enhetsregisteret?
+  **Owner, 01.11.2026:** none yet. GPSI GovTech Solution is a working name, not registered; the person who runs Laandet is the operator (D-059). No lawyer review (D-058).
 
 ### L-02 Digital Services Act (DSA)
 - **V (excerpt):**

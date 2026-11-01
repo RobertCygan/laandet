@@ -2,6 +2,13 @@
 
 All notable changes to Laandet. Dates are DD.MM.YYYY.
 
+## Unreleased — 01.11.2026
+- Larger type: nothing below 14 px, body text 17 px.
+- The legal name: GPSI GovTech Solution is a working name, not a registered business (D-059). The terms and the privacy notice, nb and en, version 0.1.2-utkast, say so; the name of the person who runs Laandet is a marker until the owner provides it.
+- No lawyer review; the owner accepts the risk (D-058). `RELEASE_GATES.md` L-1 and L-3 are owner exceptions.
+- `vercel.json` turns off Vercel builds from this repository (D-057).
+- The server image includes the release check (`node scripts/release-check.mjs`).
+
 ## Repository move — 25.10.2026
 - At the owner's request, Laandet moved from the folder `laandet/` in `RobertCygan/G-PSI_WWW` to its own repository `RobertCygan/laandet`, with the full history of the folder (D-002).
 - The CI, deploy, Dependabot and gitleaks configuration moved to this repository's root without the `laandet/` prefix.

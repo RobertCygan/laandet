@@ -1,14 +1,14 @@
 ---
 doc_key: terms
 locale: nb
-version: 0.1.1-utkast
+version: 0.1.2-utkast
 status: UTKAST – ikke juridisk gjennomgått
 updated: 01.11.2026
 ---
 
 # Brukervilkår for Laandet
 
-**Versjon 0.1.1-utkast · Sist oppdatert 01.11.2026**
+**Versjon 0.1.2-utkast · Sist oppdatert 01.11.2026**
 
 > **UTKAST – IKKE JURIDISK GJENNOMGÅTT.** Dette er et førsteutkast laget med hjelp av KI. Det er ikke
 > godkjent av advokat, og det skal ikke brukes overfor brukere før en kvalifisert norsk jurist har
@@ -19,10 +19,10 @@ updated: 01.11.2026
 1.1 Laandet er en digital møteplass der folk kan leie ut, låne ut, ønske å leie og gi bort fysiske
 ting til hverandre. Vi starter i Steigen kommune.
 
-1.2 Laandet drives av G-PSI.ai:
+1.2 Laandet drives av **[MÅ FYLLES UT FØR LANSERING: navnet på personen som driver tjenesten]** under
+navnet GPSI GovTech Solution. GPSI GovTech Solution er ikke et registrert foretak og har ikke
+organisasjonsnummer (01.11.2026).
 
-- Juridisk navn: **GPSI GovTech Solution**
-- Organisasjonsnummer: **[MÅ FYLLES UT FØR LANSERING]**
 - Adresse: **[MÅ FYLLES UT FØR LANSERING]**
 - E-post: **[MÅ FYLLES UT FØR LANSERING]**
 

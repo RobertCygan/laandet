@@ -1,7 +1,7 @@
 ---
 doc_key: privacy
 locale: en
-version: 0.1.1-utkast
+version: 0.1.2-utkast
 status: DRAFT – not legally reviewed – informational translation
 updated: 01.11.2026
 translation_of: legal/nb/personvernerklaering.md
@@ -11,7 +11,7 @@ translation_of: legal/nb/personvernerklaering.md
 
 > **Informational translation.** The Norwegian version of this document is the legally binding one. If the two versions differ, the Norwegian text prevails.
 
-**Version 0.1.1-utkast · Last updated 01.11.2026**
+**Version 0.1.2-utkast · Last updated 01.11.2026**
 
 > **DRAFT – NOT LEGALLY REVIEWED.** This is a first draft prepared with the help of AI. It must be
 > reviewed by a qualified lawyer before launch. Fields marked "MUST BE COMPLETED BEFORE LAUNCH"
@@ -22,10 +22,10 @@ rights you have. We only collect what we need to run the service.
 
 ## 1. Controller
 
-The controller for the personal data in Laandet is G-PSI.ai:
+Laandet is run under the name GPSI GovTech Solution. It is not a registered business and has no
+organisation number (01.11.2026). The controller is therefore the person who runs the service:
 
-- Legal name: **GPSI GovTech Solution**
-- Organisation number: **[MUST BE COMPLETED BEFORE LAUNCH]**
+- Name: **[MUST BE COMPLETED BEFORE LAUNCH]**
 - Address: **[MUST BE COMPLETED BEFORE LAUNCH]**
 - Email for privacy matters: **[MUST BE COMPLETED BEFORE LAUNCH]**
 

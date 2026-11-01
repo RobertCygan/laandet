@@ -4,7 +4,7 @@
 > by the controller.**
 
 **Version:** 0.1, 25.10.2026. **Covers:** the pilot in Steigen from 14.12.2026 (Phases 01–03 as implemented).
-**Controller:** G-PSI.ai — legal entity, organisation number, address and contact email: `MÅ FYLLES UT FØR LANSERING`.
+**Controller:** the person who runs Laandet under the working name GPSI GovTech Solution, not a registered business (D-059). Name, address and contact email: `MÅ FYLLES UT FØR LANSERING`.
 **Why this document exists:** the screening in [`PRIVACY.md`](PRIVACY.md) §4 found that a DPIA is not clearly
 mandatory (one to three EDPB criteria apply, each only partly). Private messages and case evidence still justify a
 short assessment before real people use the service (GDPR art. 35, to be confirmed under L-12 in
