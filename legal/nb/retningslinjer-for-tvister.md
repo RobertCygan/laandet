@@ -1,14 +1,14 @@
 ---
 doc_key: dispute_guidelines
 locale: nb
-version: 0.1.0-utkast
+version: 0.1.1-utkast
 status: UTKAST – ikke juridisk gjennomgått
-updated: 25.10.2026
+updated: 01.11.2026
 ---
 
 # Retningslinjer for tvister – når noe går galt
 
-**Versjon 0.1.0-utkast · Sist oppdatert 25.10.2026**
+**Versjon 0.1.1-utkast · Sist oppdatert 01.11.2026**
 
 > **UTKAST – IKKE JURIDISK GJENNOMGÅTT.** Opplysningene om forliksråd, gebyrer og andre muligheter
 > utenfor Laandet må kontrolleres før lansering.
@@ -120,14 +120,14 @@ på egen hånd:
 
 | Situasjon | Hva du kan gjøre |
 |---|---|
-| Uenighet om skade, forsinkelse, betaling eller depositum | Bringe saken inn for **forliksrådet** i kommunen der den andre parten bor. Gebyret fastsettes etter rettsgebyret **[KONTROLLERES FØR LANSERING: beløp for 2026]**. Det kan også være lurt å få juridisk råd, for eksempel gjennom rettshjelpsordninger eller rettshjelpsdekning i egen forsikring. |
+| Uenighet om skade, forsinkelse, betaling eller depositum | Bringe saken inn for **forliksrådet** i kommunen der den andre parten bor. Gebyret er 1,54 rettsgebyr, det vil si 2 071 kroner i 2026 (rettsgebyret er 1 345 kroner). Det kan også være lurt å få juridisk råd, for eksempel gjennom rettshjelpsordninger eller rettshjelpsdekning i egen forsikring. |
 | Mistanke om tyveri, underslag eller svindel | Anmelde forholdet til **politiet** (politiet.no eller 02800). Laandet kan gi politiet opplysninger når politiet ber om det og loven gir adgang til det. |
-| Skade på person eller farlig utstyr | Søke hjelp akutt (113 / 112 / 110). **[KONTROLLERES FØR LANSERING: hvilken myndighet som tar imot meldinger om farlige produkter]** |
+| Skade på person eller farlig utstyr | Søke hjelp akutt (113 / 112 / 110). Farlige forbrukerprodukter kan meldes til Direktoratet for samfunnssikkerhet og beredskap (DSB) på dsb.no. |
 | Forsikring | Sjekke om din egen innbo- eller ansvarsforsikring dekker skaden. Laandet har ingen forsikring for brukerne. |
 
 Avtaler om leie og lån mellom to privatpersoner hører normalt **ikke** under Forbrukertilsynets mekling
 eller Forbrukerklageutvalget. De ordningene gjelder først og fremst saker mellom forbrukere og
-næringsdrivende, og noen saker om kjøp mellom privatpersoner. **[KONTROLLERES FØR LANSERING]**
+næringsdrivende, og kjøp av ting mellom privatpersoner. For leie og lån er forliksrådet den vanlige veien.
 
 ## Steg 6: Saken avsluttes
 

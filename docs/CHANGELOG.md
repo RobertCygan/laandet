@@ -5,6 +5,7 @@ All notable changes to Laandet. Dates are DD.MM.YYYY.
 ## Unreleased — 01.11.2026
 - Larger type: nothing below 14 px, body text 17 px.
 - The operator: GPSI GovTech Solutions is a working name, not a registered business (D-059). The terms and the privacy notice, nb and en, version 0.1.3-utkast, name the person who runs Laandet, with address and e-mail, as the owner gave them. The footer, the about page and `app.env.example` use the same details.
+- Dispute guidelines, nb and en, version 0.1.1-utkast: the forliksråd fee for 2026, DSB for dangerous products, and what Forbrukerklageutvalget covers, in place of the three markers.
 - No lawyer review; the owner accepts the risk (D-058). `RELEASE_GATES.md` L-1 and L-3 are owner exceptions.
 - `vercel.json` turns off Vercel builds from this repository (D-057).
 - The server image includes the release check (`node scripts/release-check.mjs`).

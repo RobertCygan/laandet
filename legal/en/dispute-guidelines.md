@@ -1,9 +1,9 @@
 ---
 doc_key: dispute_guidelines
 locale: en
-version: 0.1.0-utkast
+version: 0.1.1-utkast
 status: DRAFT – not legally reviewed – informational translation
-updated: 25.10.2026
+updated: 01.11.2026
 translation_of: legal/nb/retningslinjer-for-tvister.md
 ---
 
@@ -11,7 +11,7 @@ translation_of: legal/nb/retningslinjer-for-tvister.md
 
 > **Informational translation.** The Norwegian version of this document is the legally binding one. If the two versions differ, the Norwegian text prevails.
 
-**Version 0.1.0-utkast · Last updated 25.10.2026**
+**Version 0.1.1-utkast · Last updated 01.11.2026**
 
 > **DRAFT – NOT LEGALLY REVIEWED.** The information about the conciliation board (forliksrådet), fees and other options
 > outside Laandet must be checked before launch.
@@ -123,15 +123,15 @@ on your own:
 
 | Situation | What you can do |
 |---|---|
-| Disagreement about damage, delay, payment or deposit | Bring the case before **the conciliation board (forliksrådet)** in the municipality where the other party lives. The fee is set based on the court fee (rettsgebyret) **[TO BE VERIFIED BEFORE LAUNCH: amount for 2026]**. It may also be wise to get legal advice, for example through legal aid schemes or legal expenses cover in your own insurance. |
+| Disagreement about damage, delay, payment or deposit | Bring the case before **the conciliation board (forliksrådet)** in the municipality where the other party lives. The fee is 1.54 times the court fee (rettsgebyret), which is NOK 2,071 in 2026 (the court fee is NOK 1,345). It may also be wise to get legal advice, for example through legal aid schemes or legal expenses cover in your own insurance. |
 | Suspected theft, embezzlement or fraud | Report the matter to **the police** (politiet.no or 02800). Laandet can give the police information when the police ask for it and the law permits it. |
-| Personal injury or dangerous equipment | Get emergency help (113 / 112 / 110). **[TO BE VERIFIED BEFORE LAUNCH: which authority receives reports about dangerous products]** |
+| Personal injury or dangerous equipment | Get emergency help (113 / 112 / 110). Dangerous consumer products can be reported to the Norwegian Directorate for Civil Protection (DSB) at dsb.no. |
 | Insurance | Check whether your own home contents or liability insurance covers the damage. Laandet has no insurance for users. |
 
 Agreements on renting and lending between two private individuals do **not** normally fall under mediation by the
 Norwegian Consumer Authority (Forbrukertilsynet) or the consumer complaints board (Forbrukerklageutvalget). Those
-schemes apply first and foremost to cases between consumers and businesses, and to some cases about purchases between
-private individuals. **[TO BE VERIFIED BEFORE LAUNCH]**
+schemes apply first and foremost to cases between consumers and businesses, and to purchases of goods between private
+individuals. For renting and lending, the conciliation board (forliksrådet) is the usual route.
 
 ## Step 6: The case is closed
 
