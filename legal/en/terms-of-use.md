@@ -1,7 +1,7 @@
 ---
 doc_key: terms
 locale: en
-version: 0.1.2-utkast
+version: 0.1.3-utkast
 status: DRAFT – not legally reviewed – informational translation
 updated: 01.11.2026
 translation_of: legal/nb/brukervilkar.md
@@ -11,7 +11,7 @@ translation_of: legal/nb/brukervilkar.md
 
 > **Informational translation.** The Norwegian version of this document is the legally binding one. If the two versions differ, the Norwegian text prevails.
 
-**Version 0.1.2-utkast · Last updated 01.11.2026**
+**Version 0.1.3-utkast · Last updated 01.11.2026**
 
 > **DRAFT – NOT LEGALLY REVIEWED.** This is a first draft prepared with the help of AI. It has not
 > been approved by a lawyer, and it must not be used with users until a qualified Norwegian lawyer has
@@ -22,12 +22,12 @@ translation_of: legal/nb/brukervilkar.md
 1.1 Laandet is a digital meeting place where people can rent out, lend, look for things to rent and give
 away physical things to each other. We are starting in Steigen municipality.
 
-1.2 Laandet is run by **[MUST BE COMPLETED BEFORE LAUNCH: the name of the person who runs the service]**
-under the name GPSI GovTech Solution. GPSI GovTech Solution is not a registered business and has no
+1.2 Laandet is run by **Robert Cygan**
+under the name GPSI GovTech Solutions. GPSI GovTech Solutions is not a registered business and has no
 organisation number (01.11.2026).
 
-- Address: **[MUST BE COMPLETED BEFORE LAUNCH]**
-- Email: **[MUST BE COMPLETED BEFORE LAUNCH]**
+- Address: **Dronningensgate 14F, 8514 Narvik**
+- Email: **laandet.steigen@gpsi.ai**
 
 In these terms we call this "Laandet", "we" or "us".
 
@@ -300,7 +300,7 @@ actual records in Laandet.
 ## 19. Reporting and moderation
 
 19.1 You can report listings, users, messages and reviews that you think break the law or these
-terms. Use the "Report" button, or email us at **[MUST BE COMPLETED BEFORE LAUNCH]**.
+terms. Use the "Report" button, or email us at **laandet.steigen@gpsi.ai**.
 
 19.2 If you report a message, a moderator sees the message you reported and any messages you choose
 to attach yourself. Apart from this, moderators do not read private conversations.
@@ -369,8 +369,8 @@ gives you that right.
 
 ## 25. Contact and complaints
 
-- Email: **[MUST BE COMPLETED BEFORE LAUNCH]**
-- Postal address: **[MUST BE COMPLETED BEFORE LAUNCH]**
+- Email: **laandet.steigen@gpsi.ai**
+- Postal address: **Dronningensgate 14F, 8514 Narvik**
 
 We aim to reply within 5 working days during the pilot phase.
 

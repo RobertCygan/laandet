@@ -5,7 +5,7 @@
   [`../legal/nb/personvernerklaering.md`](../legal/nb/personvernerklaering.md).
 - All legal bases and retention periods are **proposals for legal review**.
 
-**Data controller:** the person who runs Laandet under the working name GPSI GovTech Solution, which is not a registered business (D-059). The person's name, address and contact email are **MÅ FYLLES UT FØR LANSERING**.
+**Data controller:** Robert Cygan, who runs Laandet under the working name GPSI GovTech Solutions, which is not a registered business (D-059). Address: Dronningensgate 14F, 8514 Narvik. Contact email: laandet.steigen@gpsi.ai.
 
 ## 1. Principles applied
 

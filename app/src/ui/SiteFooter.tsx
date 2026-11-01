@@ -40,7 +40,7 @@ export async function SiteFooter() {
         </div>
       </div>
       <div className="wrap footer-bottom">
-        <span>© {year} Laandet · GPSI GovTech Solution</span>
+        <span>© {year} Laandet · GPSI GovTech Solutions</span>
         <span>{t("pilotNote")}</span>
       </div>
     </footer>

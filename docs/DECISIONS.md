@@ -538,12 +538,12 @@ during Phase 01 start as *Proposed* (implementation-level) unless the owner says
 - **Risk, accepted by the owner:** Mistakes in the terms, the privacy notice or the agreement templates are not caught by anyone before launch. A clause can turn out to be invalid under Norwegian law, or information the GDPR asks for can be missing.
 - **Status:** Accepted 01.11.2026 (owner decision).
 
-## D-059 — GPSI GovTech Solution is a working name, not a registered business
-- **Context:** The owner, 01.11.2026: the right name is «GPSI GovTech Solution»; it is not registered yet and is used as a hobby name. The terms and the privacy notice said «drives av G-PSI.ai» and gave «GPSI GovTech Solution» as the legal name.
+## D-059 — GPSI GovTech Solutions is a working name, not a registered business
+- **Context:** The owner, 01.11.2026: the name is «GPSI GovTech Solutions» (first written «Solution», corrected the same day: «Musi być Solutions»). It is not registered yet and is used as a hobby name. The terms and the privacy notice said «drives av G-PSI.ai» and gave the working name as a legal name.
 - **Decision:**
-  - The texts say Laandet is run under the name GPSI GovTech Solution, which is not a registered business and has no organisation number (01.11.2026).
-  - Without a registered business, the person who runs Laandet is the operator and the data controller. The terms and the privacy notice therefore name that person: a `MÅ FYLLES UT` marker until the owner provides the name. Address and e-mail are still required.
+  - The texts say Laandet is run under the name GPSI GovTech Solutions, which is not a registered business and has no organisation number (01.11.2026).
+  - Without a registered business, the person who runs Laandet is the operator and the data controller. The terms and the privacy notice therefore name that person, with an address and an e-mail. The owner gave them on 01.11.2026: Robert Cygan, Dronningensgate 14F, 8514 Narvik, laandet.steigen@gpsi.ai.
   - On `/kontakt`, `OPERATOR_LEGAL_NAME` is the person's name with the working name, and `OPERATOR_ORGNR` is «ikke registrert» (`deploy/env/app.env.example`).
   - When the business is registered, its name and organisation number replace this, as a new text version.
-- **Texts:** `brukervilkar.md`, `personvernerklaering.md`, `terms-of-use.md`, `privacy-notice.md` version 0.1.2-utkast.
+- **Texts:** `brukervilkar.md`, `personvernerklaering.md`, `terms-of-use.md`, `privacy-notice.md` version 0.1.3-utkast.
 - **Status:** Accepted 01.11.2026.

@@ -1,14 +1,14 @@
 ---
 doc_key: terms
 locale: nb
-version: 0.1.2-utkast
+version: 0.1.3-utkast
 status: UTKAST – ikke juridisk gjennomgått
 updated: 01.11.2026
 ---
 
 # Brukervilkår for Laandet
 
-**Versjon 0.1.2-utkast · Sist oppdatert 01.11.2026**
+**Versjon 0.1.3-utkast · Sist oppdatert 01.11.2026**
 
 > **UTKAST – IKKE JURIDISK GJENNOMGÅTT.** Dette er et førsteutkast laget med hjelp av KI. Det er ikke
 > godkjent av advokat, og det skal ikke brukes overfor brukere før en kvalifisert norsk jurist har
@@ -19,12 +19,12 @@ updated: 01.11.2026
 1.1 Laandet er en digital møteplass der folk kan leie ut, låne ut, ønske å leie og gi bort fysiske
 ting til hverandre. Vi starter i Steigen kommune.
 
-1.2 Laandet drives av **[MÅ FYLLES UT FØR LANSERING: navnet på personen som driver tjenesten]** under
-navnet GPSI GovTech Solution. GPSI GovTech Solution er ikke et registrert foretak og har ikke
+1.2 Laandet drives av **Robert Cygan** under
+navnet GPSI GovTech Solutions. GPSI GovTech Solutions er ikke et registrert foretak og har ikke
 organisasjonsnummer (01.11.2026).
 
-- Adresse: **[MÅ FYLLES UT FØR LANSERING]**
-- E-post: **[MÅ FYLLES UT FØR LANSERING]**
+- Adresse: **Dronningensgate 14F, 8514 Narvik**
+- E-post: **laandet.steigen@gpsi.ai**
 
 I disse vilkårene kaller vi dette «Laandet», «vi» eller «oss».
 
@@ -291,7 +291,7 @@ registreringer i Laandet.
 ## 19. Rapportering og moderering
 
 19.1 Du kan rapportere annonser, brukere, meldinger og vurderinger som du mener bryter loven eller disse
-vilkårene. Bruk «Rapporter»-knappen, eller skriv til oss på e-post **[MÅ FYLLES UT FØR LANSERING]**.
+vilkårene. Bruk «Rapporter»-knappen, eller skriv til oss på e-post **laandet.steigen@gpsi.ai**.
 
 19.2 Hvis du rapporterer en melding, ser en moderator den meldingen du rapporterte og eventuelle
 meldinger du selv velger å legge ved. Moderatorer leser ikke private samtaler ellers.
@@ -357,8 +357,8 @@ beholder retten til å bringe saken inn for domstolen der du bor, når loven gir
 
 ## 25. Kontakt og klager
 
-- E-post: **[MÅ FYLLES UT FØR LANSERING]**
-- Postadresse: **[MÅ FYLLES UT FØR LANSERING]**
+- E-post: **laandet.steigen@gpsi.ai**
+- Postadresse: **Dronningensgate 14F, 8514 Narvik**
 
 Vi tar sikte på å svare innen 5 virkedager i pilotfasen.
 
